@@ -717,6 +717,21 @@ body.dark-theme .profile-edit {
   border-color: #634850;
 }
 
+ 
+/* Скрываем боковую панель только во вкладке профиля */
+main:has(#profile:not([hidden])) {
+  grid-template-columns: minmax(0, 1fr);
+}
+
+main:has(#profile:not([hidden])) > aside {
+  display: none;
+}
+
+main:has(#profile:not([hidden])) > #profile {
+  grid-column: 1 / -1;
+  width: 100%;
+}
+
   </style>
 </head>
 <body>
