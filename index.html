@@ -940,9 +940,9 @@ body.profile-open #profile {
 <div class="profile-banner" id="profileBanner">
   <span id="bannerPlaceholder">Твой баннер</span>
   
- <label for="bannerUpload" id="chooseBannerBtn">
+ <button type="button" id="chooseBannerBtn">
   ✎ Изменить баннер
- </label>
+ </button>
 
   <input
     type="file"
@@ -1599,25 +1599,74 @@ const bannerPlaceholder = document.getElementById("bannerPlaceholder");
 
 let bannerObjectUrl = null;
 
-bannerUpload.addEventListener("change", () => {
-  const file = bannerUpload.files[0];
+// Открываем базу для хранения баннера
+function openBannerDB() {
+  return new Promise((resolve, reject) => {
+    const request = indexedDB.open("PhotoChineseProfile", 1);
 
-  if (!file) return;
+    request.onupgradeneeded = () => {
+      const db = request.result;
+      if (!db.objectStoreNames.contains("media")) {
+        db.createObjectStore("media");
+      }
+    };
 
-  if (!file.type.startsWith("image/") &&
-      !file.type.startsWith("video/")) {
-    alert("Выбери фотографию, GIF или видео.");
-    return;
-  }
+    request.onsuccess = () => resolve(request.result);
+    request.onerror = () => reject(request.error);
+  });
+}
 
+// Сохраняем файл
+async function saveBannerFile(file) {
+  const db = await openBannerDB();
+
+  return new Promise((resolve, reject) => {
+    const transaction = db.transaction("media", "readwrite");
+    transaction.objectStore("media").put(file, "banner");
+
+    transaction.oncomplete = () => {
+      db.close();
+      resolve();
+    };
+
+    transaction.onerror = () => {
+      db.close();
+      reject(transaction.error);
+    };
+  });
+}
+
+// Получаем сохранённый файл
+async function getSavedBanner() {
+  const db = await openBannerDB();
+
+  return new Promise((resolve, reject) => {
+    const transaction = db.transaction("media", "readonly");
+    const request = transaction.objectStore("media").get("banner");
+
+    request.onsuccess = () => {
+      const result = request.result || null;
+      db.close();
+      resolve(result);
+    };
+
+    request.onerror = () => {
+      db.close();
+      reject(request.error);
+    };
+  });
+}
+
+// Показываем баннер
+function showBanner(file) {
   if (bannerObjectUrl) {
     URL.revokeObjectURL(bannerObjectUrl);
   }
 
-  bannerObjectUrl = URL.createObjectURL(file);
-
   const oldMedia = profileBanner.querySelector(".banner-media");
   if (oldMedia) oldMedia.remove();
+
+  bannerObjectUrl = URL.createObjectURL(file);
 
   let media;
 
@@ -1636,7 +1685,51 @@ bannerUpload.addEventListener("change", () => {
 
   profileBanner.prepend(media);
   bannerPlaceholder.hidden = true;
+}
+
+// Нажатие на кнопку
+chooseBannerBtn.addEventListener("click", () => {
+  bannerUpload.click();
 });
+
+// Выбор нового файла
+bannerUpload.addEventListener("change", async () => {
+  const file = bannerUpload.files[0];
+
+  // Разрешаем повторно выбирать тот же файл
+  bannerUpload.value = "";
+
+  if (!file) return;
+
+  if (
+    !file.type.startsWith("image/") &&
+    !file.type.startsWith("video/")
+  ) {
+    alert("Выбери фотографию, GIF или видео.");
+    return;
+  }
+
+  try {
+    await saveBannerFile(file);
+    showBanner(file);
+  } catch (error) {
+    console.error(error);
+    alert("Не удалось сохранить баннер. Попробуй файл поменьше.");
+  }
+});
+
+// Восстанавливаем баннер после обновления страницы
+(async () => {
+  try {
+    const savedBanner = await getSavedBanner();
+
+    if (savedBanner) {
+      showBanner(savedBanner);
+    }
+  } catch (error) {
+    console.error("Не удалось загрузить баннер:", error);
+  }
+})();
 </script>
 
 <script>
