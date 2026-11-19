@@ -872,7 +872,123 @@ body.dark-theme #editProfileBtn {
   color: #ffe1e8;
   border-color: #76545d;
 }
-  
+.account-button {
+  width: 42px;
+  height: 42px;
+  min-width: 42px;
+  border-radius: 50%;
+  background: #fff0f5;
+  color: #925066;
+  border: 1px solid #f0dce2;
+  font-size: 23px;
+  display: grid;
+  place-items: center;
+  cursor: pointer;
+  transition: .2s ease;
+}
+
+.account-button:hover {
+  background: #f8dce3;
+  transform: translateY(-2px);
+}
+
+body.dark-theme .account-button {
+  background: #62434c;
+  color: #ffe1e8;
+  border-color: #76545d;
+}
+    .account-modal {
+  position: fixed;
+  inset: 0;
+  z-index: 10000;
+  background: rgba(30, 20, 30, .55);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 20px;
+}
+
+.account-modal[hidden] {
+  display: none;
+}
+
+.account-modal-content {
+  position: relative;
+  background: var(--card-bg, #fff);
+  color: var(--text-color, #333);
+  width: 100%;
+  max-width: 390px;
+  padding: 30px 24px;
+  border-radius: 24px;
+  text-align: center;
+  box-shadow: 0 15px 50px rgba(0,0,0,.2);
+}
+
+.account-close {
+  position: absolute;
+  right: 16px;
+  top: 12px;
+  border: 0;
+  background: none;
+  font-size: 28px;
+  cursor: pointer;
+}
+
+.account-logo {
+  font-size: 38px;
+  color: #c47791;
+}
+
+.account-tabs {
+  display: flex;
+  gap: 8px;
+  margin: 24px 0;
+}
+
+.account-tabs button {
+  flex: 1;
+  padding: 11px;
+  border: 0;
+  border-radius: 12px;
+  background: #f5e9ed;
+  cursor: pointer;
+}
+
+.account-tabs button.active {
+  background: #d99bad;
+  color: white;
+}
+
+#accountForm {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  text-align: left;
+}
+
+#accountForm input {
+  padding: 13px;
+  border: 1px solid #e5cbd4;
+  border-radius: 12px;
+  font-size: 15px;
+}
+
+.account-submit {
+  margin-top: 12px;
+  padding: 13px;
+  border: 0;
+  border-radius: 12px;
+  background: #d58da3;
+  color: white;
+  font-size: 16px;
+  cursor: pointer;
+}
+
+.account-message {
+  margin-top: 14px;
+  font-size: 13px;
+}
+    
   </style>
 </head>
 <body>
@@ -894,6 +1010,16 @@ body.dark-theme #editProfileBtn {
   <button class="theme-toggle" id="themeToggle" type="button" aria-label="Сменить тему">🌙</button>
 </header>
 
+<button
+  class="account-button"
+  id="accountButton"
+  type="button"
+  aria-label="Аккаунт"
+  onclick="openAccountModal()"
+>
+  ♙
+</button>
+  
 <section id="learn" class="tab">
   <div class="panel hero">
     <h1>Китайский начинается<br>с одного фото.</h1>
@@ -2267,6 +2393,121 @@ renderEquippedDecoration();
     <div class="splash-loader"></div>
   </div>
  </div>
+  <div class="account-modal" id="accountModal" hidden>
+  <div class="account-modal-content">
+    <button class="account-close" type="button" onclick="closeAccountModal()">×</button>
+
+    <div class="account-logo">文</div>
+    
+    <h2>PhotoChinese</h2>
+    <p>Твой личный мир китайского языка</p>
+
+    <div class="account-tabs">
+      <button type="button" class="active" id="loginTab" onclick="switchAccountMode('login')">Войти</button>
+      <button type="button" id="registerTab" onclick="switchAccountMode('register')">Регистрация</button>
+    </div>
+
+    <form id="accountForm">
+      <label for="accountEmail">Электронная почта</label>
+      <input id="accountEmail" type="email" placeholder="example@mail.com" required>
+
+      <label for="accountPassword">Пароль</label>
+      <input id="accountPassword" type="password" placeholder="Не менее 6 символов" minlength="6" required>
+
+      <button type="submit" class="account-submit" id="accountSubmit">Войти</button>
+    </form>
+
+    <div id="accountMessage" class="account-message"></div>
+  </div>
+  </div>
+  <script>
+let accountMode = "login";
+
+function openAccountModal() {
+  document.getElementById("accountModal").hidden = false;
+}
+
+function closeAccountModal() {
+  document.getElementById("accountModal").hidden = true;
+}
+
+function switchAccountMode(mode) {
+  accountMode = mode;
+
+  document.getElementById("loginTab").classList.toggle("active", mode === "login");
+  document.getElementById("registerTab").classList.toggle("active", mode === "register");
+
+  document.getElementById("accountSubmit").textContent =
+    mode === "login" ? "Войти" : "Создать аккаунт";
+
+  document.getElementById("accountMessage").textContent = "";
+}
+
+document.getElementById("accountForm").addEventListener("submit", async function(event) {
+  event.preventDefault();
+
+  const email = document.getElementById("accountEmail").value.trim();
+  const password = document.getElementById("accountPassword").value;
+  const message = document.getElementById("accountMessage");
+  const submit = document.getElementById("accountSubmit");
+
+  const supabaseClient = window.photoChineseSupabase;
+
+  if (!supabaseClient) {
+    message.textContent = "Не удалось подключиться к серверу. Попробуй обновить страницу.";
+    return;
+  }
+
+  submit.disabled = true;
+  message.textContent = "Подожди немного...";
+
+  try {
+    let result;
+
+    if (accountMode === "register") {
+      result = await supabaseClient.auth.signUp({
+        email: email,
+        password: password,
+        options: {
+          emailRedirectTo: "https://roseinyu00-ops.github.io/photochinese/"
+        }
+      });
+
+      if (!result.error) {
+        message.textContent = result.data.session
+          ? "Аккаунт создан! Ты вошла в систему."
+          : "Аккаунт создан! Проверь почту и подтверди регистрацию.";
+      }
+    } else {
+      result = await supabaseClient.auth.signInWithPassword({
+        email: email,
+        password: password
+      });
+
+      if (!result.error) {
+        message.textContent = "Успешный вход! ❤️";
+        document.getElementById("accountButton").title = "Ты вошла в аккаунт";
+
+        setTimeout(closeAccountModal, 1200);
+      }
+    }
+
+    if (result.error) {
+      message.textContent = "Ошибка: " + result.error.message;
+    }
+
+  } catch (error) {
+    message.textContent = "Что-то пошло не так. Попробуй ещё раз.";
+    console.error(error);
+  } finally {
+    submit.disabled = false;
+  }
+});
+
+window.addEventListener("keydown", function(event) {
+  if (event.key === "Escape") closeAccountModal();
+});
+  </script>
   
 </body>
 </html>
