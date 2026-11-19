@@ -389,6 +389,32 @@ body.dark-theme .splash-content h1 {
 body.dark-theme .splash-content p {
   color: #e8c9d0;
 }
+.theme-toggle {
+  width: 38px;
+  height: 38px;
+  min-width: 38px;
+  padding: 0;
+  border: 1px solid #f0e3e5;
+  border-radius: 50%;
+  background: #fff2f5;
+  color: #925066;
+  font-size: 18px;
+  display: grid;
+  place-items: center;
+  cursor: pointer;
+  transition: .2s ease;
+}
+
+.theme-toggle:hover {
+  transform: rotate(15deg);
+  background: #f8dce3;
+}
+
+body.dark-theme .theme-toggle {
+  background: #49383d !important;
+  border-color: #76545d;
+  color: #ffe1e8 !important;
+}
 </style>
 </head>
 <body>
@@ -401,6 +427,11 @@ body.dark-theme .splash-content p {
     <button data-tab="coach">ИИ-учитель</button>
     <button data-tab="hsk">Уровень HSK</button>
   </nav>
+  <nav aria-label="Разделы">
+  <button class="active" data-tab="learn">Изучение</button>
+<button class="theme-toggle" id="themeToggle" type="button" aria-label="Сменить тему">
+  🌙
+</button>
 </header>
 
 <section id="learn" class="tab">
@@ -914,17 +945,12 @@ if ("serviceWorker" in navigator) {
   });
 }
   </script>
-<button class="theme-toggle" id="themeToggle"
-style="position:fixed;bottom:20px;right:20px;z-index:9999;">
-🌙 Тёмная тема
-</button>
-
 <script>
 const themeToggle = document.getElementById("themeToggle");
 
 if (localStorage.getItem("photoChineseTheme") === "dark") {
   document.body.classList.add("dark-theme");
-  themeToggle.textContent = "☀️ Светлая тема";
+  themeToggle.textContent = "☀️";
 }
 
 themeToggle.addEventListener("click", () => {
@@ -937,9 +963,7 @@ themeToggle.addEventListener("click", () => {
     isDark ? "dark" : "light"
   );
 
-  themeToggle.textContent = isDark
-    ? "☀️ Светлая тема"
-    : "🌙 Тёмная тема";
+  themeToggle.textContent = isDark ? "☀️" : "🌙";
 });
 </script>
   <script>
