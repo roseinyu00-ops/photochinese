@@ -634,5 +634,33 @@ if ("serviceWorker" in navigator) {
   });
 }
   </script>
+<button class="theme-toggle" id="themeToggle"
+style="position:fixed;bottom:20px;right:20px;z-index:9999;">
+🌙 Тёмная тема
+</button>
+
+<script>
+const themeToggle = document.getElementById("themeToggle");
+
+if (localStorage.getItem("photoChineseTheme") === "dark") {
+  document.body.classList.add("dark-theme");
+  themeToggle.textContent = "☀️ Светлая тема";
+}
+
+themeToggle.addEventListener("click", () => {
+  document.body.classList.toggle("dark-theme");
+
+  const isDark = document.body.classList.contains("dark-theme");
+
+  localStorage.setItem(
+    "photoChineseTheme",
+    isDark ? "dark" : "light"
+  );
+
+  themeToggle.textContent = isDark
+    ? "☀️ Светлая тема"
+    : "🌙 Тёмная тема";
+});
+</script>
 </body>
 </html>
