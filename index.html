@@ -940,9 +940,9 @@ body.profile-open #profile {
 <div class="profile-banner" id="profileBanner">
   <span id="bannerPlaceholder">Твой баннер</span>
   
-  <button type="button" id="chooseBannerBtn">
-    ✎ Изменить баннер
-  </button>
+ <label for="bannerUpload" id="chooseBannerBtn">
+  ✎ Изменить баннер
+ </label>
 
   <input
     type="file"
@@ -966,13 +966,6 @@ body.profile-open #profile {
     type="file"
     id="avatarUpload"
     accept="image/*"
-  >
-
-  <label for="bannerUpload">Баннер профиля</label>
-  <input
-    type="file"
-    id="bannerUpload"
-    accept="image/*,video/mp4,video/webm"
   >
 
   <button class="primary" type="button" id="closeProfileEditor">
@@ -1605,10 +1598,6 @@ const profileBanner = document.getElementById("profileBanner");
 const bannerPlaceholder = document.getElementById("bannerPlaceholder");
 
 let bannerObjectUrl = null;
-
-chooseBannerBtn.addEventListener("click", () => {
-  bannerUpload.click();
-});
 
 bannerUpload.addEventListener("change", () => {
   const file = bannerUpload.files[0];
