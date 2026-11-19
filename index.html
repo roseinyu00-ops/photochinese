@@ -454,6 +454,269 @@ body.dark-theme .theme-toggle {
   margin: 0 0 10px;
   color: var(--muted);
 }
+  
+/* ===== PHOTOCHINESE PROFILE ===== */
+
+.profile-page {
+  overflow: hidden;
+  border-radius: 24px;
+  background: var(--white);
+  border: 1px solid var(--line);
+}
+
+.profile-banner {
+  width: 100%;
+  height: 165px;
+  background: linear-gradient(120deg, #f4b9ca, #d9c5f5, #b9dce8);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: #fff;
+  font-size: 14px;
+  position: relative;
+}
+
+.profile-main {
+  padding: 0 22px 24px;
+}
+
+.profile-top {
+  display: flex;
+  justify-content: space-between;
+  align-items: end;
+  margin-top: -58px;
+  position: relative;
+  z-index: 2;
+  min-height: 116px;
+}
+
+.profile-avatar {
+  width: 116px;
+  height: 116px;
+  border-radius: 50%;
+  background: #fff0f5;
+  border: 5px solid white;
+  display: grid;
+  place-items: center;
+  font-size: 55px;
+  box-shadow: 0 4px 18px #00000012;
+  flex-shrink: 0;
+}
+
+.profile-name-line {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  flex-wrap: wrap;
+  margin-top: 14px;
+}
+
+.profile-name-line h2 {
+  margin: 0;
+  font-size: 25px;
+}
+
+.profile-decoration {
+  font-size: 20px;
+}
+
+.profile-subtitle {
+  color: var(--muted);
+  margin: 5px 0 18px;
+}
+
+.profile-bio,
+.profile-facts {
+  padding: 15px;
+  border-radius: 16px;
+  background: #fff5f7;
+  margin-top: 12px;
+}
+
+.profile-bio h3 {
+  margin: 0 0 6px;
+}
+
+.profile-bio p {
+  margin: 0;
+  color: var(--muted);
+}
+
+.profile-facts {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 12px;
+  font-size: 13px;
+}
+
+.profile-edit {
+  margin-top: 18px;
+  padding: 15px;
+  border: 1px solid var(--line);
+  border-radius: 16px;
+}
+
+.profile-edit label {
+  display: block;
+  margin-bottom: 8px;
+}
+
+.profile-edit input {
+  width: 100%;
+  margin-bottom: 10px;
+}
+
+.profile-divider {
+  height: 1px;
+  background: var(--line);
+  margin: 25px 0;
+}
+
+.profile-section {
+  margin-top: 25px;
+}
+
+.profile-section h2 {
+  font-size: 19px;
+  margin-bottom: 14px;
+}
+
+.companion-card {
+  display: flex;
+  align-items: center;
+  gap: 16px;
+  padding: 18px;
+  border-radius: 18px;
+  background: linear-gradient(120deg, #fff0f5, #f4efff);
+}
+
+.companion-picture {
+  width: 82px;
+  height: 82px;
+  border-radius: 22px;
+  display: grid;
+  place-items: center;
+  background: #fff;
+  font-size: 48px;
+}
+
+.companion-card h3,
+.companion-card p {
+  margin: 0 0 6px;
+}
+
+.profile-collection {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 10px;
+}
+
+.collection-item {
+  min-height: 90px;
+  padding: 12px 5px;
+  border-radius: 15px;
+  background: #fff5f7;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 7px;
+  font-size: 25px;
+  text-align: center;
+}
+
+.collection-item span {
+  font-size: 11px;
+}
+
+.profile-stats {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 10px;
+}
+
+.profile-stat {
+  padding: 16px 5px;
+  border-radius: 15px;
+  background: #fff5f7;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  text-align: center;
+  gap: 5px;
+}
+
+.profile-stat strong {
+  font-size: 25px;
+}
+
+.profile-stat span {
+  font-size: 12px;
+  color: var(--muted);
+}
+
+.word-of-day {
+  padding: 20px;
+  border-radius: 18px;
+  background: linear-gradient(130deg, #fff1f5, #f2efff);
+  text-align: center;
+}
+
+.word-character {
+  font: 65px/1.2 serif;
+  margin-top: 10px;
+}
+
+@media (max-width: 480px) {
+  .profile-main {
+    padding-left: 15px;
+    padding-right: 15px;
+  }
+
+  .profile-banner {
+    height: 145px;
+  }
+
+  .profile-avatar {
+    width: 104px;
+    height: 104px;
+  }
+
+  .profile-top {
+    margin-top: -52px;
+  }
+}
+
+body.dark-theme .profile-page {
+  background: #3d3034;
+  border-color: #634850;
+}
+
+body.dark-theme .profile-avatar {
+  background: #62434c;
+  border-color: #3d3034;
+}
+
+body.dark-theme .profile-bio,
+body.dark-theme .profile-facts,
+body.dark-theme .collection-item,
+body.dark-theme .profile-stat {
+  background: #49383d;
+}
+
+body.dark-theme .companion-card,
+body.dark-theme .word-of-day {
+  background: linear-gradient(120deg, #49383d, #51415b);
+}
+
+body.dark-theme .companion-picture {
+  background: #62434c;
+}
+
+body.dark-theme .profile-edit {
+  border-color: #634850;
+}
+
   </style>
 </head>
 <body>
@@ -585,30 +848,119 @@ body.dark-theme .theme-toggle {
     <p style="text-align:center">учиться; изучать</p>
   </div>
 </aside>
-<section id="profile" class="tab" hidden>
-  <div class="panel">
-    <h1>Твой профиль 🦊</h1>
-    <p>Добро пожаловать в своё маленькое пространство PhotoChinese!</p>
 
-    <div class="profile-card">
-     <div class="profile-edit">
-  <label for="nicknameInput">Изменить никнейм</label>
-  <input
-    id="nicknameInput"
-    type="text"
-    maxlength="20"
-    placeholder="Новый никнейм"
-  >
-  <button class="primary" id="saveNickname" type="button">
-    Сохранить
-  </button>
-     </div>
-      <div class="profile-avatar">🦊</div>
-      <div>
-        <h2 id="profileNickname">dollrot</h2>
-        <p>Начинающий исследователь китайского языка</p>
-        <span class="tag">HSK 1 · Новичок</span>
+<section id="profile" class="tab" hidden>
+  <div class="profile-page">
+
+    <!-- БАННЕР -->
+    <div class="profile-banner" id="profileBanner">
+      <span>Твой баннер</span>
+    </div>
+
+    <!-- ОСНОВНАЯ ИНФОРМАЦИЯ -->
+    <div class="profile-main">
+
+      <div class="profile-top">
+        <div class="profile-avatar">
+          <span id="profileAvatarPlaceholder">🦊</span>
+        </div>
+        <button class="secondary" type="button">✎ Редактировать</button>
       </div>
+
+      <div class="profile-name-line">
+        <h2 id="profileNickname">dollrot</h2>
+        <span class="profile-decoration">🌸</span>
+        <span class="profile-decoration">🎀</span>
+      </div>
+
+      <p class="profile-subtitle">Начинающий исследователь китайского языка</p>
+
+      <div class="profile-bio">
+        <h3>Обо мне</h3>
+        <p>Расскажи немного о себе ♡</p>
+      </div>
+
+      <div class="profile-facts">
+        <span>♡ Любимый иероглиф: 愛</span>
+        <span>📚 Изучаю китайский</span>
+      </div>
+
+      <!-- РЕДАКТИРОВАНИЕ НИКНЕЙМА -->
+      <div class="profile-edit">
+        <label for="nicknameInput">Изменить никнейм</label>
+        <input
+          id="nicknameInput"
+          type="text"
+          maxlength="20"
+          placeholder="Новый никнейм"
+        >
+        <button class="primary" id="saveNickname" type="button">
+          Сохранить
+        </button>
+      </div>
+
+      <div class="profile-divider"></div>
+
+      <!-- КОМПАНЬОН -->
+      <section class="profile-section">
+        <h2>🦊 Мой компаньон</h2>
+        <div class="companion-card">
+          <div class="companion-picture">🦊</div>
+          <div>
+            <h3>Мой лисёнок</h3>
+            <p>Твой маленький спутник в изучении китайского</p>
+            <span class="tag">Уровень 1</span>
+          </div>
+        </div>
+      </section>
+
+      <!-- ДОСТИЖЕНИЯ -->
+      <section class="profile-section">
+        <h2>🏆 Достижения</h2>
+        <div class="profile-collection">
+          <div class="collection-item">🌱<span>Первые шаги</span></div>
+          <div class="collection-item">📖<span>Любознательный</span></div>
+          <div class="collection-item">⭐<span>Новичок</span></div>
+        </div>
+      </section>
+
+      <!-- КОЛЛЕКЦИЯ -->
+      <section class="profile-section">
+        <h2>🎀 Моя коллекция</h2>
+        <p>Здесь будут рамки, украшения, фоны и стикеры.</p>
+      </section>
+
+      <!-- ПРОГРЕСС -->
+      <section class="profile-section">
+        <h2>📊 Твой прогресс</h2>
+        <div class="profile-stats">
+          <div class="profile-stat">
+            <strong>0</strong>
+            <span>Иероглифов</span>
+          </div>
+          <div class="profile-stat">
+            <strong>0</strong>
+            <span>Дней подряд</span>
+          </div>
+          <div class="profile-stat">
+            <strong>1</strong>
+            <span>Уровень HSK</span>
+          </div>
+        </div>
+      </section>
+
+      <!-- СЛОВО ДНЯ -->
+      <section class="profile-section word-of-day">
+        <h2>今日单词 · Слово дня</h2>
+        <div class="word-character">学</div>
+        <div class="pinyin">xué</div>
+        <p>учиться; изучать</p>
+      </section>
+
+    </div>
+  </div>
+</section>
+
     </div>
   </div>
 </section>
