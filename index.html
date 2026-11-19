@@ -424,7 +424,37 @@ body.dark-theme .theme-toggle {
   border-color: #76545d;
   color: #ffe1e8 !important;
 }
-</style>
+.profile-card {
+  display: flex;
+  align-items: center;
+  gap: 18px;
+  padding: 20px;
+  margin-top: 20px;
+  background: #fff2f5;
+  border: 1px solid #f0dce2;
+  border-radius: 20px;
+}
+
+.profile-avatar {
+  width: 86px;
+  height: 86px;
+  display: grid;
+  place-items: center;
+  background: #f8dce3;
+  border-radius: 24px;
+  font-size: 48px;
+  flex-shrink: 0;
+}
+
+.profile-card h2 {
+  margin: 0 0 5px;
+}
+
+.profile-card p {
+  margin: 0 0 10px;
+  color: var(--muted);
+}
+  </style>
 </head>
 <body>
 <div class="app">
@@ -557,8 +587,29 @@ body.dark-theme .theme-toggle {
 </aside>
 <section id="profile" class="tab" hidden>
   <div class="panel">
-    <h1>Мой профиль</h1>
-    <p>Твоё маленькое пространство в PhotoChinese 🌸</p>
+    <h1>Твой профиль 🦊</h1>
+    <p>Добро пожаловать в своё маленькое пространство PhotoChinese!</p>
+
+    <div class="profile-card">
+     <div class="profile-edit">
+  <label for="nicknameInput">Изменить никнейм</label>
+  <input
+    id="nicknameInput"
+    type="text"
+    maxlength="20"
+    placeholder="Новый никнейм"
+  >
+  <button class="primary" id="saveNickname" type="button">
+    Сохранить
+  </button>
+     </div>
+      <div class="profile-avatar">🦊</div>
+      <div>
+        <h2 id="profileNickname">dollrot</h2>
+        <p>Начинающий исследователь китайского языка</p>
+        <span class="tag">HSK 1 · Новичок</span>
+      </div>
+    </div>
   </div>
 </section>
 </main>
@@ -981,6 +1032,24 @@ themeToggle.addEventListener("click", () => {
   );
 
   themeToggle.textContent = isDark ? "☀️" : "🌙";
+});
+</script>
+<script>
+const nicknameInput = document.getElementById("nicknameInput");
+const profileNickname = document.getElementById("profileNickname");
+const saveNickname = document.getElementById("saveNickname");
+
+const savedNickname = localStorage.getItem("photoChineseNickname") || "dollrot";
+profileNickname.textContent = savedNickname;
+
+saveNickname.addEventListener("click", () => {
+  const nickname = nicknameInput.value.trim();
+
+  if (!nickname) return;
+
+  localStorage.setItem("photoChineseNickname", nickname);
+  profileNickname.textContent = nickname;
+  nicknameInput.value = "";
 });
 </script>
   <script>
