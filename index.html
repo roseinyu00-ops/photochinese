@@ -744,6 +744,63 @@ body.profile-open #profile {
   grid-column: 1 / -1;
   width: 100%;
     }
+ 
+/* ЗАГРУЖЕННЫЙ БАННЕР */
+
+.profile-banner {
+  position: relative;
+  overflow: hidden;
+  isolation: isolate;
+}
+
+.banner-media {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  z-index: -1;
+}
+
+#bannerPlaceholder {
+  position: relative;
+  z-index: 1;
+}
+
+#chooseBannerBtn {
+  position: absolute;
+  right: 14px;
+  bottom: 14px;
+  z-index: 2;
+  padding: 9px 14px;
+  border: none;
+  border-radius: 12px;
+  background: #ffffffdf;
+  color: #60464d;
+  font-weight: 600;
+  cursor: pointer;
+}
+
+body.dark-theme #chooseBannerBtn {
+  background: #3d3034eF;
+  color: #fff1ed;
+}
+#profileAvatar {
+  cursor: pointer;
+  overflow: hidden;
+  position: relative;
+}
+
+#profileAvatarImage {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  border-radius: inherit;
+}
+
+#profileAvatarImage[hidden] {
+  display: none;
+}
   </style>
 </head>
 <body>
@@ -880,37 +937,70 @@ body.profile-open #profile {
   <div class="profile-page">
 
     <!-- БАННЕР -->
-    <div class="profile-banner" id="profileBanner">
-      <span>Твой баннер</span>
-    </div>
+    
+<div class="profile-banner" id="profileBanner">
+  <span id="bannerPlaceholder">Твой баннер</span>
+
+  <button type="button" id="chooseBannerBtn">
+    ✎ Изменить баннер
+  </button>
+
+  <input
+    type="file"
+    id="bannerUpload"
+    accept="image/*,video/mp4,video/webm"
+    hidden
+  >
+</div>
+
 
     <!-- ОСНОВНАЯ ИНФОРМАЦИЯ -->
     <div class="profile-main">
 
       <div class="profile-top">
-        <div class="profile-avatar">
-          <span id="profileAvatarPlaceholder">🦊</span>
+        <div class="profile-avatar" id="profileAvatar">
+  <span id="profileAvatarPlaceholder">🦊</span>
+  <img id="profileAvatarImage" hidden>
+  <input
+    type="file"
+    id="avatarUpload"
+    accept="image/*"
+    hidden
+  >
         </div>
-        <button class="secondary" type="button">✎ Редактировать</button>
-      </div>
-
+        <button class="secondary" id="editProfileBtn" type="button">
+  ✎ Редактировать
+        </button>
       <div class="profile-name-line">
-        <h2 id="profileNickname">dollrot</h2>
-        <span class="profile-decoration">🌸</span>
-        <span class="profile-decoration">🎀</span>
+  <h2 id="profileNickname">dollrot</h2>
+  <span class="profile-decoration" id="equippedDecoration"></span>
       </div>
 
       <p class="profile-subtitle">Начинающий исследователь китайского языка</p>
 
-      <div class="profile-bio">
-        <h3>Обо мне</h3>
-        <p>Расскажи немного о себе ♡</p>
-      </div>
+      
+<div class="profile-bio">
+  <h3>Обо мне</h3>
+  <p id="profileBioText">Расскажи немного о себе ♡</p>
+</div>
 
-      <div class="profile-facts">
-        <span>♡ Любимый иероглиф: 愛</span>
-        <span>📚 Изучаю китайский</span>
-      </div>
+<div class="profile-facts">
+  <span>♡ Любимый иероглиф: <strong id="favoriteCharacter">愛</strong></span>
+  <span>📚 Изучаю китайский</span>
+</div>
+
+<div class="profile-edit" id="profileEditPanel" hidden>
+  <label for="bioInput">Обо мне</label>
+  <textarea id="bioInput" maxlength="300" placeholder="Расскажи о себе..."></textarea>
+
+  <label for="favoriteCharacterInput">Любимый иероглиф</label>
+  <input id="favoriteCharacterInput" type="text" maxlength="5" placeholder="Например, 愛">
+
+  <button class="primary" id="saveProfileInfo" type="button">
+    Сохранить информацию
+  </button>
+</div>
+
 
       <!-- РЕДАКТИРОВАНИЕ НИКНЕЙМА -->
       <div class="profile-edit">
@@ -941,21 +1031,50 @@ body.profile-open #profile {
         </div>
       </section>
 
-      <!-- ДОСТИЖЕНИЯ -->
-      <section class="profile-section">
-        <h2>🏆 Достижения</h2>
-        <div class="profile-collection">
-          <div class="collection-item">🌱<span>Первые шаги</span></div>
-          <div class="collection-item">📖<span>Любознательный</span></div>
-          <div class="collection-item">⭐<span>Новичок</span></div>
-        </div>
-      </section>
+      
+<!-- ДОСТИЖЕНИЯ -->
+<section class="profile-section">
+  <h2>🏆 Достижения</h2>
 
-      <!-- КОЛЛЕКЦИЯ -->
-      <section class="profile-section">
-        <h2>🎀 Моя коллекция</h2>
-        <p>Здесь будут рамки, украшения, фоны и стикеры.</p>
-      </section>
+  <div class="profile-collection" id="achievementsList">
+
+    <div class="collection-item" data-achievement="first_steps">
+      🌱
+      <span>Первые шаги</span>
+      <small>Изучи первый иероглиф</small>
+    </div>
+
+    <div class="collection-item" data-achievement="curious">
+      📖
+      <span>Любознательный</span>
+      <small>Изучи 10 иероглифов</small>
+    </div>
+
+    <div class="collection-item" data-achievement="beginner">
+      ⭐
+      <span>Новичок</span>
+      <small>Заверши первый урок</small>
+    </div>
+
+  </div>
+</section>
+
+
+      
+<!-- КОЛЛЕКЦИЯ -->
+<section class="profile-section">
+  <h2>🎀 Моя коллекция</h2>
+
+  <div class="profile-collection" id="collectionList">
+    <p>Пока коллекция пуста...</p>
+  </div>
+
+  <p id="collectionCount">Получено предметов: 0</p>
+</section>
+
+        <button type="button" id="removeDecorationBtn">
+  Снять украшение
+        </button>
 
       <!-- ПРОГРЕСС -->
       <section class="profile-section">
@@ -1458,6 +1577,445 @@ window.addEventListener("load", () => {
   }
 });
   </script>
+
+<script>
+const chooseBannerBtn = document.getElementById("chooseBannerBtn");
+const bannerUpload = document.getElementById("bannerUpload");
+const profileBanner = document.getElementById("profileBanner");
+const bannerPlaceholder = document.getElementById("bannerPlaceholder");
+
+let bannerObjectUrl = null;
+
+chooseBannerBtn.addEventListener("click", () => {
+  bannerUpload.click();
+});
+
+bannerUpload.addEventListener("change", () => {
+  const file = bannerUpload.files[0];
+
+  if (!file) return;
+
+  if (!file.type.startsWith("image/") &&
+      !file.type.startsWith("video/")) {
+    alert("Выбери фотографию, GIF или видео.");
+    return;
+  }
+
+  if (bannerObjectUrl) {
+    URL.revokeObjectURL(bannerObjectUrl);
+  }
+
+  bannerObjectUrl = URL.createObjectURL(file);
+
+  const oldMedia = profileBanner.querySelector(".banner-media");
+  if (oldMedia) oldMedia.remove();
+
+  let media;
+
+  if (file.type.startsWith("video/")) {
+    media = document.createElement("video");
+    media.autoplay = true;
+    media.loop = true;
+    media.muted = true;
+    media.playsInline = true;
+  } else {
+    media = document.createElement("img");
+  }
+
+  media.className = "banner-media";
+  media.src = bannerObjectUrl;
+
+  profileBanner.prepend(media);
+  bannerPlaceholder.hidden = true;
+});
+</script>
+
+<script>
+// ===== ПРОФИЛЬ: НИКНЕЙМ =====
+
+const nicknameInput = document.getElementById("nicknameInput");
+const saveNickname = document.getElementById("saveNickname");
+const profileNickname = document.getElementById("profileNickname");
+
+// Загружаем сохранённый никнейм
+const savedNickname = localStorage.getItem("profileNickname");
+
+if (savedNickname) {
+  profileNickname.textContent = savedNickname;
+  nicknameInput.value = savedNickname;
+}
+
+// Сохраняем новый никнейм
+saveNickname.addEventListener("click", () => {
+  const newNickname = nicknameInput.value.trim();
+
+  if (!newNickname) {
+    alert("Введи никнейм!");
+    return;
+  }
+
+  localStorage.setItem("profileNickname", newNickname);
+  profileNickname.textContent = newNickname;
+
+  alert("Никнейм успешно сохранён! ♡");
+});
+</script>
+
+<script>
+// ===== ПРОФИЛЬ: АВАТАР =====
+
+const profileAvatar = document.getElementById("profileAvatar");
+const avatarUpload = document.getElementById("avatarUpload");
+const profileAvatarImage = document.getElementById("profileAvatarImage");
+const profileAvatarPlaceholder = document.getElementById("profileAvatarPlaceholder");
+
+// Загружаем сохранённый аватар
+const savedAvatar = localStorage.getItem("profileAvatar");
+
+if (savedAvatar) {
+  profileAvatarImage.src = savedAvatar;
+  profileAvatarImage.hidden = false;
+  profileAvatarPlaceholder.hidden = true;
+}
+
+// Нажатие на аватар открывает выбор файла
+profileAvatar.addEventListener("click", () => {
+  avatarUpload.click();
+});
+
+// Выбор изображения
+avatarUpload.addEventListener("change", () => {
+  const file = avatarUpload.files[0];
+
+  if (!file) return;
+
+  if (!file.type.startsWith("image/")) {
+    alert("Выбери изображение!");
+    return;
+  }
+
+  const reader = new FileReader();
+
+  reader.onload = () => {
+    try {
+      localStorage.setItem("profileAvatar", reader.result);
+
+      profileAvatarImage.src = reader.result;
+      profileAvatarImage.hidden = false;
+      profileAvatarPlaceholder.hidden = true;
+    } catch (error) {
+      alert("Изображение слишком большое. Выбери файл поменьше.");
+    }
+  };
+
+  reader.readAsDataURL(file);
+});
+</script>
+
+<script>
+// ===== ПРОФИЛЬ: ИНФОРМАЦИЯ =====
+
+const bioInput = document.getElementById("bioInput");
+const favoriteCharacterInput = document.getElementById("favoriteCharacterInput");
+
+const profileBioText = document.getElementById("profileBioText");
+const favoriteCharacter = document.getElementById("favoriteCharacter");
+const saveProfileInfo = document.getElementById("saveProfileInfo");
+
+// Загружаем сохранённую информацию
+const savedBio = localStorage.getItem("profileBio");
+const savedCharacter = localStorage.getItem("favoriteCharacter");
+
+if (savedBio !== null) {
+  profileBioText.textContent = savedBio;
+  bioInput.value = savedBio;
+}
+
+if (savedCharacter !== null) {
+  favoriteCharacter.textContent = savedCharacter;
+  favoriteCharacterInput.value = savedCharacter;
+}
+
+// Сохраняем изменения
+saveProfileInfo.addEventListener("click", () => {
+  const bio = bioInput.value.trim();
+  const character = favoriteCharacterInput.value.trim();
+
+  localStorage.setItem("profileBio", bio);
+  localStorage.setItem("favoriteCharacter", character || "—");
+
+  profileBioText.textContent = bio || "Расскажи немного о себе ♡";
+  favoriteCharacter.textContent = character || "—";
+
+  alert("Информация профиля сохранена! ♡");
+});
+</script>
+
+<script>
+// ===== ПРОФИЛЬ: ОКНО РЕДАКТИРОВАНИЯ =====
+
+const editProfileBtn = document.getElementById("editProfileBtn");
+const profileEditPanel = document.getElementById("profileEditPanel");
+
+editProfileBtn.addEventListener("click", () => {
+  profileEditPanel.hidden = !profileEditPanel.hidden;
+
+  editProfileBtn.textContent = profileEditPanel.hidden
+    ? "✎ Редактировать"
+    : "✖ Закрыть редактор";
+});
+</script>
+
+<script>
+// ===== PHOTOCHINESE: СИСТЕМА ПРОГРЕССА =====
+
+const progress = {
+  learnedCharacters: JSON.parse(
+    localStorage.getItem("learnedCharacters") || "[]"
+  ),
+
+  completedLessons: JSON.parse(
+    localStorage.getItem("completedLessons") || "[]"
+  ),
+
+  achievements: JSON.parse(
+    localStorage.getItem("achievements") || "[]"
+  )
+};
+
+// Сохранение прогресса
+function saveProgress() {
+  localStorage.setItem(
+    "learnedCharacters",
+    JSON.stringify(progress.learnedCharacters)
+  );
+
+  localStorage.setItem(
+    "completedLessons",
+    JSON.stringify(progress.completedLessons)
+  );
+
+  localStorage.setItem(
+    "achievements",
+    JSON.stringify(progress.achievements)
+  );
+}
+
+// Добавление изученного иероглифа
+function learnCharacter(character) {
+  if (!character || progress.learnedCharacters.includes(character)) {
+    return;
+  }
+
+  progress.learnedCharacters.push(character);
+
+  saveProgress();
+  updateAchievements();
+  updateProfileProgress();
+}
+
+// Завершение урока
+function completeLesson(lessonId) {
+  if (!lessonId || progress.completedLessons.includes(lessonId)) {
+    return;
+  }
+
+  progress.completedLessons.push(lessonId);
+
+  saveProgress();
+  updateAchievements();
+}
+
+// Проверка достижений
+function updateAchievements() {
+  const rules = [
+    {
+      id: "first_steps",
+      condition: progress.learnedCharacters.length >= 1
+    },
+    {
+      id: "curious",
+      condition: progress.learnedCharacters.length >= 10
+    },
+    {
+      id: "beginner",
+      condition: progress.completedLessons.length >= 1
+    }
+  ];
+
+  rules.forEach(rule => {
+    if (
+      rule.condition &&
+      !progress.achievements.includes(rule.id)
+    ) {
+      progress.achievements.push(rule.id);
+      saveProgress();
+
+      console.log("Получено достижение:", rule.id);
+    }
+  });
+}
+
+// Обновление цифр в профиле
+function updateProfileProgress() {
+  const stats = document.querySelectorAll(".profile-stat strong");
+
+  if (stats.length >= 1) {
+    stats[0].textContent = progress.learnedCharacters.length;
+  }
+}
+
+// Загружаем данные при открытии сайта
+updateAchievements();
+updateProfileProgress();
+
+</script>
+
+
+<script>
+// ===== PHOTOCHINESE: ДОСТИЖЕНИЯ И КОЛЛЕКЦИЯ =====
+
+const achievementRewards = {
+  first_steps: "🌱",
+  curious: "📖",
+  beginner: "⭐"
+};
+
+// Обновление сохранённых наград
+function updateCollection() {
+  const unlockedItems = Object.keys(achievementRewards)
+    .filter(id => progress.achievements.includes(id))
+    .map(id => achievementRewards[id]);
+
+  localStorage.setItem(
+    "profileCollection",
+    JSON.stringify(unlockedItems)
+  );
+}
+
+// Отображение достижений
+function renderAchievements() {
+  const items = document.querySelectorAll("[data-achievement]");
+
+  items.forEach(item => {
+    const id = item.dataset.achievement;
+    const unlocked = progress.achievements.includes(id);
+
+    item.classList.toggle("unlocked", unlocked);
+    item.classList.toggle("locked", !unlocked);
+
+    let status = item.querySelector(".achievement-status");
+
+    if (!status) {
+      status = document.createElement("small");
+      status.className = "achievement-status";
+      item.appendChild(status);
+    }
+
+    status.textContent = unlocked
+      ? "✓ Получено"
+      : "🔒 Пока закрыто";
+  });
+}
+
+// Отображение коллекции
+function renderCollection() {
+  const collectionList = document.getElementById("collectionList");
+  const collectionCount = document.getElementById("collectionCount");
+
+  if (!collectionList || !collectionCount) return;
+
+  const items = JSON.parse(
+    localStorage.getItem("profileCollection") || "[]"
+  );
+
+  const equipped = localStorage.getItem("equippedDecoration");
+
+  collectionList.innerHTML = "";
+
+  if (items.length === 0) {
+    collectionList.textContent = "Пока коллекция пуста...";
+  }
+
+  items.forEach((item, index) => {
+    const card = document.createElement("div");
+    card.className = "collection-item";
+
+    const emoji = document.createElement("span");
+    emoji.textContent = item;
+
+    const name = document.createElement("span");
+
+    if (equipped === item) {
+      name.textContent = "✓ Надето";
+      card.classList.add("equipped");
+    } else {
+      name.textContent = "Нажми, чтобы надеть";
+    }
+
+    card.append(emoji, name);
+
+    card.addEventListener("click", () => {
+      equipDecoration(item);
+    });
+
+    collectionList.appendChild(card);
+  });
+
+  collectionCount.textContent =
+    "Получено предметов: " + items.length;
+}
+
+// ===== УКРАШЕНИЯ ПРОФИЛЯ =====
+
+const equippedDecoration = document.getElementById("equippedDecoration");
+
+function renderEquippedDecoration() {
+  if (!equippedDecoration) return;
+
+  const saved = localStorage.getItem("equippedDecoration");
+  equippedDecoration.textContent = saved || "";
+}
+
+function equipDecoration(emoji) {
+  localStorage.setItem("equippedDecoration", emoji);
+  renderEquippedDecoration();
+  renderCollection();
+}
+
+function removeDecoration() {
+  localStorage.removeItem("equippedDecoration");
+  renderEquippedDecoration();
+  renderCollection();
+}
+
+// Кнопка снятия украшения
+const removeDecorationBtn = document.getElementById("removeDecorationBtn");
+
+if (removeDecorationBtn) {
+  removeDecorationBtn.addEventListener("click", removeDecoration);
+}
+
+// Обновление при получении нового достижения
+const previousUpdateAchievements = updateAchievements;
+
+updateAchievements = function() {
+  previousUpdateAchievements();
+  updateCollection();
+  renderAchievements();
+  renderCollection();
+};
+
+// Первоначальная загрузка
+updateCollection();
+renderAchievements();
+renderCollection();
+renderEquippedDecoration();
+
+</script>
+
+</script>
+
 </body>
   <div id="splashScreen">
   <div class="splash-content">
