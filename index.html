@@ -1192,7 +1192,26 @@ body.dark-theme #editProfileBtn {
 <footer>PhotoChinese · Учись видеть смысл в каждом иероглифе<br><span class="small">Словарные данные: Maqsudjonpolatov, HSK Chinese–Uzbek–Russian · <a href="https://huggingface.co/datasets/Maqsudjonpolatov/hsk-chinese-uzbek-russian" target="_blank" rel="noopener">источник</a> · <a href="https://creativecommons.org/licenses/by/4.0/" target="_blank" rel="noopener">CC BY 4.0</a><br>Данные о структуре иероглифов: Make Me a Hanzi · LGPL-3.0-or-later; данные черт: Arphic Public License · <a href="https://wangwave.github.io/makeme_word/" target="_blank" rel="noopener">источник и лицензии</a></span></footer>
 </div>
 <script src="https://cdn.jsdelivr.net/npm/tesseract.js@5/dist/tesseract.min.js"></script>
-<script src="https://cdn.jsdelivr.net/npm/hanzi-writer@3.7/dist/hanzi-writer.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+
+<script>
+  const SUPABASE_URL = "https://kzgogdhomujftpfksdfl.supabase.co";
+  const SUPABASE_PUBLISHABLE_KEY = "sb_publishable_vcXo0QCxXV2Ppe28NWgvRw_U8ZL5MYu";
+
+  window.photoChineseSupabase = window.supabase.createClient(
+    SUPABASE_URL,
+    SUPABASE_PUBLISHABLE_KEY,
+    {
+      auth: {
+        autoRefreshToken: true,
+        persistSession: true,
+        detectSessionInUrl: true
+      }
+    }
+  );
+
+  console.log("PhotoChinese: Supabase подключён");
+</script>
 <script>
 const tabs = document.querySelectorAll('nav button');
 tabs.forEach(btn => btn.addEventListener('click', () => {
