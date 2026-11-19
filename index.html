@@ -584,5 +584,14 @@ document.getElementById('nextQuestion').onclick=()=>{
 };
 renderQ();
 </script>
+  <script>
+if ("serviceWorker" in navigator) {
+  window.addEventListener("load", () => {
+    navigator.serviceWorker.register("./service-worker.js")
+      .then(() => console.log("PhotoChinese PWA ready!"))
+      .catch(error => console.error("PWA error:", error));
+  });
+}
+  </script>
 </body>
 </html>
