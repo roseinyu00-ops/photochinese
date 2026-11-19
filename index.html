@@ -801,6 +801,78 @@ body.profile-open #profile {
 #profileAvatarImage[hidden] {
   display: none;
 }
+  /* ===== НОВЫЙ ВИД ПРОФИЛЯ ===== */
+
+#editProfileBtn {
+  margin-left: auto;
+  align-self: flex-end;
+  padding: 10px 17px;
+  border-radius: 14px;
+  background: #fff0f5;
+  color: #925066;
+  border: 1px solid #f0dce2;
+  font-weight: 700;
+  white-space: nowrap;
+  transition: 0.2s ease;
+}
+
+#editProfileBtn:hover {
+  background: #f8dce3;
+  transform: translateY(-2px);
+}
+
+/* Аватарка остаётся круглой */
+
+#profileAvatar {
+  border-radius: 50%;
+  overflow: hidden;
+  position: relative;
+}
+
+/* Подсказка при редактировании аватарки */
+
+#profileAvatar::after {
+  content: "Изменить фото";
+  position: absolute;
+  bottom: 0;
+  left: 0;
+  right: 0;
+  padding: 7px 2px;
+  background: #60464dcc;
+  color: white;
+  font-size: 11px;
+  text-align: center;
+  opacity: 0;
+  transition: opacity 0.2s ease;
+}
+
+body.profile-editing #profileAvatar::after {
+  opacity: 1;
+}
+
+body.profile-editing #profileAvatar {
+  cursor: pointer;
+  outline: 3px solid #e98da1;
+  outline-offset: 3px;
+}
+
+/* Оформление редактора */
+
+.profile-edit {
+  background: #fffafb;
+  box-shadow: 0 4px 15px #60464d0a;
+}
+
+body.dark-theme .profile-edit {
+  background: #49383d;
+}
+
+body.dark-theme #editProfileBtn {
+  background: #62434c;
+  color: #ffe1e8;
+  border-color: #76545d;
+}
+  
   </style>
 </head>
 <body>
@@ -977,7 +1049,7 @@ body.profile-open #profile {
         </div>
         
         <button class="secondary" id="editProfileBtn" type="button">
-  ✎ Редактировать
+  ✎ Редактировать профиль
         </button>
 
       </div>
