@@ -292,6 +292,103 @@ body.dark-theme .splash-content h1 {
 body.dark-theme .splash-content p {
   color: #e8c9d0;
 }
+  /* PHOTOCHINESE SPLASH SCREEN */
+
+#splashScreen {
+  position: fixed;
+  inset: 0;
+  z-index: 100000;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: #fffaf8;
+  transition: opacity .7s ease, visibility .7s ease;
+}
+
+#splashScreen.hide {
+  opacity: 0;
+  visibility: hidden;
+}
+
+.splash-content {
+  text-align: center;
+  animation: splashAppear 1s ease both;
+}
+
+.splash-logo {
+  width: 100px;
+  height: 100px;
+  margin: 0 auto 20px;
+  display: grid;
+  place-items: center;
+  border-radius: 30px;
+  background: #f8dce3;
+  color: #b65d73;
+  font-family: serif;
+  font-size: 55px;
+  box-shadow: 0 12px 35px #e98da133;
+}
+
+.splash-content h1 {
+  color: #60464d;
+  font-size: 30px;
+  margin: 0;
+}
+
+.splash-content h1 span {
+  color: #e98da1;
+}
+
+.splash-content p {
+  color: #98858a;
+  margin-top: 8px;
+  font-size: 14px;
+}
+
+.splash-loader {
+  width: 35px;
+  height: 4px;
+  margin: 25px auto 0;
+  border-radius: 10px;
+  background: #f8dce3;
+  overflow: hidden;
+}
+
+.splash-loader::after {
+  content: "";
+  display: block;
+  width: 50%;
+  height: 100%;
+  background: #e98da1;
+  animation: splashLoading 1s ease-in-out infinite alternate;
+}
+
+@keyframes splashAppear {
+  from { opacity: 0; transform: translateY(15px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+
+@keyframes splashLoading {
+  from { transform: translateX(0); }
+  to { transform: translateX(100%); }
+}
+
+body.dark-theme #splashScreen {
+  background: #292124;
+}
+
+body.dark-theme .splash-logo {
+  background: #49383d;
+  color: #f2a9ba;
+}
+
+body.dark-theme .splash-content h1 {
+  color: #fff1ed;
+}
+
+body.dark-theme .splash-content p {
+  color: #e8c9d0;
+}
 </style>
 </head>
 <body>
@@ -856,5 +953,24 @@ window.addEventListener("load", () => {
   }
 });
   </script>
+  <script>
+window.addEventListener("load", () => {
+  const splash = document.getElementById("splashScreen");
+
+  if (splash) {
+    setTimeout(() => {
+      splash.classList.add("hide");
+    }, 1800);
+  }
+});
+  </script>
 </body>
+  <div id="splashScreen">
+  <div class="splash-content">
+    <div class="splash-logo">文</div>
+    <h1>Photo<span>Chinese</span></h1>
+    <p>Your little Chinese learning space</p>
+    <div class="splash-loader"></div>
+  </div>
+  </div>
 </html>
