@@ -962,7 +962,6 @@ body.profile-open #profile {
 <div class="profile-editor" id="profileEditor" hidden>
   <h3>✏️ Настройка профиля</h3>
 
-  <label for="avatarUpload">Изменить аватарку</label>
 <input
   type="file"
   id="avatarUpload"
@@ -970,9 +969,6 @@ body.profile-open #profile {
   hidden
 >
 
-  <button class="primary" type="button" id="closeProfileEditor">
-    Закрыть редактор
-  </button>
 </div>
 
         <div class="profile-avatar" id="profileAvatar">
@@ -1861,7 +1857,6 @@ const profileModeBioEditor = document.getElementById("profileEditPanel");
 const profileModeNicknameEditor = document.getElementById("nicknameEditPanel");
 const profileModeBannerButton = document.getElementById("chooseBannerBtn");
 const profileModeDecorationButton = document.getElementById("removeDecorationBtn");
-const profileModeCloseButton = document.getElementById("closeProfileEditor");
 
 let profileModeActive = false;
 
@@ -1883,10 +1878,6 @@ function setProfileMode(active) {
 
 profileModeButton.addEventListener("click", () => {
   setProfileMode(!profileModeActive);
-});
-
-profileModeCloseButton.addEventListener("click", () => {
-  setProfileMode(false);
 });
 
 </script>
