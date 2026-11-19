@@ -941,7 +941,7 @@ body.profile-open #profile {
 <div class="profile-banner" id="profileBanner">
   <span id="bannerPlaceholder">Твой баннер</span>
   
- <button type="button" id="chooseBannerBtn">
+ <button type="button" id="chooseBannerBtn" hidden>
   ✎ Изменить баннер
  </button>
 
@@ -962,12 +962,13 @@ body.profile-open #profile {
 <div class="profile-editor" id="profileEditor" hidden>
   <h3>✏️ Настройка профиля</h3>
 
-  <label for="avatarUpload">Аватарка</label>
-  <input
-    type="file"
-    id="avatarUpload"
-    accept="image/*"
-  >
+  <label for="avatarUpload">Изменить аватарку</label>
+<input
+  type="file"
+  id="avatarUpload"
+  accept="image/*"
+  hidden
+>
 
   <button class="primary" type="button" id="closeProfileEditor">
     Закрыть редактор
@@ -977,13 +978,8 @@ body.profile-open #profile {
         <div class="profile-avatar" id="profileAvatar">
   <span id="profileAvatarPlaceholder">🦊</span>
   <img id="profileAvatarImage" hidden>
-  <input
-    type="file"
-    id="avatarUpload"
-    accept="image/*"
-    hidden
-  >
         </div>
+        
         <button class="secondary" id="editProfileBtn" type="button">
   ✎ Редактировать
         </button>
@@ -1022,8 +1018,8 @@ body.profile-open #profile {
 
 
       <!-- РЕДАКТИРОВАНИЕ НИКНЕЙМА -->
-      <div class="profile-edit">
-        <label for="nicknameInput">Изменить никнейм</label>
+      <div class="profile-edit" id="nicknameEditPanel" hidden>
+  <label for="nicknameInput">Изменить никнейм</label>
         <input
           id="nicknameInput"
           type="text"
@@ -1091,7 +1087,7 @@ body.profile-open #profile {
   <p id="collectionCount">Получено предметов: 0</p>
 </section>
 
-        <button type="button" id="removeDecorationBtn">
+        <button type="button" id="removeDecorationBtn" hidden>
   Снять украшение
         </button>
 
@@ -1783,6 +1779,8 @@ if (savedAvatar) {
 
 // Нажатие на аватар открывает выбор файла
 profileAvatar.addEventListener("click", () => {
+  if (document.getElementById("profileEditor").hidden) return;
+
   avatarUpload.click();
 });
 
@@ -1855,18 +1853,42 @@ saveProfileInfo.addEventListener("click", () => {
 </script>
 
 <script>
-// ===== ПРОФИЛЬ: ОКНО РЕДАКТИРОВАНИЯ =====
+// ===== ЕДИНЫЙ РЕЖИМ РЕДАКТИРОВАНИЯ ПРОФИЛЯ =====
 
-const editProfileBtn = document.getElementById("editProfileBtn");
-const profileEditPanel = document.getElementById("profileEditPanel");
+const profileModeButton = document.getElementById("editProfileBtn");
+const profileModeAvatarEditor = document.getElementById("profileEditor");
+const profileModeBioEditor = document.getElementById("profileEditPanel");
+const profileModeNicknameEditor = document.getElementById("nicknameEditPanel");
+const profileModeBannerButton = document.getElementById("chooseBannerBtn");
+const profileModeDecorationButton = document.getElementById("removeDecorationBtn");
+const profileModeCloseButton = document.getElementById("closeProfileEditor");
 
-editProfileBtn.addEventListener("click", () => {
-  profileEditPanel.hidden = !profileEditPanel.hidden;
+let profileModeActive = false;
 
-  editProfileBtn.textContent = profileEditPanel.hidden
-    ? "✎ Редактировать"
-    : "✖ Закрыть редактор";
+function setProfileMode(active) {
+  profileModeActive = active;
+
+  profileModeAvatarEditor.hidden = !active;
+  profileModeBioEditor.hidden = !active;
+  profileModeNicknameEditor.hidden = !active;
+  profileModeBannerButton.hidden = !active;
+  profileModeDecorationButton.hidden = !active;
+
+  profileModeButton.textContent = active
+    ? "✓ Готово"
+    : "✎ Редактировать профиль";
+
+  document.body.classList.toggle("profile-editing", active);
+}
+
+profileModeButton.addEventListener("click", () => {
+  setProfileMode(!profileModeActive);
 });
+
+profileModeCloseButton.addEventListener("click", () => {
+  setProfileMode(false);
+});
+
 </script>
 
 <script>
