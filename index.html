@@ -732,6 +732,18 @@ main:has(#profile:not([hidden])) > #profile {
   width: 100%;
 }
 
+body.profile-open aside.side {
+  display: none !important;
+}
+
+body.profile-open main {
+  grid-template-columns: minmax(0, 1fr) !important;
+}
+
+body.profile-open #profile {
+  grid-column: 1 / -1;
+  width: 100%;
+    }
   </style>
 </head>
 <body>
@@ -989,6 +1001,11 @@ const tabs = document.querySelectorAll('nav button');
 tabs.forEach(btn => btn.addEventListener('click', () => {
   tabs.forEach(b => b.classList.toggle('active', b === btn));
   document.querySelectorAll('.tab').forEach(s => s.hidden = s.id !== btn.dataset.tab);
+
+document.body.classList.toggle(
+  "profile-open",
+  btn.dataset.tab === "profile"
+);
 }));
 const photo = document.getElementById('photo');
 const cameraPhoto = document.getElementById('cameraPhoto');
