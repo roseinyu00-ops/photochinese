@@ -778,29 +778,7 @@ body.profile-open #profile {
   background: #ffffffdf;
   color: #60464d;
   font-weight: 600;
-  cursor: pointer;
-}
-
-body.dark-theme #chooseBannerBtn {
-  background: #3d3034eF;
-  color: #fff1ed;
-}
-#profileAvatar {
-  cursor: pointer;
-  overflow: hidden;
-  position: relative;
-}
-
-#profileAvatarImage {
-  width: 100%;
-  height: 100%;
-  object-fit: cover;
-  border-radius: inherit;
-}
-
-#profileAvatarImage[hidden] {
-  display: none;
-}
+  curso
   </style>
 </head>
 <body>
@@ -940,7 +918,7 @@ body.dark-theme #chooseBannerBtn {
     
 <div class="profile-banner" id="profileBanner">
   <span id="bannerPlaceholder">Твой баннер</span>
-
+  
   <button type="button" id="chooseBannerBtn">
     ✎ Изменить баннер
   </button>
@@ -958,6 +936,29 @@ body.dark-theme #chooseBannerBtn {
     <div class="profile-main">
 
       <div class="profile-top">
+       
+<div class="profile-editor" id="profileEditor" hidden>
+  <h3>✏️ Настройка профиля</h3>
+
+  <label for="avatarUpload">Аватарка</label>
+  <input
+    type="file"
+    id="avatarUpload"
+    accept="image/*"
+  >
+
+  <label for="bannerUpload">Баннер профиля</label>
+  <input
+    type="file"
+    id="bannerUpload"
+    accept="image/*,video/mp4,video/webm"
+  >
+
+  <button class="primary" type="button" id="closeProfileEditor">
+    Закрыть редактор
+  </button>
+</div>
+
         <div class="profile-avatar" id="profileAvatar">
   <span id="profileAvatarPlaceholder">🦊</span>
   <img id="profileAvatarImage" hidden>
@@ -971,7 +972,8 @@ body.dark-theme #chooseBannerBtn {
         <button class="secondary" id="editProfileBtn" type="button">
   ✎ Редактировать
         </button>
-      <div class="profile-name-line">
+     
+        <div class="profile-name-line">
   <h2 id="profileNickname">dollrot</h2>
   <span class="profile-decoration" id="equippedDecoration"></span>
       </div>
@@ -1623,392 +1625,6 @@ bannerUpload.addEventListener("change", () => {
   profileBanner.prepend(media);
   bannerPlaceholder.hidden = true;
 });
-</script>
-
-<script>
-// ===== ПРОФИЛЬ: НИКНЕЙМ =====
-
-const nicknameInput = document.getElementById("nicknameInput");
-const saveNickname = document.getElementById("saveNickname");
-const profileNickname = document.getElementById("profileNickname");
-
-// Загружаем сохранённый никнейм
-const savedNickname = localStorage.getItem("profileNickname");
-
-if (savedNickname) {
-  profileNickname.textContent = savedNickname;
-  nicknameInput.value = savedNickname;
-}
-
-// Сохраняем новый никнейм
-saveNickname.addEventListener("click", () => {
-  const newNickname = nicknameInput.value.trim();
-
-  if (!newNickname) {
-    alert("Введи никнейм!");
-    return;
-  }
-
-  localStorage.setItem("profileNickname", newNickname);
-  profileNickname.textContent = newNickname;
-
-  alert("Никнейм успешно сохранён! ♡");
-});
-</script>
-
-<script>
-// ===== ПРОФИЛЬ: АВАТАР =====
-
-const profileAvatar = document.getElementById("profileAvatar");
-const avatarUpload = document.getElementById("avatarUpload");
-const profileAvatarImage = document.getElementById("profileAvatarImage");
-const profileAvatarPlaceholder = document.getElementById("profileAvatarPlaceholder");
-
-// Загружаем сохранённый аватар
-const savedAvatar = localStorage.getItem("profileAvatar");
-
-if (savedAvatar) {
-  profileAvatarImage.src = savedAvatar;
-  profileAvatarImage.hidden = false;
-  profileAvatarPlaceholder.hidden = true;
-}
-
-// Нажатие на аватар открывает выбор файла
-profileAvatar.addEventListener("click", () => {
-  avatarUpload.click();
-});
-
-// Выбор изображения
-avatarUpload.addEventListener("change", () => {
-  const file = avatarUpload.files[0];
-
-  if (!file) return;
-
-  if (!file.type.startsWith("image/")) {
-    alert("Выбери изображение!");
-    return;
-  }
-
-  const reader = new FileReader();
-
-  reader.onload = () => {
-    try {
-      localStorage.setItem("profileAvatar", reader.result);
-
-      profileAvatarImage.src = reader.result;
-      profileAvatarImage.hidden = false;
-      profileAvatarPlaceholder.hidden = true;
-    } catch (error) {
-      alert("Изображение слишком большое. Выбери файл поменьше.");
-    }
-  };
-
-  reader.readAsDataURL(file);
-});
-</script>
-
-<script>
-// ===== ПРОФИЛЬ: ИНФОРМАЦИЯ =====
-
-const bioInput = document.getElementById("bioInput");
-const favoriteCharacterInput = document.getElementById("favoriteCharacterInput");
-
-const profileBioText = document.getElementById("profileBioText");
-const favoriteCharacter = document.getElementById("favoriteCharacter");
-const saveProfileInfo = document.getElementById("saveProfileInfo");
-
-// Загружаем сохранённую информацию
-const savedBio = localStorage.getItem("profileBio");
-const savedCharacter = localStorage.getItem("favoriteCharacter");
-
-if (savedBio !== null) {
-  profileBioText.textContent = savedBio;
-  bioInput.value = savedBio;
-}
-
-if (savedCharacter !== null) {
-  favoriteCharacter.textContent = savedCharacter;
-  favoriteCharacterInput.value = savedCharacter;
-}
-
-// Сохраняем изменения
-saveProfileInfo.addEventListener("click", () => {
-  const bio = bioInput.value.trim();
-  const character = favoriteCharacterInput.value.trim();
-
-  localStorage.setItem("profileBio", bio);
-  localStorage.setItem("favoriteCharacter", character || "—");
-
-  profileBioText.textContent = bio || "Расскажи немного о себе ♡";
-  favoriteCharacter.textContent = character || "—";
-
-  alert("Информация профиля сохранена! ♡");
-});
-</script>
-
-<script>
-// ===== ПРОФИЛЬ: ОКНО РЕДАКТИРОВАНИЯ =====
-
-const editProfileBtn = document.getElementById("editProfileBtn");
-const profileEditPanel = document.getElementById("profileEditPanel");
-
-editProfileBtn.addEventListener("click", () => {
-  profileEditPanel.hidden = !profileEditPanel.hidden;
-
-  editProfileBtn.textContent = profileEditPanel.hidden
-    ? "✎ Редактировать"
-    : "✖ Закрыть редактор";
-});
-</script>
-
-<script>
-// ===== PHOTOCHINESE: СИСТЕМА ПРОГРЕССА =====
-
-const progress = {
-  learnedCharacters: JSON.parse(
-    localStorage.getItem("learnedCharacters") || "[]"
-  ),
-
-  completedLessons: JSON.parse(
-    localStorage.getItem("completedLessons") || "[]"
-  ),
-
-  achievements: JSON.parse(
-    localStorage.getItem("achievements") || "[]"
-  )
-};
-
-// Сохранение прогресса
-function saveProgress() {
-  localStorage.setItem(
-    "learnedCharacters",
-    JSON.stringify(progress.learnedCharacters)
-  );
-
-  localStorage.setItem(
-    "completedLessons",
-    JSON.stringify(progress.completedLessons)
-  );
-
-  localStorage.setItem(
-    "achievements",
-    JSON.stringify(progress.achievements)
-  );
-}
-
-// Добавление изученного иероглифа
-function learnCharacter(character) {
-  if (!character || progress.learnedCharacters.includes(character)) {
-    return;
-  }
-
-  progress.learnedCharacters.push(character);
-
-  saveProgress();
-  updateAchievements();
-  updateProfileProgress();
-}
-
-// Завершение урока
-function completeLesson(lessonId) {
-  if (!lessonId || progress.completedLessons.includes(lessonId)) {
-    return;
-  }
-
-  progress.completedLessons.push(lessonId);
-
-  saveProgress();
-  updateAchievements();
-}
-
-// Проверка достижений
-function updateAchievements() {
-  const rules = [
-    {
-      id: "first_steps",
-      condition: progress.learnedCharacters.length >= 1
-    },
-    {
-      id: "curious",
-      condition: progress.learnedCharacters.length >= 10
-    },
-    {
-      id: "beginner",
-      condition: progress.completedLessons.length >= 1
-    }
-  ];
-
-  rules.forEach(rule => {
-    if (
-      rule.condition &&
-      !progress.achievements.includes(rule.id)
-    ) {
-      progress.achievements.push(rule.id);
-      saveProgress();
-
-      console.log("Получено достижение:", rule.id);
-    }
-  });
-}
-
-// Обновление цифр в профиле
-function updateProfileProgress() {
-  const stats = document.querySelectorAll(".profile-stat strong");
-
-  if (stats.length >= 1) {
-    stats[0].textContent = progress.learnedCharacters.length;
-  }
-}
-
-// Загружаем данные при открытии сайта
-updateAchievements();
-updateProfileProgress();
-
-</script>
-
-
-<script>
-// ===== PHOTOCHINESE: ДОСТИЖЕНИЯ И КОЛЛЕКЦИЯ =====
-
-const achievementRewards = {
-  first_steps: "🌱",
-  curious: "📖",
-  beginner: "⭐"
-};
-
-// Обновление сохранённых наград
-function updateCollection() {
-  const unlockedItems = Object.keys(achievementRewards)
-    .filter(id => progress.achievements.includes(id))
-    .map(id => achievementRewards[id]);
-
-  localStorage.setItem(
-    "profileCollection",
-    JSON.stringify(unlockedItems)
-  );
-}
-
-// Отображение достижений
-function renderAchievements() {
-  const items = document.querySelectorAll("[data-achievement]");
-
-  items.forEach(item => {
-    const id = item.dataset.achievement;
-    const unlocked = progress.achievements.includes(id);
-
-    item.classList.toggle("unlocked", unlocked);
-    item.classList.toggle("locked", !unlocked);
-
-    let status = item.querySelector(".achievement-status");
-
-    if (!status) {
-      status = document.createElement("small");
-      status.className = "achievement-status";
-      item.appendChild(status);
-    }
-
-    status.textContent = unlocked
-      ? "✓ Получено"
-      : "🔒 Пока закрыто";
-  });
-}
-
-// Отображение коллекции
-function renderCollection() {
-  const collectionList = document.getElementById("collectionList");
-  const collectionCount = document.getElementById("collectionCount");
-
-  if (!collectionList || !collectionCount) return;
-
-  const items = JSON.parse(
-    localStorage.getItem("profileCollection") || "[]"
-  );
-
-  const equipped = localStorage.getItem("equippedDecoration");
-
-  collectionList.innerHTML = "";
-
-  if (items.length === 0) {
-    collectionList.textContent = "Пока коллекция пуста...";
-  }
-
-  items.forEach((item, index) => {
-    const card = document.createElement("div");
-    card.className = "collection-item";
-
-    const emoji = document.createElement("span");
-    emoji.textContent = item;
-
-    const name = document.createElement("span");
-
-    if (equipped === item) {
-      name.textContent = "✓ Надето";
-      card.classList.add("equipped");
-    } else {
-      name.textContent = "Нажми, чтобы надеть";
-    }
-
-    card.append(emoji, name);
-
-    card.addEventListener("click", () => {
-      equipDecoration(item);
-    });
-
-    collectionList.appendChild(card);
-  });
-
-  collectionCount.textContent =
-    "Получено предметов: " + items.length;
-}
-
-// ===== УКРАШЕНИЯ ПРОФИЛЯ =====
-
-const equippedDecoration = document.getElementById("equippedDecoration");
-
-function renderEquippedDecoration() {
-  if (!equippedDecoration) return;
-
-  const saved = localStorage.getItem("equippedDecoration");
-  equippedDecoration.textContent = saved || "";
-}
-
-function equipDecoration(emoji) {
-  localStorage.setItem("equippedDecoration", emoji);
-  renderEquippedDecoration();
-  renderCollection();
-}
-
-function removeDecoration() {
-  localStorage.removeItem("equippedDecoration");
-  renderEquippedDecoration();
-  renderCollection();
-}
-
-// Кнопка снятия украшения
-const removeDecorationBtn = document.getElementById("removeDecorationBtn");
-
-if (removeDecorationBtn) {
-  removeDecorationBtn.addEventListener("click", removeDecoration);
-}
-
-// Обновление при получении нового достижения
-const previousUpdateAchievements = updateAchievements;
-
-updateAchievements = function() {
-  previousUpdateAchievements();
-  updateCollection();
-  renderAchievements();
-  renderCollection();
-};
-
-// Первоначальная загрузка
-updateCollection();
-renderAchievements();
-renderCollection();
-renderEquippedDecoration();
-
-</script>
-
 </script>
 
 </body>
