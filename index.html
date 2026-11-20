@@ -1141,7 +1141,297 @@ body.dark-theme .pc-character-tags span {
 
   .pc-character-head {
     grid-template-columns: 115px minmax(0, 1fr);
-    gap: 14px;
+
+/* ===== PHOTOCHINESE — CHARACTER CARD DESIGN ===== */
+
+.pc-character-card {
+  margin-top: 22px;
+  padding: 26px;
+  background: #fff;
+  border: 1px solid var(--line);
+  border-radius: 24px;
+  box-shadow: 0 8px 30px #4a25300a;
+  color: #30272a;
+}
+
+.pc-character-card h2 {
+  font-size: 23px;
+  margin: 0 0 22px;
+}
+
+/* Верхняя часть */
+
+.pc-character-head {
+  display: grid;
+  grid-template-columns: 155px minmax(0, 1fr);
+  gap: 24px;
+  align-items: center;
+}
+
+.pc-character-symbol {
+  width: 100%;
+  aspect-ratio: 1;
+  display: grid;
+  place-items: center;
+  border-radius: 23px;
+  background: #fff2f5;
+  border: 1px solid var(--line);
+  font: 112px/1 serif;
+  color: #30272a;
+}
+
+.pc-character-intro {
+  min-width: 0;
+  margin-bottom: 0;
+}
+
+/* Пиньинь и тон */
+
+.pc-character-reading {
+  display: flex;
+  align-items: baseline;
+  flex-wrap: wrap;
+  gap: 9px;
+  margin-bottom: 8px;
+}
+
+.pc-character-pinyin {
+  color: #b65d73;
+  font-size: 28px;
+  font-weight: 800;
+}
+
+.pc-character-tone {
+  color: #a99ba0;
+  font-size: 14px;
+  font-weight: 500;
+}
+
+/* Перевод */
+
+.pc-character-meaning {
+  font-size: 22px;
+  font-weight: 750;
+  color: #292326;
+  margin: 0 0 20px;
+  line-height: 1.4;
+}
+
+/* Происхождение и состав */
+
+.pc-character-origin {
+  margin-top: 18px;
+  padding-top: 17px;
+  border-top: 1px solid var(--line);
+}
+
+.pc-character-origin h3,
+.pc-character-section h3 {
+  font-size: 15px;
+  font-weight: 750;
+  color: #927d84;
+  margin: 0 0 9px;
+}
+
+.pc-character-description {
+  font-size: 15px;
+  line-height: 1.7;
+  color: #594d51;
+  margin: 0;
+}
+
+/* Метки */
+
+.pc-character-tags {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 9px;
+  margin-top: 20px;
+}
+
+.pc-character-tags span {
+  padding: 8px 13px;
+  border-radius: 10px;
+  background: #fff0f4;
+  color: #925066;
+  font-size: 13px;
+  font-weight: 600;
+}
+
+/* Информационные карточки */
+
+.pc-character-info-grid {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 12px;
+  margin-top: 24px;
+}
+
+.pc-character-info {
+  padding: 17px;
+  min-height: 100px;
+  background: #fffafb;
+  border: 1px solid var(--line);
+  border-radius: 18px;
+}
+
+.pc-character-info b {
+  display: block;
+  color: #98858a;
+  margin-bottom: 9px;
+  font-size: 14px;
+  font-weight: 650;
+}
+
+.pc-character-info span {
+  font-size: 16px;
+  line-height: 1.6;
+  color: #403438;
+}
+
+/* Дополнительные разделы */
+
+.pc-character-section {
+  margin-top: 25px;
+  padding-top: 19px;
+  border-top: 1px solid var(--line);
+}
+
+.pc-character-section p {
+  font-size: 15px;
+  line-height: 1.7;
+  color: #594d51;
+  margin: 0;
+}
+
+/* Компоненты */
+
+.pc-character-components {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 10px;
+  margin-top: 12px;
+}
+
+.pc-character-component {
+  padding: 11px 14px;
+  background: #fff5f7;
+  border: 1px solid var(--line);
+  border-radius: 13px;
+}
+
+.pc-character-component strong {
+  font-size: 21px;
+  color: #b65d73;
+  margin-right: 7px;
+}
+
+.pc-character-component span {
+  font-size: 13px;
+  color: #75666b;
+}
+
+/* Ассоциации */
+
+.pc-character-memory {
+  padding: 17px;
+  background: #fff5f7;
+  border-radius: 16px;
+  border: 1px solid var(--line);
+}
+
+/* Анимация черт */
+
+.pc-character-strokes {
+  margin-top: 27px;
+  padding-top: 20px;
+  border-top: 1px solid var(--line);
+}
+
+.pc-character-strokes h3 {
+  font-size: 16px;
+  color: #927d84;
+  margin: 0 0 14px;
+}
+
+.pc-stroke-animation-button {
+  margin-top: 15px;
+  padding: 12px 18px;
+  border: none;
+  border-radius: 12px;
+  background: #f8dce3;
+  color: #813d50;
+  font-weight: 700;
+  cursor: pointer;
+}
+
+/* Тёмная тема */
+
+body.dark-theme .pc-character-card {
+  background: #3d3034;
+  border-color: #634850;
+  color: #fff1ed;
+}
+
+body.dark-theme .pc-character-symbol,
+body.dark-theme .pc-character-info {
+  background: #49383d;
+  border-color: #76545d;
+}
+
+body.dark-theme .pc-character-meaning {
+  color: #fff1ed;
+}
+
+body.dark-theme .pc-character-tone {
+  color: #bdaeb3;
+}
+
+body.dark-theme .pc-character-description,
+body.dark-theme .pc-character-info span,
+body.dark-theme .pc-character-section p {
+  color: #e2d2d7;
+}
+
+body.dark-theme .pc-character-tags span {
+  background: #62434c;
+  color: #ffe1e8;
+}
+
+body.dark-theme .pc-character-origin,
+body.dark-theme .pc-character-section,
+body.dark-theme .pc-character-strokes {
+  border-color: #634850;
+}
+
+body.dark-theme .pc-character-origin h3,
+body.dark-theme .pc-character-section h3,
+body.dark-theme .pc-character-strokes h3 {
+  color: #c7aab3;
+}
+
+body.dark-theme .pc-character-component,
+body.dark-theme .pc-character-memory {
+  background: #49383d;
+  border-color: #76545d;
+}
+
+body.dark-theme .pc-character-component span {
+  color: #e2d2d7;
+}
+
+/* Мобильная версия */
+
+@media (max-width: 600px) {
+  .pc-character-card {
+    padding: 17px;
+    border-radius: 19px;
+  }
+
+  .pc-character-head {
+    grid-template-columns: 108px minmax(0, 1fr);
+    gap: 13px;
+    align-items: start;
   }
 
   .pc-character-symbol {
@@ -1150,7 +1440,11 @@ body.dark-theme .pc-character-tags span {
   }
 
   .pc-character-pinyin {
-    font-size: 21px;
+    font-size: 22px;
+  }
+
+  .pc-character-tone {
+    font-size: 12px;
   }
 
   .pc-character-meaning {
@@ -1167,10 +1461,16 @@ body.dark-theme .pc-character-tags span {
 
   .pc-character-info {
     padding: 12px;
+    min-height: 85px;
   }
 
   .pc-character-info span {
-    font-size: 15px;
+    font-size: 14px;
+  }
+
+  .pc-character-tags span {
+    font-size: 12px;
+    padding: 7px 10px;
   }
 }
   </style>
@@ -1835,18 +2135,18 @@ function roughGloss(tokens){
 }
 async function analyzeChineseText(){
 
-function buildCharacterCard(ch, d) {
-  const tags = [
-    d.r ? `Ключ: ${d.r}` : '',
-    d.n ? `${d.n} черт` : ''
-  ].filter(Boolean);
 
+function buildCharacterCard(ch, d) {
   const infoBox = (title, value) => `
     <div class="pc-character-info">
       <b>${title}</b>
       <span>${esc(value || 'Пока нет данных')}</span>
     </div>
   `;
+
+  const components = d.c
+    ? String(d.c).split(/[,;]+/).map(x => x.trim()).filter(Boolean)
+    : [];
 
   return `
     <article class="pc-character-card">
@@ -1859,33 +2159,60 @@ function buildCharacterCard(ch, d) {
         <div class="pc-character-symbol">${esc(ch)}</div>
 
         <div>
-          <div class="pc-character-pinyin">
-            ${esc(d.p || 'Пиньинь не найден')}
+          <div class="pc-character-reading">
+            <span class="pc-character-pinyin">
+              ${esc(d.p || 'Пиньинь не найден')}
+            </span>
+            ${d.p ? '<span class="pc-character-tone">Чтение</span>' : ''}
           </div>
 
           <div class="pc-character-meaning">
             ${esc(d.m || 'Перевод пока не найден')}
           </div>
-
-          <p class="pc-character-description">
-            ${esc(d.note || 'Дополнительное объяснение пока отсутствует.')}
-          </p>
-
-          <div class="pc-character-tags">
-            ${tags.map(tag => `<span>${esc(tag)}</span>`).join('')}
-          </div>
         </div>
+      </div>
+
+      <section class="pc-character-origin">
+        <h3>Состав и происхождение</h3>
+        <p class="pc-character-description">
+          ${esc(d.note || 'Дополнительное объяснение пока отсутствует.')}
+        </p>
+      </section>
+
+      <div class="pc-character-tags">
+        ${d.n ? `<span>${esc(d.n)} черт</span>` : ''}
       </div>
 
       <div class="pc-character-info-grid">
         ${infoBox('Радикал / ключ', d.r)}
         ${infoBox('Количество черт', d.n)}
-        ${infoBox('Компоненты', d.c)}
-        ${infoBox('Состав и происхождение', d.note)}
       </div>
 
+      ${components.length ? `
+        <section class="pc-character-section">
+          <h3>Компоненты</h3>
+          <div class="pc-character-components">
+            ${components.map(item => `
+              <div class="pc-character-component">
+                ${esc(item)}
+              </div>
+            `).join('')}
+          </div>
+        </section>
+      ` : ''}
+
+      <section class="pc-character-section">
+        <h3>Другие значения</h3>
+        <p>${esc(d.m || 'Дополнительные значения пока не найдены.')}</p>
+      </section>
+
+      <section class="pc-character-memory">
+        <h3>Ассоциации для запоминания</h3>
+        <p>Попробуй связать форму иероглифа с его значением.</p>
+      </section>
+
       <div class="pc-character-strokes">
-        <h3>Написание иероглифа</h3>
+        <h3>Последовательность черт · схематично</h3>
         <p>Посмотри, в каком порядке создаётся этот знак.</p>
 
         <button
@@ -1899,6 +2226,7 @@ function buildCharacterCard(ch, d) {
     </article>
   `;
 }
+
   const text = analysisInput.value.trim();
 
   if (!text) {
