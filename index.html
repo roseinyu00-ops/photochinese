@@ -2112,7 +2112,7 @@ async function loadCharacterStructureData(){
   const response=await fetch('https://raw.githubusercontent.com/skishore/makemeahanzi/master/dictionary.txt');
   if(!response.ok) throw new Error('HTTP '+response.status);
   const raw=await response.text();
-  let count=0;
+  let count=0, withDefinition=0, withPinyin=0, withDecomposition=0, withEtymology=0, withRadical=0;
   raw.split(/\r?\n/).forEach(line=>{
    if(!line.trim()) return;
    try{
@@ -2123,6 +2123,7 @@ async function loadCharacterStructureData(){
      r:item.radical||'',
      c:formatDecomposition(item.decomposition),
      decomposition:item.decomposition||'',
+     matches:Array.isArray(item.matches)?item.matches:[],
      definition:item.definition||'',
      pinyinMMH:item.pinyin||'',
      etymologyType:etymology.type||'',
@@ -2131,10 +2132,15 @@ async function loadCharacterStructureData(){
      etymologyPhonetic:etymology.phonetic||''
     };
     count++;
+    if(item.definition) withDefinition++;
+    if(item.pinyin) withPinyin++;
+    if(item.decomposition && !item.decomposition.startsWith('？')) withDecomposition++;
+    if(item.etymology) withEtymology++;
+    if(item.radical) withRadical++;
    }catch(e){}
   });
   if(!count) throw new Error('В файле не найдены записи');
-  if(status) status.textContent='Структура иероглифов загружена · '+count.toLocaleString('ru-RU')+' знаков';
+  if(status) status.textContent='База Make Me a Hanzi · '+count.toLocaleString('ru-RU')+' знаков · чтение '+withPinyin.toLocaleString('ru-RU')+' · состав '+withDecomposition.toLocaleString('ru-RU')+' · определения '+withDefinition.toLocaleString('ru-RU')+' · этимология '+withEtymology.toLocaleString('ru-RU');
  }catch(error){
   console.warn('Не удалось загрузить структуру иероглифов:',error);
   if(status) status.textContent='Данные о компонентах пока не загрузились. Проверь интернет и обнови страницу.';
@@ -2264,11 +2270,13 @@ function buildCharacterCard(ch, d) {
   const rawMeanings = String(d.m || '').split(/\s*;\s*/).filter(Boolean);
   const hasRussianMeaning = Boolean(extra.meanings || rawMeanings.length);
   const displayMeaning = extra.meanings || rawMeanings.join('; ') || (d.definition ? d.definition + ' (определение на английском)' : 'Русский перевод пока не найден');
-  const meaningSourceNote = hasRussianMeaning
-    ? 'Перевод: русскоязычная запись словаря PhotoChinese.'
-    : d.definition
-      ? 'В основном источнике доступно краткое определение на английском. Русский перевод не подменяем догадкой.'
-      : 'Для этого знака пока не найдено подтверждённое русскоязычное определение.';
+  const meaningSourceNote = extra.meanings
+    ? 'Перевод: редакционная карточка PhotoChinese.'
+    : rawMeanings.length
+      ? 'Перевод: русскоязычная запись из локального HSK-словаря.'
+      : d.definition
+        ? 'В основном источнике доступно краткое определение на английском. Русский перевод не подменяем догадкой.'
+        : 'Для этого знака пока не найдено подтверждённое русскоязычное определение.';
   const frequencyRank = Number(String(d.frequencyRank || '').replace(/[^0-9]/g, ''));
   const strokeCount = Number(d.n) || 0;
   const relatedWordPool = Object.entries(databaseWordDictionary)
