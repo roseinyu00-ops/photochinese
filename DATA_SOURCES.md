@@ -10,6 +10,7 @@ This file records which sources currently power character cards and how their da
 - Fields used by PhotoChinese: character, learner definition, pinyin, IDS decomposition, etymology annotation and primary radical.
 - License: GNU LGPL v3 or later for `dictionary.txt`. The upstream `COPYING` file distinguishes this from `graphics.txt`, which has a separate Arphic Public License.
 - Important limitation: etymology may be null. A decomposition or mnemonic is not proof of historical origin.
+- Stroke graphics are loaded through Hanzi Writer (`hanzi-writer-data`), which uses the Make Me a Hanzi stroke data. The Hanzi Writer library is MIT-licensed; the character stroke data has a separate Arphic Public License.
 
 ## Dictionary cross-check: MDBG / CC-CEDICT
 
@@ -17,7 +18,15 @@ This file records which sources currently power character cards and how their da
 - CC-CEDICT project and download information: https://cc-cedict.org/editor/editor.php?handler=Download
 - License: CC BY-SA 4.0.
 - Current use: character-specific external lookup link only. CC-CEDICT is not yet bundled as a local dictionary in this version.
+- The current CC-CEDICT release is published by MDBG and maintained by its contributors. The project states the CC BY-SA 4.0 terms and requires attribution and ShareAlike for redistributed adaptations.
 - Any future import must preserve attribution to MDBG, CC-CEDICT editors and contributors, and comply with ShareAlike requirements.
+
+## Character-specific verification and examples
+
+- Example entry `狗`: verified against Dong Chinese, which identifies 犭 as the meaning component and 句 as the sound component, and records the historical phonetic relationship; see https://www.dong-chinese.com/dictionary/狗.
+- `狗` has 8 strokes; cross-check: HanziFun character entry and Hanzi Writer / Make Me a Hanzi stroke data.
+- Example usage sentences and words are added only when checked against a dictionary or corpus. For `狗`, the examples `小狗` and the sentences `他家里养了一只小狗。` / `小狗的鼻子很灵。` are based on the Dong Chinese entry: https://www.dong-chinese.com/dictionary/狗.
+- This is an initial curated entry, not a claim that all 9,000+ cards are already fully enriched.
 
 ## Character properties: Unicode Unihan
 
@@ -38,7 +47,7 @@ This file records which sources currently power character cards and how their da
 2. Keep word compounds separate from true synonyms.
 3. Label English-only definitions as English; do not present them as Russian translations.
 4. Keep historical etymology separate from memory aids. A mnemonic is a learning device, not a historical claim.
-5. Show the source or a clear limitation when a field is missing.
+5. Keep source provenance in project documentation and data metadata. In the learner-facing card, avoid technical source notes; show a concise, natural message only when a useful field is genuinely unavailable.
 6. Keep simplified and traditional glyphs available as separate searchable character records when the upstream dataset provides them.
 
 ## Next enrichment priorities
