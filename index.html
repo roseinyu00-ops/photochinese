@@ -2145,7 +2145,7 @@ function buildCharacterCard(ch, d) {
   const toneLabel = numericTone ? (numericTone[0] === '5' ? 'нейтральный тон' : numericTone[0] + ' тон')
     : pinyin.includes('\u0304') ? '1 тон' : pinyin.includes('\u0301') ? '2 тон' : pinyin.includes('\u030c') ? '3 тон' : pinyin.includes('\u0300') ? '4 тон' : '';
   const hskLevel = d.hsk2025 || d.hsk30 || d.hsk20 || '';
-  const meanings = String(d.m || '').split(/\\s*;\\s*/).filter(Boolean);
+  const meanings = String(d.m || '').split(/\s*;\s*/).filter(Boolean);
   const mainMeaning = meanings.shift() || '';
   const extraMeanings = meanings;
   const frequencyRank = Number(String(d.frequencyRank || '').replace(/[^0-9]/g, ''));
