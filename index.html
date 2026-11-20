@@ -1465,7 +1465,48 @@ body.dark-theme .pc-character-component span {
     padding: 7px 10px;
   }
 }
-  </style>
+  
+/* PHOTOCHINESE — расширенная карточка разбора */
+.pc-character-origin { margin-top: 24px; }
+.pc-character-info-grid { grid-template-columns: repeat(2,minmax(0,1fr)); align-items: stretch; }
+.pc-character-info { min-width: 0; }
+.pc-character-info b { font-size: 13px; }
+.pc-character-info span { font-size: 14px; }
+.pc-character-radical { font-size: 20px !important; font-weight: 700; color: #b65d73 !important; }
+.pc-character-components-info { grid-column: 1 / -1; }
+.pc-character-components { margin-top: 0; }
+.pc-character-component { display: grid; grid-template-columns: auto auto; align-items: baseline; gap: 2px 8px; }
+.pc-character-component strong { margin: 0; }
+.pc-character-component em { font-size: 11px; color: #a77c89; font-style: normal; }
+.pc-character-component span { grid-column: 1 / -1; font-size: 12px; }
+.pc-character-meaning-table { display: grid; gap: 7px; }
+.pc-character-meaning-row { padding: 11px 14px; background: #fff5f7; border: 1px solid var(--line); border-radius: 11px; font-size: 14px; line-height: 1.55; }
+.pc-character-synonyms { display: grid; grid-template-columns: repeat(2,minmax(0,1fr)); gap: 9px; }
+.pc-character-synonym { display: grid; grid-template-columns: auto 1fr; gap: 2px 9px; align-items: baseline; padding: 12px; background: #fff5f7; border: 1px solid var(--line); border-radius: 12px; }
+.pc-character-synonym strong { color: #b65d73; font-size: 18px; }
+.pc-character-synonym span { color: #9a7180; font-size: 12px; }
+.pc-character-synonym small { grid-column: 1 / -1; color: #75666b; font-size: 13px; }
+.pc-character-section-note { margin: -3px 0 10px !important; font-size: 13px !important; }
+.pc-character-memory { font-size: 14px; line-height: 1.7; color: #594d51; }
+.pc-stroke-scheme { display: flex; flex-wrap: wrap; gap: 7px; margin: 12px 0 4px; }
+.pc-stroke-tile { position: relative; width: 62px; height: 62px; display: grid; place-items: center; background: #fff5f7; border: 1px solid var(--line); border-radius: 10px; overflow: hidden; }
+.pc-stroke-tile svg { width: 48px; height: 48px; }
+.pc-stroke-tile b { position: absolute; right: 4px; top: 2px; font-size: 10px; color: #b65d73; background: #fffaf8dd; border-radius: 50%; min-width: 15px; text-align: center; }
+body.dark-theme .pc-character-meaning-row,
+body.dark-theme .pc-character-synonym,
+body.dark-theme .pc-stroke-tile { background: #49383d; border-color: #76545d; }
+body.dark-theme .pc-character-synonym small,
+body.dark-theme .pc-character-memory { color: #e2d2d7; }
+body.dark-theme .pc-character-synonym span { color: #d5aebb; }
+@media(max-width:600px) {
+  .pc-character-info-grid { grid-template-columns: 1fr; }
+  .pc-character-components-info { grid-column: auto; }
+  .pc-character-synonyms { grid-template-columns: 1fr; }
+  .pc-stroke-tile { width: 54px; height: 54px; }
+  .pc-stroke-tile svg { width: 42px; height: 42px; }
+}
+
+</style>
 </head>
 <body>
 <div class="app">
@@ -2140,87 +2181,146 @@ function roughGloss(tokens){
 }
 async function analyzeChineseText(){
 function buildCharacterCard(ch, d) {
+  const learningData = {
+    '好': {
+      meanings: 'хороший; хорошо; приятный',
+      partOfSpeech: 'Прилагательное, наречие. При чтении hào — глагол «любить, увлекаться».',
+      other: ['умелый, искусный — 好手 (hǎoshǒu)', 'готовый, завершённый — 好了 (hǎo le)', 'в порядке, нормально — 好的 (hǎo de); смысл зависит от ситуации'],
+      synonyms: [['优秀','yōuxiù','отличный, выдающийся'],['不错','búcuò','неплохой, хороший'],['良好','liánghǎo','хороший, благоприятный'],['美好','měihǎo','прекрасный, замечательный']],
+      memory: '女 — женщина, 子 — ребёнок. Традиционная мнемоника: заботливая мать держит ребёнка — 好. Это удобная ассоциация для запоминания формы, а не буквальная научная этимология.',
+      usage: '好吃 — вкусный; 好看 — красивый, приятный на вид; 你好 — привет.'
+    },
+    '你': {partOfSpeech:'Местоимение: ты, вы.', other:['вежливое обращение «вы» обычно выражается 您 (nín)'], synonyms:[['您','nín','вежливое «вы»'],['大家','dàjiā','все, вы все']], memory:'亻 — человек. Знак связан с обращением к собеседнику; запомни его через фразу 你好 (nǐ hǎo).', usage:'你好 — привет; 你们 — вы (несколько человек).'},
+    '我': {partOfSpeech:'Местоимение: я, меня, мной.', other:['в сочетаниях может входить в значение «мой / наш» через притяжательную частицу 的'], synonyms:[['本人','běnrén','лично я, сам'],['自己','zìjǐ','сам, себя']], memory:'Запоминай как самостоятельный знак со значением «я». В современном китайском он не разбирается как буквальная картинка из отдельных предметов.', usage:'我们 — мы; 我的 — мой / моя; 我们的 — наш.'},
+    '他': {partOfSpeech:'Местоимение: он, его.', other:['в письменной речи относится к мужчине или человеку мужского рода'], synonyms:[['那个人','nàge rén','тот человек'],['别人','biérén','другой человек']], memory:'亻 — человек. В паре с 也 образует местоимение 他.', usage:'他们 — они (мужчины или смешанная группа).'},
+    '她': {partOfSpeech:'Местоимение: она, её.', other:['произносится так же, как 他 (tā), но на письме обозначает женщину'], synonyms:[['那位女士','nà wèi nǚshì','та дама'],['女性','nǚxìng','женщина; женский пол']], memory:'女 — женщина. Это помогает отличать письменную форму «она» от 他 — «он».', usage:'她们 — они (женская группа).'},
+    '人': {partOfSpeech:'Существительное; счётное слово в некоторых конструкциях.', other:['люди, население; человек как представитель общества'], synonyms:[['人们','rénmen','люди'],['人员','rényuán','персонал, сотрудники'],['人物','rénwù','личность, персона']], memory:'Иероглиф 人 напоминает фигуру человека в профиль или шагающего человека.', usage:'中国人 — китайцы / китаец; 好人 — хороший человек; 人们 — люди.'},
+    '大': {partOfSpeech:'Прилагательное; наречное употребление в сочетаниях.', other:['старший — о брате или сестре в семейных обращениях','взрослый, значительный — по контексту'], synonyms:[['巨大','jùdà','огромный'],['很大','hěn dà','очень большой'],['大型','dàxíng','крупный, большого размера']], memory:'大 — человек с широко расставленными руками и ногами; ассоциация с размером.', usage:'大学 — университет; 大人 — взрослый; 大家 — все.'},
+    '小': {partOfSpeech:'Прилагательное; иногда часть существительных и обращений.', other:['младший — в семейных обращениях','немного, малый по степени — в сочетаниях'], synonyms:[['细小','xìxiǎo','крошечный'],['微小','wēixiǎo','очень маленький'],['小型','xiǎoxíng','маленького размера']], memory:'Три небольших штриха расходятся от центра — удобно связать форму с идеей малого размера.', usage:'小时 — час; 小孩子 — маленький ребёнок.'},
+    '中': {partOfSpeech:'Существительное; прилагательное в составных словах.', other:['середина, центр','попасть в цель — 中 (zhòng), другое чтение'], synonyms:[['中间','zhōngjiān','середина'],['中心','zhōngxīn','центр'],['中央','zhōngyāng','центральная часть']], memory:'Вертикальная линия 丨 проходит через центр рамки 口 — «середина».', usage:'中国 — Китай; 中文 — китайский язык; 中间 — посередине.'},
+    '国': {partOfSpeech:'Существительное: страна, государство.', other:['родина или государство в составе названий и устойчивых сочетаний'], synonyms:[['国家','guójiā','государство, страна'],['祖国','zǔguó','родина'],['外国','wàiguó','иностранное государство']], memory:'囗 — внешняя граница; внутри 玉. Ассоциация: ценности и жизнь внутри границ страны.', usage:'中国 — Китай; 国籍 — гражданство; 国家 — государство.'},
+    '文': {partOfSpeech:'Существительное; определение в составных словах.', other:['письменность, культура, литературный текст','гражданский, невоенный — в противопоставлении 武'], synonyms:[['文字','wénzì','письменность, знаки'],['文章','wénzhāng','текст, статья'],['文化','wénhuà','культура']], memory:'文 — древний знак, связанный с узором или рисунком на теле; сегодня часто относится к письменности и культуре.', usage:'中文 — китайский язык; 文化 — культура; 文字 — письменные знаки.'},
+    '字': {partOfSpeech:'Существительное: иероглиф, письменный знак.', other:['слово или письменная форма в отдельных сочетаниях'], synonyms:[['汉字','hànzì','китайский иероглиф'],['文字','wénzì','письменные знаки'],['字体','zìtǐ','шрифт']], memory:'宀 — крыша, 子 — ребёнок. Образ ребёнка под крышей помогает запомнить состав; этимология исторически сложнее этой мнемоники.', usage:'汉字 — китайские иероглифы; 字典 — словарь; 名字 — имя.'},
+    '学': {partOfSpeech:'Глагол «учиться, изучать»; существительное «учёба, наука» в составе слов.', other:['область знаний, дисциплина — в словах типа 数学 (математика)'], synonyms:[['学习','xuéxí','учиться, изучать'],['求学','qiúxué','получать образование'],['学问','xuéwen','знания, учёность']], memory:'В верхней части — элементы, напоминающие руки над крышей 冖, внизу 子. Ассоциация: ребёнок учится под присмотром.', usage:'学生 — ученик / студент; 学校 — школа; 学习 — учиться.'},
+    '生': {partOfSpeech:'Глагол «рождаться, возникать»; существительное «жизнь»; часть слов о людях.', other:['сырой, не приготовленный — в 生菜 (shēngcài)','незнакомый — в 生人 (shēngrén), по контексту'], synonyms:[['出生','chūshēng','родиться'],['生命','shēngmìng','жизнь'],['学生','xuésheng','ученик, студент']], memory:'Самостоятельный древний знак, связанный с ростком, который появляется из земли.', usage:'学生 — студент; 生日 — день рождения; 生活 — жизнь.'},
+    '水': {partOfSpeech:'Существительное: вода.', other:['река или водоём — в некоторых географических названиях и сочетаниях'], synonyms:[['河水','héshuǐ','речная вода'],['液体','yètǐ','жидкость'],['饮用水','yǐnyòngshuǐ','питьевая вода']], memory:'Форма напоминает поток воды с расходящимися струями. В составе часто сокращается до 氵.', usage:'水果 — фрукты; 水果店 — фруктовый магазин; 水杯 — стакан для воды.'},
+    '火': {partOfSpeech:'Существительное: огонь; иногда определение.', other:['пожар — в сочетаниях','популярный, очень востребованный — разговорное значение в словах типа 火爆'], synonyms:[['火焰','huǒyàn','пламя'],['大火','dàhuǒ','сильный огонь, пожар'],['着火','zháohuǒ','загореться']], memory:'Похоже на языки пламени, расходящиеся вверх. Внизу некоторых знаков превращается в 灬.', usage:'火车 — поезд; 火山 — вулкан; 火锅 — хот-пот.'},
+    '木': {partOfSpeech:'Существительное: дерево, древесина.', other:['дерево как материал; деревянный — в составе слов'], synonyms:[['树','shù','дерево'],['木材','mùcái','древесина'],['森林','sēnlín','лес']], memory:'Ствол 木 с ветвями и корнями. В составе может обозначать связь с деревьями или древесиной.', usage:'木头 — древесина; 树木 — деревья; 木桌 — деревянный стол.'},
+    '日': {partOfSpeech:'Существительное: солнце; день; дата.', other:['ежедневно, каждый день — в книжных и составных словах'], synonyms:[['太阳','tàiyáng','солнце'],['日期','rìqī','дата'],['日子','rìzi','день; период жизни']], memory:'Древняя форма изображала солнце; современная форма сохраняет очертания круга с чертой внутри.', usage:'生日 — день рождения; 日常 — повседневный; 日记 — дневник.'},
+    '月': {partOfSpeech:'Существительное: луна; месяц.', other:['в ряде иероглифов компонент 月 исторически связан не с луной, а с 肉 — плотью или телом'], synonyms:[['月份','yuèfèn','месяц календаря'],['月亮','yuèliang','луна'],['每月','měiyuè','ежемесячно']], memory:'Форма связана с изображением полумесяца. Важно: в составе некоторых знаков похожий компонент — это историческая форма 肉.', usage:'月亮 — луна; 一个月 — один месяц; 月份 — месяц.'},
+    '明': {partOfSpeech:'Прилагательное: светлый, ясный; глагольные и именные значения в сочетаниях.', other:['завтра — 明天 (míngtiān)','понятный, очевидный — по контексту'], synonyms:[['光明','guāngmíng','светлый, свет'],['明亮','míngliàng','яркий'],['清楚','qīngchu','ясный, понятный']], memory:'日 — солнце и 月 — луна: вместе дают ассоциацию яркого света. Это традиционная мнемоника идеографического знака.', usage:'明天 — завтра; 明白 — понимать, ясный; 明亮 — яркий.'},
+    '女': {partOfSpeech:'Существительное: женщина; определение «женский».', other:['дочь — в некоторых контекстах и сочетаниях'], synonyms:[['女性','nǚxìng','женщина; женский пол'],['女人','nǚrén','женщина'],['女士','nǚshì','госпожа, дама']], memory:'女 — древний пиктографический знак, изображавший сидящую женщину.', usage:'女儿 — дочь; 女生 — девушка / ученица; 女朋友 — девушка (партнёр).'},
+    '子': {partOfSpeech:'Существительное: ребёнок, сын; суффикс в ряде слов.', other:['суффикс существительных, который часто не переводится отдельно'], synonyms:[['孩子','háizi','ребёнок'],['儿子','érzi','сын'],['子女','zǐnǚ','дети, потомки']], memory:'Древняя форма изображала ребёнка в пелёнках.', usage:'孩子 — ребёнок; 儿子 — сын; 桌子 — стол (子 здесь суффикс).'},
+    '是': {partOfSpeech:'Глагол-связка: быть, являться; слово подтверждения «да».', other:['подчёркивание правильности или согласия — в разговорных конструкциях'], synonyms:[['就是','jiùshì','именно; как раз'],['确实','quèshí','действительно'],['对','duì','верно, правильно']], memory:'Запоминай 是 как связку между темой и тем, кем или чем она является: 我是学生 — я студент.', usage:'我是学生 — я студент; 不是 — не является; 是的 — да.'},
+    '不': {partOfSpeech:'Отрицательная частица перед глаголами и прилагательными.', other:['в некоторых сочетаниях меняет произношение на bú перед слогом 4-го тона'], synonyms:[['没','méi','не; не иметь (другая грамматическая область)'],['未','wèi','ещё не; не (книжное)'],['别','bié','не надо; не делай']], memory:'不 — один из главных знаков отрицания. Запоминай его вместе с противоположными парами: 好 / 不好.', usage:'不好 — нехорошо; 不是 — не является; 不要 — не нужно.'},
+    '吃': {partOfSpeech:'Глагол: есть, принимать пищу.', other:['переносные значения зависят от устойчивого сочетания'], synonyms:[['进食','jìnshí','принимать пищу'],['用餐','yòngcān','есть, трапезничать'],['吃饭','chīfàn','есть, обедать']], memory:'口 — рот: радикал подсказывает связь с едой и действиями рта.', usage:'吃饭 — есть; 好吃 — вкусный; 吃面 — есть лапшу.'},
+    '看': {partOfSpeech:'Глагол: смотреть, видеть; читать (в сочетании с текстом).', other:['посещать, навещать — в 看望 (kànwàng)','считать, полагать — в 看起来 (kànqǐlái), по контексту'], synonyms:[['观看','guānkàn','смотреть, наблюдать'],['阅读','yuèdú','читать'],['注视','zhùshì','пристально смотреть']], memory:'Верхняя часть напоминает руку 手 над глазом 目: прикрыть глаза рукой и посмотреть вдаль. Это мнемоника, а не буквальная этимология.', usage:'看书 — читать книгу; 看见 — увидеть; 看电影 — смотреть фильм.'},
+    '家': {partOfSpeech:'Существительное: дом, семья; счётное слово для заведений и специалистов.', other:['специалист, деятель — в словах типа 作家 (писатель)','счётное слово для предприятий: 一家公司 — одна компания'], synonyms:[['家庭','jiātíng','семья, домашний очаг'],['房子','fángzi','дом, здание'],['住处','zhùchù','место проживания']], memory:'宀 — крыша; под ней 豕 — свинья. В древнем хозяйстве наличие домашнего животного было связано с домом и семьёй.', usage:'回家 — возвращаться домой; 家人 — члены семьи; 国家 — государство.'},
+    '吗': {partOfSpeech:'Вопросительная частица в конце общего вопроса.', other:['не употребляется после вопросительных слов вроде 谁, 什么, 哪里'], synonyms:[], memory:'口 — рот: частица относится к оформлению вопроса в речи.', usage:'你好吗？ — Как дела?; 是吗？ — Правда?'},
+    '们': {partOfSpeech:'Суффикс множественного числа после местоимений и некоторых обозначений людей.', other:['обычно не добавляется к любому существительному; употребление ограничено'], synonyms:[], memory:'亻 — человек, 门 — фонетическая часть. Вместе образуют суффикс множественности для обозначений людей.', usage:'我们 — мы; 你们 — вы; 他们 — они.'},
+    '喜': {partOfSpeech:'Глагол «радоваться»; существительное «радость» в сочетаниях.', other:['счастливый, радостный — в составе слов'], synonyms:[['高兴','gāoxìng','радоваться, быть довольным'],['快乐','kuàilè','радостный, счастливый'],['欢喜','huānxǐ','радость, радоваться']], memory:'Мнемоника: рот 口 и элементы, связанные с праздничным звуком и радостью. Запоминай через 喜欢 — нравиться.', usage:'喜欢 — нравиться; 喜事 — радостное событие.'},
+    '欢': {partOfSpeech:'Глагол или прилагательная часть устойчивых сочетаний: радоваться, радостный.', other:['в современном языке чаще встречается в составе слов'], synonyms:[['欢乐','huānlè','весёлый, радостный'],['欢喜','huānxǐ','радоваться'],['欢迎','huānyíng','приветствовать']], memory:'В составе 喜欢 вместе с 喜 образует слово «нравиться».', usage:'喜欢 — нравиться; 欢迎 — добро пожаловать.'},
+    '学': {partOfSpeech:'Глагол «учиться, изучать»; существительное «учёба».', other:['наука, дисциплина — в словах типа 医学 (медицина)'], synonyms:[['学习','xuéxí','учиться'],['求学','qiúxué','получать образование'],['学业','xuéyè','учёба']], memory:'Запоминай через 学生 и 学校: ученик и школа.', usage:'学习 — учиться; 学生 — ученик / студент.'},
+    '习': {partOfSpeech:'Глагол: упражняться, практиковаться; повторять.', other:['привычка — в 习惯 (xíguàn)'], synonyms:[['练习','liànxí','упражняться'],['复习','fùxí','повторять пройденное'],['实习','shíxí','проходить практику']], memory:'Связывай знак с повторением и тренировкой: 练习 — упражнение, 复习 — повторение.', usage:'学习 — учиться; 习惯 — привычка.'}
+  };
+  const extra = learningData[ch] || {};
+  const pinyinSource = d.p || d.pinyinMMH || '';
   const numericTone = String(d.pn || '').match(/[1-5]/);
-  const pinyin = String(d.p || '').normalize('NFD');
+  const normalizedPinyin = String(pinyinSource).normalize('NFD');
   const toneLabel = numericTone ? (numericTone[0] === '5' ? 'нейтральный тон' : numericTone[0] + ' тон')
-    : pinyin.includes('\u0304') ? '1 тон' : pinyin.includes('\u0301') ? '2 тон' : pinyin.includes('\u030c') ? '3 тон' : pinyin.includes('\u0300') ? '4 тон' : '';
+    : normalizedPinyin.includes('\u0304') ? '1 тон' : normalizedPinyin.includes('\u0301') ? '2 тон' : normalizedPinyin.includes('\u030c') ? '3 тон' : normalizedPinyin.includes('\u0300') ? '4 тон' : '';
   const hskLevel = d.hsk2025 || d.hsk30 || d.hsk20 || '';
-  const meanings = String(d.m || '').split(/\s*;\s*/).filter(Boolean);
-  const mainMeaning = meanings.shift() || '';
-  const extraMeanings = meanings;
+  const rawMeanings = String(d.m || '').split(/\s*;\s*/).filter(Boolean);
+  const displayMeaning = extra.meanings || rawMeanings.join('; ') || d.definition || 'Перевод пока не найден';
   const frequencyRank = Number(String(d.frequencyRank || '').replace(/[^0-9]/g, ''));
   const radicalMeanings = {
-    '人':'человек','亻':'человек','口':'рот','女':'женщина','子':'ребёнок','宀':'крыша',
-    '心':'сердце','忄':'сердце','手':'рука','扌':'рука','水':'вода','氵':'вода',
+    '人':'человек','亻':'человек','口':'рот, речь','女':'женщина','子':'ребёнок','宀':'крыша',
+    '心':'сердце, чувства','忄':'сердце, чувства','手':'рука','扌':'рука','水':'вода','氵':'вода',
     '火':'огонь','灬':'огонь','木':'дерево','艹':'трава, растения','日':'солнце, день',
-    '月':'луна; в некоторых знаках — часть тела','言':'речь, слова','讠':'речь, слова',
+    '月':'луна; иногда историческая форма 肉 — плоть','言':'речь, слова','讠':'речь, слова',
     '辶':'движение, путь','土':'земля','金':'металл','钅':'металл','糸':'нить, шёлк',
     '纟':'нить, шёлк','食':'еда','饣':'еда','足':'нога','⻊':'нога','目':'глаз',
     '耳':'ухо','山':'гора','石':'камень','雨':'дождь','禾':'зерно','米':'рис',
     '力':'сила','刀':'нож','刂':'нож','门':'ворота','車':'повозка','车':'повозка',
-    '马':'лошадь','贝':'раковина','田':'поле','疒':'болезнь','广':'навес, строение',
+    '马':'лошадь','贝':'раковина; деньги','田':'поле','疒':'болезнь','广':'навес, строение',
     '彳':'шаг, движение','攵':'действие','攴':'действие','竹':'бамбук','⺮':'бамбук',
-    '冫':'лёд, холод','雨':'дождь','气':'воздух, пар','风':'ветер','馬':'лошадь',
+    '冫':'лёд, холод','气':'воздух, пар','风':'ветер','馬':'лошадь',
     '鸟':'птица','魚':'рыба','鱼':'рыба','虫':'насекомое','犬':'собака','犭':'животное',
-    '牛':'корова, бык','羊':'овца','豕':'свинья','⺾':'трава, растения','王':'нефрит, драгоценный камень',
-    '玉':'нефрит, драгоценный камень','白':'белый','黑':'чёрный','赤':'красный',
-    '青':'сине-зелёный','色':'цвет','見':'видеть','见':'видеть','立':'стоять',
-    '走':'идти, бежать','止':'останавливаться','辵':'движение, путь','廴':'длинный шаг',
+    '牛':'корова, бык','羊':'овца','豕':'свинья','王':'нефрит','玉':'нефрит',
+    '白':'белый','黑':'чёрный','赤':'красный','青':'сине-зелёный','色':'цвет',
+    '見':'видеть','见':'видеть','立':'стоять','走':'идти, бежать','止':'останавливаться',
     '方':'сторона, направление','厂':'склон, утёс','穴':'пещера, отверстие','工':'работа',
     '弓':'лук','矢':'стрела','斤':'топор','戈':'копьё','皿':'сосуд, посуда',
-    '衣':'одежда','衤':'одежда','巾':'ткань, полотенце','示':'алтарь, обряд','礻':'алтарь, обряд',
-    '贝':'раковина; деньги','頁':'голова; страница','页':'голова; страница','骨':'кость',
-    '肉':'мясо, плоть','月':'луна; часто компонент со значением «часть тела»',
-    '酉':'сосуд для вина','辛':'горький; острый','甘':'сладкий','舌':'язык',
-    '舟':'лодка','車':'повозка','车':'повозка','門':'ворота','门':'ворота',
-    '隹':'короткохвостая птица','羽':'перо, крыло','革':'кожа','韋':'кожа','韦':'кожа',
-    '頁':'голова; страница','頁':'голова; страница','爪':'коготь','爫':'коготь, рука',
-    '父':'отец','母':'мать','毋':'не; запрет','又':'рука; снова','廾':'две руки',
-    '卩':'печать, колено','巳':'змея (древняя форма)','己':'сам','已':'уже',
-    '寸':'дюйм; мера длины','又':'рука; снова','卜':'гадание','夕':'вечер',
-    '夕':'вечер','匕':'ложка','勹':'обёртывать','匚':'ящик','冂':'граница, рамка',
+    '衣':'одежда','衤':'одежда','巾':'ткань','示':'алтарь, обряд','礻':'алтарь, обряд',
+    '页':'голова; страница','骨':'кость','肉':'плоть','酉':'сосуд для брожения',
+    '辛':'острый, горький','甘':'сладкий','舌':'язык','舟':'лодка','門':'ворота',
+    '隹':'птица','羽':'перо, крыло','革':'кожа','爪':'коготь','爫':'коготь, рука',
+    '父':'отец','母':'мать','又':'рука; снова','廾':'две руки','卩':'печать',
+    '己':'сам','已':'уже','寸':'мера длины','卜':'гадание','夕':'вечер',
+    '匕':'ложка','勹':'обёртывать','匚':'ящик','冂':'граница, рамка',
     '凵':'открытый контейнер','几':'столик','八':'разделять','入':'входить',
     '二':'два','三':'три','十':'десять','丨':'вертикальная черта','丶':'точка',
-    '丿':'наклонная черта','乙':'изогнутая черта','一':'один, горизонтальная черта'
+    '丿':'наклонная черта','乙':'изогнутая черта','一':'горизонтальная черта',
+    '囗':'ограда, граница','欠':'недостаток; зевать','马':'лошадь','尔':'ты; такой'
   };
-  const etymologyLabels = {
-    pictographic:'В источнике этот знак отнесён к пиктографическим: его ранняя форма была связана с изображением предмета или явления.',
-    ideographic:'В источнике этот знак отнесён к идеографическим: его значение объясняется через идею или сочетание элементов.',
-    pictophonetic:'В источнике этот знак отнесён к фоно-семантическим: обычно один элемент связан со значением, а другой — с произношением.'
-  };
-  const radicalText = d.r ? d.r + (radicalMeanings[d.r] ? ' — ' + radicalMeanings[d.r] : '') : '';
-  const components = d.c ? String(d.c).split(/[+;,]+/).map(x => x.trim()).filter(Boolean) : [];
-  const infoBox = (title, value) => value ? '<div class="pc-character-info"><b>' + title + '</b><span>' + esc(value) + '</span></div>' : '';
-  const infoCards = [infoBox('Радикал', radicalText), infoBox('Количество черт', d.n)].filter(Boolean).join('');
-  const componentCards = components.map(item => {
-    const gloss = radicalMeanings[item];
+  const glossComponent = (item) => {
+    const info = getCharInfo(item);
+    const gloss = radicalMeanings[item] || info.m || '';
+    const py = info.p || info.pinyinMMH || '';
     return '<div class="pc-character-component"><strong>' + esc(item) + '</strong>' +
-      (gloss ? '<span>' + esc(gloss) + '</span>' : '') + '</div>';
-  }).join('');
+      (py ? '<em>' + esc(py) + '</em>' : '') +
+      (gloss ? '<span>' + esc(gloss.split(';')[0]) + '</span>' : '<span>значение зависит от состава знака</span>') + '</div>';
+  };
+  const components = d.c ? String(d.c).split(/[+;,]+/).map(x => x.trim()).filter(Boolean) : [];
+  const componentCards = components.map(glossComponent).join('');
+  const radical = d.r || '';
+  const radicalMeaning = radicalMeanings[radical] || '';
+  const radicalCard = radical ? '<div class="pc-character-info"><b>Радикал</b><span class="pc-character-radical">' + esc(radical) + (radicalMeaning ? ' — ' + esc(radicalMeaning) : '') + '</span></div>' : '';
+  const partOfSpeech = extra.partOfSpeech || d.partOfSpeech || 'Определяется по слову и контексту: один иероглиф может выполнять разные грамматические роли.';
+  const otherMeanings = extra.other || [];
+  const otherTable = otherMeanings.length ? '<div class="pc-character-meaning-table">' + otherMeanings.map(item => '<div class="pc-character-meaning-row"><span>' + esc(item) + '</span></div>').join('') + '</div>' : '';
+  const synonyms = extra.synonyms || [];
+  const synonymsBlock = synonyms.length ? '<div class="pc-character-synonyms">' + synonyms.map(item => '<div class="pc-character-synonym"><strong>' + esc(item[0]) + '</strong><span>' + esc(item[1]) + '</span><small>' + esc(item[2]) + '</small></div>').join('') + '</div>' : '';
+  const memory = extra.memory || d.note || '';
+  const usage = extra.usage || '';
+  const etymologyLabels = {
+    pictographic:'Пиктографический знак: ранняя форма была связана с изображением предмета или явления.',
+    ideographic:'Идеографический знак: значение связано с идеей или сочетанием элементов.',
+    pictophonetic:'Фоно-семантический знак: один элемент обычно связан со значением, другой — с произношением.'
+  };
   const semanticPart = d.etymologySemantic || '';
   const phoneticPart = d.etymologyPhonetic || '';
   const semanticGloss = radicalMeanings[semanticPart] || '';
-  const phoneticGloss = radicalMeanings[phoneticPart] || '';
+  const phoneticInfo = getCharInfo(phoneticPart);
+  const phoneticPinyin = phoneticInfo.p || phoneticInfo.pinyinMMH || '';
   const originDetails = d.etymologyType === 'pictophonetic'
     ? [
         semanticPart ? 'Смысловой элемент: ' + semanticPart + (semanticGloss ? ' — ' + semanticGloss : '') : '',
-        phoneticPart ? 'Звуковой элемент: ' + phoneticPart + (phoneticGloss ? ' — ' + phoneticGloss : '') : ''
-      ].filter(Boolean).join(' · ')
+        phoneticPart ? 'Звуковой элемент: ' + phoneticPart + (phoneticPinyin ? ' (' + phoneticPinyin + ')' : '') + ' — фонетический ориентир, но современное чтение может отличаться' : ''
+      ].filter(Boolean).join('. ')
     : '';
-  const originText = [etymologyLabels[d.etymologyType] || '', originDetails].filter(Boolean).join(' ');
+  const originText = [etymologyLabels[d.etymologyType] || '', d.etymologyHint || '', originDetails].filter(Boolean).join(' ');
+  const tags = (hskLevel ? '<span>HSK · уровень ' + esc(hskLevel) + '</span>' : '') +
+    (d.n ? '<span>' + esc(d.n) + ' черт</span>' : '') +
+    (frequencyRank > 0 ? '<span title="Место в частотном списке: чем меньше номер, тем чаще встречается">Частотный ранг · №' + frequencyRank.toLocaleString('ru-RU') + '</span>' : '');
+  const toneText = toneLabel ? '<span class="pc-character-tone">• ' + esc(toneLabel) + '</span>' : '';
   return '<article class="pc-character-card">' +
     '<h2>Разбор иероглифа</h2>' +
-    '<p class="pc-character-intro">Познакомимся со строением и значением знака</p>' +
     '<div class="pc-character-head"><div class="pc-character-symbol">' + esc(ch) + '</div><div>' +
-    '<div class="pc-character-reading"><span class="pc-character-pinyin">' + esc(d.p || 'Пиньинь не найден') + '</span>' +
-    (toneLabel ? '<span class="pc-character-tone">• ' + esc(toneLabel) + '</span>' : '') + '</div>' +
-    '<div class="pc-character-meaning">' + esc(mainMeaning || 'Перевод пока не найден') + '</div></div></div>' +
+    '<div class="pc-character-reading"><span class="pc-character-pinyin">' + esc(pinyinSource || 'Пиньинь не найден') + '</span>' + toneText + '</div>' +
+    '<div class="pc-character-meaning">' + esc(displayMeaning) + '</div></div></div>' +
     (originText ? '<section class="pc-character-origin"><h3>Состав и происхождение</h3><p class="pc-character-description">' + esc(originText) + '</p></section>' : '') +
-    '<div class="pc-character-tags">' + (hskLevel ? '<span>HSK · уровень ' + esc(hskLevel) + '</span>' : '') + (d.n ? '<span>' + esc(d.n) + ' черт</span>' : '') + (frequencyRank > 0 ? '<span>Частотность · №' + frequencyRank.toLocaleString('ru-RU') + '</span>' : '') + '</div>' +
-    (infoCards ? '<div class="pc-character-info-grid">' + infoCards + '</div>' : '') +
-    (extraMeanings.length ? '<section class="pc-character-section"><h3>Другие значения</h3><p>' + extraMeanings.map(esc).join(' · ') + '</p></section>' : '') +
-    (componentCards ? '<section class="pc-character-section"><h3>Компоненты</h3><div class="pc-character-components">' + componentCards + '</div></section>' : '') +
-    '<div class="pc-character-strokes"><h3>Последовательность черт</h3><p>Посмотри, в каком порядке создаётся этот знак.</p><button class="pc-stroke-animation-button stroke-choice" data-char="' + esc(ch) + '" type="button">✎ Показать порядок черт</button></div>' +
+    '<div class="pc-character-tags">' + tags + '</div>' +
+    '<div class="pc-character-info-grid">' +
+      '<div class="pc-character-info"><b>Часть речи</b><span>' + esc(partOfSpeech) + '</span></div>' +
+      radicalCard +
+      (componentCards ? '<div class="pc-character-info pc-character-components-info"><b>Компоненты иероглифа</b><div class="pc-character-components">' + componentCards + '</div></div>' : '') +
+    '</div>' +
+    (otherTable ? '<section class="pc-character-section"><h3>Другие значения</h3>' + otherTable + '</section>' : '') +
+    (synonymsBlock ? '<section class="pc-character-section"><h3>Синонимы по контексту</h3><p class="pc-character-section-note">Близкие по смыслу слова и выражения — точный выбор зависит от фразы.</p>' + synonymsBlock + '</section>' : '') +
+    (usage ? '<section class="pc-character-section"><h3>Как употребляется</h3><p>' + esc(usage) + '</p></section>' : '') +
+    (memory ? '<section class="pc-character-section"><h3>Ассоциация для запоминания</h3><div class="pc-character-memory">' + esc(memory) + '</div></section>' : '') +
+    '<div class="pc-character-strokes"><h3>Схема последовательности черт</h3><p>Каждая миниатюра показывает отдельную черту в порядке написания. Нажми на анимацию, чтобы увидеть движение.</p><div class="pc-stroke-scheme" data-char="' + esc(ch) + '">Подготавливаем схему черт…</div><button class="pc-stroke-animation-button stroke-choice" data-char="' + esc(ch) + '" type="button">✎ Показать анимацию написания</button></div>' +
     '</article>';
 }
   const text = analysisInput.value.trim();
@@ -2293,6 +2393,30 @@ function buildCharacterCard(ch, d) {
   });
 
   analysisResults.innerHTML = html;
+
+  analysisResults.querySelectorAll('.pc-stroke-scheme').forEach(async container => {
+    const ch = container.dataset.char;
+    if (!window.HanziWriter || !HanziWriter.loadCharacterData) {
+      container.textContent = 'Схема черт сейчас недоступна.';
+      return;
+    }
+    try {
+      const data = await HanziWriter.loadCharacterData(ch);
+      if (!data || !Array.isArray(data.strokes) || !data.strokes.length) {
+        container.textContent = 'Для этого знака схема пока не найдена.';
+        return;
+      }
+      container.innerHTML = data.strokes.map((path, index) => {
+        const median = data.medians && data.medians[index] ? data.medians[index] : [];
+        const points = median.flat ? median.flat() : [];
+        const x = points.length ? points.filter((v,i) => i % 2 === 0).reduce((a,b) => a + b, 0) / Math.max(1, Math.ceil(points.length / 2)) : 512;
+        const y = points.length ? points.filter((v,i) => i % 2 === 1).reduce((a,b) => a + b, 0) / Math.max(1, Math.floor(points.length / 2)) : 512;
+        return '<div class="pc-stroke-tile" title="Черта ' + (index + 1) + '"><svg viewBox="0 0 1024 1024" aria-hidden="true"><path d="' + esc(path) + '" fill="#b65d73"/><circle cx="' + x + '" cy="' + y + '" r="1" fill="none"/></svg><b>' + (index + 1) + '</b></div>';
+      }).join('');
+    } catch (error) {
+      container.textContent = 'Не удалось загрузить схему черт.';
+    }
+  });
 
   analysisResults
     .querySelectorAll('.stroke-choice')
