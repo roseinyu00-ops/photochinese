@@ -14,6 +14,7 @@
 <meta property="og:description" content="Твой уютный помощник в изучении китайского языка. Распознавай иероглифы, изучай пиньинь и запоминай новые слова.">
 <meta property="og:url" content="https://photochinese.netlify.app/">
 <meta name="twitter:card" content="summary">
+  <script src="https://cdn.jsdelivr.net/npm/hanzi-writer@3.5/dist/hanzi-writer.min.js"></script>
   <link rel="icon" type="image/png" href="./icon-192.png">
 <link rel="apple-touch-icon" href="./icon-192.png">
   <style>
@@ -1975,7 +1976,8 @@ const charDictionary = {
  '火':{p:'huǒ',m:'огонь',r:'火',n:4,c:'Самостоятельный знак',note:'В составе часто принимает форму 灬 или 火.'},
  '木':{p:'mù',m:'дерево; древесина',r:'木',n:4,c:'Самостоятельный знак',note:'Встречается в названиях растений и предметов из дерева.'},
  '日':{p:'rì',m:'солнце; день',r:'日',n:4,c:'Самостоятельный знак',note:'Встречается в словах о времени и днях.'},
- '月':{p:'yuè',m:'луна; месяц',r:'月',n:4,c:'Самостоятельный знак',note:'Встречается в названиях месяцев.'}
+ '月':{p:'yuè',m:'луна; месяц',r:'月',n:4,c:'Самостоятельный знак',note:'Встречается в названиях месяцев.'},
+ '狗':{p:'gǒu',m:'собака',r:'犭 — животные',n:8,c:'犭 + 句',note:'犭 — смысловой компонент, 句 — фонетический компонент.'}
 };
 const wordDictionary = {
  '你好':{p:'nǐ hǎo',m:'привет; здравствуйте'},
@@ -2003,7 +2005,10 @@ const wordDictionary = {
  '吗':{p:'ma',m:'вопросительная частица'},
  '不':{p:'bù',m:'не; нет'},
  '我':{p:'wǒ',m:'я'},
- '你':{p:'nǐ',m:'ты; вы'}
+ '你':{p:'nǐ',m:'ты; вы'},
+ '小狗':{p:'xiǎogǒu',m:'щенок; маленькая собака'},
+ '狗狗':{p:'gǒugou',m:'собачка; ласковое разговорное обозначение собаки'},
+ '狗叫':{p:'gǒujiào',m:'лай; лаять'}
 };
 const sentenceTranslations = {
  '你好': 'Привет! / Здравствуйте!',
@@ -2146,17 +2151,26 @@ async function loadCharacterStructureData(){
   if(status) status.textContent='Данные о компонентах пока не загрузились. Проверь интернет и обнови страницу.';
  }
 }
+const strokeDataPromises=Object.create(null);
+function loadStrokeData(ch){
+ if(!window.HanziWriter || !HanziWriter.loadCharacterData) return Promise.resolve(null);
+ if(!strokeDataPromises[ch]){
+  strokeDataPromises[ch]=HanziWriter.loadCharacterData(ch).catch(error=>{
+   delete strokeDataPromises[ch];
+   console.warn('Не удалось загрузить данные черт для '+ch,error);
+   return null;
+  });
+ }
+ return strokeDataPromises[ch];
+}
 async function enrichStrokeCounts(chars){
- if(!window.HanziWriter || !HanziWriter.loadCharacterData) return;
  const unique=[...new Set(chars)];
  await Promise.all(unique.map(async ch=>{
   const current=getCharInfo(ch);
   if(current.n) return;
-  try{
-   const data=await HanziWriter.loadCharacterData(ch);
-   const count=data?.strokes?.length;
-   if(count) databaseCharDictionary[ch]={...(databaseCharDictionary[ch]||{}),n:count};
-  }catch(e){}
+  const data=await loadStrokeData(ch);
+  const count=data?.strokes?.length;
+  if(count) databaseCharDictionary[ch]={...(databaseCharDictionary[ch]||{}),n:count};
  }));
 }
 function tokenizeChinese(text){
@@ -2279,7 +2293,8 @@ function buildCharacterCard(ch, d) {
         : 'Для этого знака пока не найдено подтверждённое русскоязычное определение.';
   const frequencyRank = Number(String(d.frequencyRank || '').replace(/[^0-9]/g, ''));
   const strokeCount = Number(d.n) || 0;
-  const relatedWordPool = Object.entries(databaseWordDictionary)
+  const allExampleWords = {...wordDictionary,...databaseWordDictionary};
+  const relatedWordPool = Object.entries(allExampleWords)
     .filter(([word,entry]) => word.includes(ch) && word !== ch && entry?.m && entry?.p)
     .sort((a,b) => (Number(a[1].frequencyRank)||999999)-(Number(b[1].frequencyRank)||999999) || a[0].length-b[0].length);
   const relatedWords = relatedWordPool.slice(0,6);
@@ -2352,7 +2367,7 @@ function buildCharacterCard(ch, d) {
   const componentMeanings = components.map(item => { const info=getCharInfo(item); return item+' — '+(radicalMeanings[item]||info.m||'элемент без отдельного перевода'); });
   const generatedMemory = componentMeanings.length ? 'Представь короткую сцену из частей: '+componentMeanings.join('; ')+'. Свяжи её с основным значением «'+(rawMeanings[0]||ch)+'». Это мнемоника, а не научная этимология.' : relatedWords.length ? 'Запомни знак через слово «'+relatedWords[0][0]+'» ('+relatedWords[0][1].p+') — '+relatedWords[0][1].m+'. Представь ситуацию, в которой используешь это слово.' : 'Закрепи форму через произношение и короткое слово или предложение. Надёжную образную подсказку для этого знака пока не удалось подтвердить — не будем её выдумывать.';
   const memory = extra.memory || generatedMemory;
-  const usage = extra.usage || (relatedWords.length ? 'Примеры из словаря: '+exampleWordText+'.' : 'Используй знак в составе знакомых слов и проверяй значение по контексту целой фразы.');
+  const usage = extra.usage || (relatedWords.length ? 'Примеры употребления: '+exampleWordText+'.' : 'Для этого знака пока не подобраны проверенные словосочетания. Лучше изучать его в составе целой фразы, а не заучивать изолированно.');
   const semanticPart=d.etymologySemantic||'', phoneticPart=d.etymologyPhonetic||'';
   const semanticGloss=radicalMeanings[semanticPart]||getCharInfo(semanticPart).m||'';
   const phoneticInfo=getCharInfo(phoneticPart), phoneticPinyin=phoneticInfo.p||phoneticInfo.pinyinMMH||'';
@@ -2376,7 +2391,7 @@ function buildCharacterCard(ch, d) {
     : components.length?'Видимые компоненты: '+componentMeanings.join('; ')+'.':'';
   const etymologyTypeNames = {pictographic:'пиктографическая',ideographic:'идеографическая',pictophonetic:'фонетико-семантическая'};
   const etymologyTypeLabel = etymologyTypeNames[d.etymologyType] || '';
-  const originText=[hintText,originDetails,etymologyTypeLabel ? 'Тип заметки Make Me a Hanzi: '+etymologyTypeLabel+'.' : ''].filter(Boolean).join(' ');
+  const originText=[hintText,originDetails].filter(Boolean).join(' ');
   const tags = (hskLevel ? '<span title="' + esc(hskLevelTitle) + '">' + (directHskLevel ? 'HSK · уровень ' : 'HSK · слова с этим знаком: ') + esc(hskLevel) + '</span>' : '') +
     '<span class="pc-character-stroke-count" data-stroke-count-for="' + esc(ch) + '">' + (strokeCount ? strokeCount + ' черт' : 'Число черт · загружается…') + '</span>' +
     (frequencyRank > 0 ? '<span title="Место в частотном списке: чем меньше номер, тем чаще встречается">Частотный ранг · №' + frequencyRank.toLocaleString('ru-RU') + '</span>' : '');
@@ -2385,8 +2400,8 @@ function buildCharacterCard(ch, d) {
     '<h2>Разбор иероглифа</h2>' +
     '<div class="pc-character-head"><div class="pc-character-symbol">' + esc(ch) + '</div><div>' +
     '<div class="pc-character-reading"><span class="pc-character-pinyin">' + esc(pinyinSource || 'Пиньинь не найден') + '</span>' + toneText + '</div>' +
-    '<div class="pc-character-meaning">' + esc(displayMeaning) + '</div><p class="pc-character-section-note">' + esc(meaningSourceNote) + '</p></div></div>' +
-    '<section class="pc-character-origin"><h3>Состав и происхождение</h3><p class="pc-character-description">' + esc(originText || 'Make Me a Hanzi не предоставляет для этого знака этимологическую заметку. Ниже показана доступная структурная разбивка; мнемоника отдельно помечена как способ запоминания.') + '</p><p class="pc-character-section-note">' + (d.etymologyType ? 'Этимологическая заметка взята из Make Me a Hanzi; это краткая справочная аннотация, а не исчерпывающий историко-лингвистический разбор.' : 'Историческое происхождение не установлено по подключённой записи — не выдаём мнемонику за этимологию.') + '</p></section>' +
+    '<div class="pc-character-meaning">' + esc(displayMeaning) + '</div></div></div>' +
+    '<section class="pc-character-origin"><h3>Состав и происхождение</h3><p class="pc-character-description">' + esc(originText || 'Историческое объяснение пока не найдено. Доступные компоненты показаны отдельно.') + '</p></section>' +
     '<div class="pc-character-tags">' + tags + '</div>' +
     '<div class="pc-character-info-grid">' +
       '<div class="pc-character-info"><b>Часть речи</b><span>' + esc(partOfSpeech) + '</span></div>' +
@@ -2394,10 +2409,10 @@ function buildCharacterCard(ch, d) {
       '<div class="pc-character-info pc-character-components-info"><b>Компоненты иероглифа</b><div class="pc-character-components">' + componentCards + '</div></div>' +
     '</div>' +
     '<section class="pc-character-section"><h3>Другие значения и оттенки</h3>' + otherTable + '</section>' +
-    '<section class="pc-character-section"><h3>Синонимы и слова с этим иероглифом</h3><p class="pc-character-section-note">Синонимы и слова, в составе которых встречается знак, — разные вещи. Мы не называем словосочетания с этим знаком синонимами.</p>' + synonymsBlock + '</section>' +
+    '<section class="pc-character-section"><h3>Слова с этим иероглифом</h3>' + synonymsBlock + '</section>' +
     '<section class="pc-character-section"><h3>Как употребляется</h3><p>' + esc(usage) + '</p></section>' +
     '<section class="pc-character-section"><h3>Ассоциация для запоминания</h3><div class="pc-character-memory">' + esc(memory) + '</div></section>' +
-    '<p class="pc-character-sources">Источники и дополнительная проверка: <a href="https://wangwave.github.io/makeme_word/" target="_blank" rel="noopener">Make Me a Hanzi</a> (структура, радикал, этимологические заметки); <a href="https://www.mdbg.net/chinese/dictionary?cdqchi=' + encodeURIComponent(ch) + '" target="_blank" rel="noopener">MDBG / CC-CEDICT</a> (словарная проверка); <a href="https://unicode.org/charts/unihan.html" target="_blank" rel="noopener">Unicode Unihan</a> (чтения и свойства знака). ' + (extra.sourceLinks || []).map(([label,url]) => '<a href="' + esc(url) + '" target="_blank" rel="noopener">' + esc(label) + '</a>').join(' · ') + '</p>' +
+
     '<div class="pc-character-strokes"><h3>Схема последовательности черт</h3><p>Каждая миниатюра показывает отдельную черту в порядке написания. Нажми на анимацию, чтобы увидеть движение.</p><div class="pc-stroke-scheme" data-char="' + esc(ch) + '">Подготавливаем схему черт…</div><button class="pc-stroke-animation-button stroke-choice" data-char="' + esc(ch) + '" type="button">✎ Показать анимацию написания</button></div>' +
     '</article>';
 }
@@ -2410,10 +2425,6 @@ function buildCharacterCard(ch, d) {
   }
 
   await Promise.all([dictionaryPromise, characterStructurePromise]);
-
-  await enrichStrokeCounts(
-    [...text].filter(ch => /\p{Script=Han}/u.test(ch))
-  );
 
   const tokens = tokenizeChinese(text);
 
@@ -2479,7 +2490,7 @@ function buildCharacterCard(ch, d) {
       return;
     }
     try {
-      const data = await HanziWriter.loadCharacterData(ch);
+      const data = await loadStrokeData(ch);
       if (!data || !Array.isArray(data.strokes) || !data.strokes.length) {
         container.textContent = 'Для этого знака схема пока не найдена.';
         return;
