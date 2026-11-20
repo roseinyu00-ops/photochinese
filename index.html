@@ -1514,6 +1514,39 @@ body.dark-theme .pc-character-synonym span { color: #d5aebb; }
 .pc-character-meaning-row { line-height:1.65; }
 body.dark-theme .pc-character-sources { color:#c4aeb6; }
 
+
+/* Компактный блок результата разбора текста */
+.analysis-result-summary {
+  display: block;
+  width: fit-content;
+  max-width: min(100%, 760px);
+  box-sizing: border-box;
+  padding: 18px 22px;
+  margin: 12px 0 18px;
+  line-height: 1.65;
+  white-space: normal;
+  overflow-wrap: anywhere;
+}
+
+.analysis-result-summary .small {
+  margin-top: 14px;
+  line-height: 1.5;
+}
+
+body.dark-theme .analysis-result-summary {
+  background: #49383d !important;
+  color: #fff1ed !important;
+  border-color: #76545d !important;
+}
+
+body.dark-theme .analysis-result-summary b {
+  color: #ffe1e8 !important;
+}
+
+body.dark-theme .analysis-result-summary .small {
+  color: #e8c9d0 !important;
+}
+
 </style>
 </head>
 <body>
@@ -3478,36 +3511,3 @@ window.addEventListener("keydown", function(event) {
   
 </body>
 </html>
-
-
-/* Компактный блок результата разбора текста */
-.analysis-result-summary {
-  display: block;
-  width: fit-content;
-  max-width: min(100%, 760px);
-  box-sizing: border-box;
-  padding: 18px 22px;
-  margin: 12px 0 18px;
-  line-height: 1.65;
-  white-space: normal;
-  overflow-wrap: anywhere;
-}
-
-.analysis-result-summary .small {
-  margin-top: 14px;
-  line-height: 1.5;
-}
-
-body.dark-theme .analysis-result-summary {
-  background: #49383d !important;
-  color: #fff1ed !important;
-  border-color: #76545d !important;
-}
-
-body.dark-theme .analysis-result-summary b {
-  color: #ffe1e8 !important;
-}
-
-body.dark-theme .analysis-result-summary .small {
-  color: #e8c9d0 !important;
-}
