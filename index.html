@@ -2190,7 +2190,7 @@ function showStrokeAnimation(ch){
  document.getElementById('strokeHint').textContent='Выбран иероглиф: '+ch+' · нажми кнопку, чтобы посмотреть порядок черт.';
  const box=document.getElementById('strokeCanvas'); box.innerHTML=''; strokeWriter=null;
  if(!window.HanziWriter){box.textContent='Не удалось загрузить Hanzi Writer. Проверь интернет и обнови страницу.';return;}
- try{strokeWriter=HanziWriter.create('strokeCanvas',ch,{width:180,height:180,padding:8,showOutline:true,strokeAnimationSpeed:1,delayBetweenStrokes:250});}
+ try{strokeWriter=HanziWriter.create('strokeCanvas',ch,{width:180,height:180,padding:8,showOutline:true,strokeAnimationSpeed:1,delayBetweenStrokes:250,charDataLoader:(character,onComplete)=>{loadStrokeData(character).then(data=>{if(data)onComplete(data);});}});}
  catch(e){box.textContent='Не удалось подготовить анимацию для этого знака.';}
 }
 document.getElementById('playStrokes').addEventListener('click',()=>{
@@ -2273,7 +2273,8 @@ function buildCharacterCard(ch, d) {
 ,
 
     '猫': {meanings:'кошка; кот',sourceLinks:[['Dong Chinese','https://www.dong-chinese.com/wiki/%E8%B2%93'],['MDBG / CC-CEDICT','https://www.mdbg.net/chinese/dictionary?cdqchi=%E7%8C%AB']],partOfSpeech:'Существительное: кошка, кот.',other:['Редкое диалектное значение: прятаться, скрываться.','В разговорном заимствованном употреблении может обозначать модем.'],synonyms:[['猫咪','māomī','ласкательное «кошечка»'],['小猫','xiǎomāo','котёнок'],['家猫','jiāmāo','домашняя кошка'],['野猫','yěmāo','дикая или бездомная кошка']],memory:'Слева 犭 — подсказка «животное», справа 苗 (miáo) — фонетическая часть. Представь кошку, крадущуюся между молодыми ростками: левый элемент помогает вспомнить значение, а 苗 — звучание. Сегодня māo и miáo не рифмуются точно: это историческая звуковая подсказка.',usage:'猫喜欢在阳光下睡觉。 (māo xǐhuan zài yángguāng xià shuìjiào) — Кошки любят спать на солнце. 我养了一只猫。 (wǒ yǎng le yì zhī māo) — Я завёл(а) кошку. 熊猫 (xióngmāo) — панда; 小猫 (xiǎomāo) — котёнок.'},
-    '白': {meanings:'белый; светлый; ясный; напрасно',sourceLinks:[['5000 Chinese Characters','https://5000yan.com/hanzi/en/white.html']],partOfSpeech:'Прилагательное: белый, светлый, чистый. Наречие: зря, напрасно (白等 — ждать зря). В устойчивых сочетаниях также «бесплатно», «ясно, очевидно».',other:['Бесплатно: 白吃 (bái chī) — есть бесплатно; 白送 (bái sòng) — отдать даром.','Напрасно: 白等 (bái děng) — ждать зря; 白跑一趟 (bái pǎo yí tàng) — зря сходить / съездить.','Ясно, очевидно: 真相大白 (zhēnxiàng dàbái) — правда раскрылась.','Простой, без добавок: 白开水 (báikāishuǐ) — обычная кипячёная вода.'],synonyms:[['雪白','xuěbái','снежно-белый'],['洁白','jiébái','чисто-белый; незапятнанный'],['苍白','cāngbái','бледный'],['明白','míngbai','ясный, понятный; понимать — зависит от конструкции']],memory:'Представь горящую свечу в темноте: яркий свет делает окружающее белым. В Make Me a Hanzi также приводится образ солнечных лучей. Это мнемоника для запоминания, а не единственное бесспорное объяснение исторического происхождения.',usage:'白天 (báitiān) — дневное время; 白色 (báisè) — белый цвет; 白纸 (báizhǐ) — белая бумага; 明白 (míngbai) — понимать, ясный; 白白 (báibái) — зря, напрасно.'}
+    '白': {meanings:'белый; светлый; ясный; напрасно',sourceLinks:[['5000 Chinese Characters','https://5000yan.com/hanzi/en/white.html']],partOfSpeech:'Прилагательное: белый, светлый, чистый. Наречие: зря, напрасно (白等 — ждать зря). В устойчивых сочетаниях также «бесплатно», «ясно, очевидно».',other:['Бесплатно: 白吃 (bái chī) — есть бесплатно; 白送 (bái sòng) — отдать даром.','Напрасно: 白等 (bái děng) — ждать зря; 白跑一趟 (bái pǎo yí tàng) — зря сходить / съездить.','Ясно, очевидно: 真相大白 (zhēnxiàng dàbái) — правда раскрылась.','Простой, без добавок: 白开水 (báikāishuǐ) — обычная кипячёная вода.'],synonyms:[['雪白','xuěbái','снежно-белый'],['洁白','jiébái','чисто-белый; незапятнанный'],['苍白','cāngbái','бледный'],['明白','míngbai','ясный, понятный; понимать — зависит от конструкции']],memory:'Представь горящую свечу в темноте: яркий свет делает окружающее белым. В Make Me a Hanzi также приводится образ солнечных лучей. Это мнемоника для запоминания, а не единственное бесспорное объяснение исторического происхождения.',usage:'白天 (báitiān) — дневное время; 白色 (báisè) — белый цвет; 白纸 (báizhǐ) — белая бумага; 明白 (míngbai) — понимать, ясный; 白白 (báibái) — зря, напрасно.'},
+    '狗': {meanings:'собака',partOfSpeech:'Существительное: собака.',other:['В современном китайском часто встречается в названиях домашних собак и в разговорных сочетаниях.'],memory:'犭 — смысловая часть, указывающая на животное. 句 — фонетическая часть: она исторически подсказывает звучание, хотя современное произношение gǒu уже не совпадает с jù.',usage:'他家里养了一只小狗。 (Tā jiālǐ yǎngle yì zhī xiǎogǒu.) — Он держит дома щенка. 小狗的鼻子很灵。 (Xiǎogǒu de bízi hěn líng.) — У щенка очень чуткий нюх. 小狗 (xiǎogǒu) — щенок; 狗狗 (gǒugou) — собачка.'}
   };
   const extra = learningData[ch] || {};
   const pinyinSource = d.p || d.pinyinMMH || '';
@@ -2282,15 +2283,7 @@ function buildCharacterCard(ch, d) {
   const toneLabel = numericTone ? (numericTone[0] === '5' ? 'нейтральный тон' : numericTone[0] + ' тон')
     : normalizedPinyin.includes('\u0304') ? '1 тон' : normalizedPinyin.includes('\u0301') ? '2 тон' : normalizedPinyin.includes('\u030c') ? '3 тон' : normalizedPinyin.includes('\u0300') ? '4 тон' : '';
   const rawMeanings = String(d.m || '').split(/\s*;\s*/).filter(Boolean);
-  const hasRussianMeaning = Boolean(extra.meanings || rawMeanings.length);
-  const displayMeaning = extra.meanings || rawMeanings.join('; ') || (d.definition ? d.definition + ' (определение на английском)' : 'Русский перевод пока не найден');
-  const meaningSourceNote = extra.meanings
-    ? 'Перевод: редакционная карточка PhotoChinese.'
-    : rawMeanings.length
-      ? 'Перевод: русскоязычная запись из локального HSK-словаря.'
-      : d.definition
-        ? 'В основном источнике доступно краткое определение на английском. Русский перевод не подменяем догадкой.'
-        : 'Для этого знака пока не найдено подтверждённое русскоязычное определение.';
+  const displayMeaning = extra.meanings || rawMeanings.join('; ') || (d.definition ? d.definition : 'Перевод пока не добавлен');
   const frequencyRank = Number(String(d.frequencyRank || '').replace(/[^0-9]/g, ''));
   const strokeCount = Number(d.n) || 0;
   const allExampleWords = {...wordDictionary,...databaseWordDictionary};
@@ -2356,16 +2349,16 @@ function buildCharacterCard(ch, d) {
   const exampleWordText = relatedWords.map(([word,e]) => word + ' (' + e.p + ') — ' + e.m).join('; ');
   const partOfSpeech = extra.partOfSpeech || d.partOfSpeech || ('Роль знака определяется словом и предложением. Примеры сочетаний: ' + (exampleWordText || 'нужен контекст целой фразы.'));
   const otherMeanings = extra.other || rawMeanings.slice(1).map(v => 'Дополнительное словарное значение: ' + v);
-  const otherRows = otherMeanings.length ? otherMeanings : [relatedWords.length ? 'Отдельные переносные значения в краткой записи не выделены. В словах знак встречается так: ' + relatedWords.slice(0,3).map(([w,e])=>w+' — '+e.m).join('; ')+'.' : 'В краткой словарной записи отдельные дополнительные значения не указаны; неподтверждённые значения не добавляем.'];
+  const otherRows = otherMeanings.length ? otherMeanings : (relatedWords.length ? ['Встречается в словах: ' + relatedWords.slice(0,3).map(([w,e])=>w+' — '+e.m).join('; ')+'.'] : []);
   const otherTable = '<div class="pc-character-meaning-table">' + otherRows.map(item => '<div class="pc-character-meaning-row"><span>' + esc(item) + '</span></div>').join('') + '</div>';
   const synonyms = extra.synonyms || [];
   const synonymsBlock = synonyms.length
     ? '<div class="pc-character-synonyms">' + synonyms.map(item => '<div class="pc-character-synonym"><strong>' + esc(item[0]) + '</strong><span>' + esc(item[1]) + '</span><small>' + esc(item[2]) + '</small></div>').join('') + '</div>'
     : relatedWords.length
       ? '<p class="pc-character-section-note">Это не прямые синонимы, а реальные слова из словаря, в которых встречается данный знак.</p><div class="pc-character-synonyms">' + relatedWords.map(([w,e])=>'<div class="pc-character-synonym"><strong>'+esc(w)+'</strong><span>'+esc(e.p)+'</span><small>'+esc(e.m)+'</small></div>').join('')+'</div>'
-      : '<p class="pc-character-section-note">Прямые синонимы для этого знака в доступной базе не подтверждены. Ниже смотри примеры употребления и близкие конструкции.</p>';
+      : '<p>Похожие слова пока не добавлены.</p>';
   const componentMeanings = components.map(item => { const info=getCharInfo(item); return item+' — '+(radicalMeanings[item]||info.m||'элемент без отдельного перевода'); });
-  const generatedMemory = componentMeanings.length ? 'Представь короткую сцену из частей: '+componentMeanings.join('; ')+'. Свяжи её с основным значением «'+(rawMeanings[0]||ch)+'». Это мнемоника, а не научная этимология.' : relatedWords.length ? 'Запомни знак через слово «'+relatedWords[0][0]+'» ('+relatedWords[0][1].p+') — '+relatedWords[0][1].m+'. Представь ситуацию, в которой используешь это слово.' : 'Закрепи форму через произношение и короткое слово или предложение. Надёжную образную подсказку для этого знака пока не удалось подтвердить — не будем её выдумывать.';
+  const generatedMemory = componentMeanings.length ? 'Представь короткую сцену из частей: '+componentMeanings.join('; ')+'. Свяжи её с основным значением «'+(rawMeanings[0]||ch)+'».' : relatedWords.length ? 'Запомни знак через слово «'+relatedWords[0][0]+'» ('+relatedWords[0][1].p+') — '+relatedWords[0][1].m+'. Представь ситуацию, в которой используешь это слово.' : 'Закрепи форму через произношение и короткое слово или предложение.';
   const memory = extra.memory || generatedMemory;
   const usage = extra.usage || (relatedWords.length ? 'Примеры употребления: '+exampleWordText+'.' : 'Для этого знака пока не подобраны проверенные словосочетания. Лучше изучать его в составе целой фразы, а не заучивать изолированно.');
   const semanticPart=d.etymologySemantic||'', phoneticPart=d.etymologyPhonetic||'';
@@ -2401,14 +2394,14 @@ function buildCharacterCard(ch, d) {
     '<div class="pc-character-head"><div class="pc-character-symbol">' + esc(ch) + '</div><div>' +
     '<div class="pc-character-reading"><span class="pc-character-pinyin">' + esc(pinyinSource || 'Пиньинь не найден') + '</span>' + toneText + '</div>' +
     '<div class="pc-character-meaning">' + esc(displayMeaning) + '</div></div></div>' +
-    '<section class="pc-character-origin"><h3>Состав и происхождение</h3><p class="pc-character-description">' + esc(originText || 'Историческое объяснение пока не найдено. Доступные компоненты показаны отдельно.') + '</p></section>' +
+    (originText ? '<section class="pc-character-origin"><h3>Состав и происхождение</h3><p class="pc-character-description">' + esc(originText) + '</p></section>' : '') +
     '<div class="pc-character-tags">' + tags + '</div>' +
     '<div class="pc-character-info-grid">' +
       '<div class="pc-character-info"><b>Часть речи</b><span>' + esc(partOfSpeech) + '</span></div>' +
       radicalCard +
       '<div class="pc-character-info pc-character-components-info"><b>Компоненты иероглифа</b><div class="pc-character-components">' + componentCards + '</div></div>' +
     '</div>' +
-    '<section class="pc-character-section"><h3>Другие значения и оттенки</h3>' + otherTable + '</section>' +
+    (otherRows.length ? '<section class="pc-character-section"><h3>Другие значения и оттенки</h3>' + otherTable + '</section>' : '') +
     '<section class="pc-character-section"><h3>Слова с этим иероглифом</h3>' + synonymsBlock + '</section>' +
     '<section class="pc-character-section"><h3>Как употребляется</h3><p>' + esc(usage) + '</p></section>' +
     '<section class="pc-character-section"><h3>Ассоциация для запоминания</h3><div class="pc-character-memory">' + esc(memory) + '</div></section>' +
