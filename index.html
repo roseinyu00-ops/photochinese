@@ -2457,7 +2457,7 @@ function buildCharacterCard(ch, d) {
     .replace(/\s+([，。！？；：、,.!?;:])/g, '$1');
 
   let html = `
-    <div class="result">
+    <div class="result analysis-result-summary">
       <b>Пиньинь:</b> ${esc(pinyin)}
       <br>
       <b>${sentence ? 'Перевод:' : 'Смысл по частям (черновой):'}</b>
@@ -3478,3 +3478,36 @@ window.addEventListener("keydown", function(event) {
   
 </body>
 </html>
+
+
+/* Компактный блок результата разбора текста */
+.analysis-result-summary {
+  display: block;
+  width: fit-content;
+  max-width: min(100%, 760px);
+  box-sizing: border-box;
+  padding: 18px 22px;
+  margin: 12px 0 18px;
+  line-height: 1.65;
+  white-space: normal;
+  overflow-wrap: anywhere;
+}
+
+.analysis-result-summary .small {
+  margin-top: 14px;
+  line-height: 1.5;
+}
+
+body.dark-theme .analysis-result-summary {
+  background: #49383d !important;
+  color: #fff1ed !important;
+  border-color: #76545d !important;
+}
+
+body.dark-theme .analysis-result-summary b {
+  color: #ffe1e8 !important;
+}
+
+body.dark-theme .analysis-result-summary .small {
+  color: #e8c9d0 !important;
+}
