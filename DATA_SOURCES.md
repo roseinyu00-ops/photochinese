@@ -17,7 +17,7 @@ This file records which sources currently power character cards and how their da
 - Lookup: https://www.mdbg.net/chinese/dictionary
 - CC-CEDICT project and download information: https://cc-cedict.org/editor/editor.php?handler=Download
 - License: CC BY-SA 4.0.
-- Current use: character-specific external lookup link only. CC-CEDICT is not yet bundled as a local dictionary in this version.
+- Current use: verified reference for editorial checks; the learner-facing card no longer displays a technical source list. CC-CEDICT is not yet bundled as a local dictionary in this version.
 - The current CC-CEDICT release is published by MDBG and maintained by its contributors. The project states the CC BY-SA 4.0 terms and requires attribution and ShareAlike for redistributed adaptations.
 - Any future import must preserve attribution to MDBG, CC-CEDICT editors and contributors, and comply with ShareAlike requirements.
 
