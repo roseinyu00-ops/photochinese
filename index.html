@@ -2004,15 +2004,25 @@ async function loadLargeDictionary(){
   if(lines.length<2) throw new Error('Файл словаря пустой');
   const headers=parseCSVLine(lines[0]);
   const col=name=>headers.indexOf(name);
-  const simplified=col('simplified'), traditional=col('traditional'), pinyin=col('pinyin'), russian=col('russian');
+  const simplified=col('simplified'), traditional=col('traditional');
+  const pinyin=col('pinyin'), pinyinNumeric=col('pinyin_numeric'), russian=col('russian');
+  const hsk2025=col('hsk_2025'), hsk30=col('hsk_3_0'), hsk20=col('hsk_2_0');
+  const frequencyRank=col('frequency_rank');
   if(simplified<0 || pinyin<0 || russian<0) throw new Error('Не найдены нужные столбцы CSV');
   let count=0;
   for(let i=1;i<lines.length;i++){
    const row=parseCSVLine(lines[i]);
    const simp=(row[simplified]||'').trim(), trad=(traditional>=0?(row[traditional]||''):'').trim();
-   const p=(row[pinyin]||'').trim(), m=(row[russian]||'').trim();
+   const p=(row[pinyin]||'').trim(), pn=(pinyinNumeric>=0?(row[pinyinNumeric]||''):'').trim();
+   const m=(row[russian]||'').trim();
    if(!m || !p) continue;
-   const entry={p,m};
+   const entry={
+    p,m,pn,
+    hsk2025:hsk2025>=0?(row[hsk2025]||'').trim():'',
+    hsk30:hsk30>=0?(row[hsk30]||'').trim():'',
+    hsk20:hsk20>=0?(row[hsk20]||'').trim():'',
+    frequencyRank:frequencyRank>=0?(row[frequencyRank]||'').trim():''
+   };
    if(simp){
     if([...simp].length>1) databaseWordDictionary[simp]=entry;
     else databaseCharDictionary[simp]={...(databaseCharDictionary[simp]||{}),...entry};
@@ -2067,11 +2077,17 @@ async function loadCharacterStructureData(){
    try{
     const item=JSON.parse(line);
     if(!item.character) return;
+    const etymology=item.etymology||{};
     makeMeCharacterDictionary[item.character]={
      r:item.radical||'',
      c:formatDecomposition(item.decomposition),
-     note:item.etymology?.hint||'',
-     decomposition:item.decomposition||''
+     decomposition:item.decomposition||'',
+     definition:item.definition||'',
+     pinyinMMH:item.pinyin||'',
+     etymologyType:etymology.type||'',
+     etymologyHint:etymology.hint||'',
+     etymologySemantic:etymology.semantic||'',
+     etymologyPhonetic:etymology.phonetic||''
     };
     count++;
    }catch(e){}
@@ -2116,27 +2132,35 @@ function showStrokeAnimation(ch){
  try{strokeWriter=HanziWriter.create('strokeCanvas',ch,{width:180,height:180,padding:8,showOutline:true,strokeAnimationSpeed:1,delayBetweenStrokes:250});}
  catch(e){box.textContent='Не удалось подготовить анимацию для этого знака.';}
 }
-document.getElementById('playStrokes').addEventListener('click',()=>{
- if(strokeWriter){strokeWriter.animateCharacter();document.getElementById('strokeHint').textContent='Смотри на порядок появления черт. Иероглиф: '+selectedStrokeChar;}
- else document.getElementById('strokeHint').textContent='Анимация пока недоступна для этого иероглифа.';
-});
-function roughGloss(tokens){
- const parts=[];
- tokens.forEach(t=>{
-  if(t.type==='punct'){
-   if(parts.length && /[。！？!?]/.test(t.text)) parts[parts.length-1]+=t.text;
-   return;
+documenfunction buildCharacterCard(ch, d) {
+  const toneLabel = (() => {
+    const numeric = String(d.pn || '').match(/[1-5]/);
+    if (numeric) return numeric[0] === '5' ? 'нейтральный тон' : numeric[0] + ' тон';
+    const pinyin = String(d.p || '').normalize('NFD');
+    if (pinyin.includes('\u0304')) return '1 тон';
+    if (pinyin.includes('\u0301')) return '2 тон';
+    if (pinyin.includes('\u030c')) return '3 тон';
+    if (pinyin.includes('\u0300')) return '4 тон';
+    return d.p ? 'тон не указан' : '';
+  })();
+
+  const hskLevel = d.hsk2025 || d.hsk30 || d.hsk20 || '';
+  const hskLabel = hskLevel ? 'HSK · уровень ' + hskLevel : '';
+  const components = d.c
+    ? String(d.c).split(/[,;]+/).map(x => x.trim()).filter(Boolean)
+    : [];
+
+  let originText = d.note || '';
+  if (!originText && d.etymologyType === 'pictophonetic') {
+    originText = 'Это фоно-семантический иероглиф: один компонент связан со значением, другой подсказывает произношение. Точная роль компонентов зависит от истории конкретного знака.';
+  } else if (!originText && d.etymologyType === 'pictographic') {
+    originText = 'В базе знак отмечен как пиктографический — его ранняя форма была связана с изображением предмета или явления.';
+  } else if (!originText && d.etymologyType === 'ideographic') {
+    originText = 'В базе знак отмечен как идеографический: его значение объясняется через идею или сочетание элементов.';
+  } else if (!originText && components.length) {
+    originText = 'Структура знака показана по компонентам. Само разложение помогает увидеть устройство иероглифа, но не всегда является буквальным объяснением его происхождения.';
   }
-  const info=getCharInfo(t.text);
-  const meaning=t.m || info.m || 'значение неизвестно';
-  parts.push(meaning);
- });
- return parts.join(' + ');
-}
-async function analyzeChineseText(){
 
-
-function buildCharacterCard(ch, d) {
   const infoBox = (title, value) => `
     <div class="pc-character-info">
       <b>${title}</b>
@@ -2144,42 +2168,29 @@ function buildCharacterCard(ch, d) {
     </div>
   `;
 
-  const components = d.c
-    ? String(d.c).split(/[,;]+/).map(x => x.trim()).filter(Boolean)
-    : [];
-
   return `
     <article class="pc-character-card">
       <h2>Разбор иероглифа</h2>
-      <p class="pc-character-intro">
-        Познакомимся со строением и значением знака
-      </p>
+      <p class="pc-character-intro">Познакомимся со строением и значением знака</p>
 
       <div class="pc-character-head">
         <div class="pc-character-symbol">${esc(ch)}</div>
-
         <div>
           <div class="pc-character-reading">
-            <span class="pc-character-pinyin">
-              ${esc(d.p || 'Пиньинь не найден')}
-            </span>
-            ${d.p ? '<span class="pc-character-tone">Чтение</span>' : ''}
+            <span class="pc-character-pinyin">${esc(d.p || 'Пиньинь не найден')}</span>
+            ${toneLabel ? `<span class="pc-character-tone">• ${esc(toneLabel)}</span>` : ''}
           </div>
-
-          <div class="pc-character-meaning">
-            ${esc(d.m || 'Перевод пока не найден')}
-          </div>
+          <div class="pc-character-meaning">${esc(d.m || 'Перевод пока не найден')}</div>
         </div>
       </div>
 
       <section class="pc-character-origin">
         <h3>Состав и происхождение</h3>
-        <p class="pc-character-description">
-          ${esc(d.note || 'Дополнительное объяснение пока отсутствует.')}
-        </p>
+        <p class="pc-character-description">${esc(originText || 'В доступных источниках пока нет объяснения происхождения этого знака.')}</p>
       </section>
 
       <div class="pc-character-tags">
+        ${hskLabel ? `<span>${esc(hskLabel)}</span>` : ''}
         ${d.n ? `<span>${esc(d.n)} черт</span>` : ''}
       </div>
 
@@ -2188,20 +2199,42 @@ function buildCharacterCard(ch, d) {
         ${infoBox('Количество черт', d.n)}
       </div>
 
+      <section class="pc-character-section">
+        <h3>Другие значения</h3>
+        <p>Отдельные дополнительные значения пока не выделены в подключённых русскоязычных источниках.</p>
+      </section>
+
+      <section class="pc-character-section">
+        <h3>Синонимы по контексту</h3>
+        <p>Синонимы пока не загружены: не будем подставлять случайные близкие по смыслу слова.</p>
+      </section>
+
       ${components.length ? `
         <section class="pc-character-section">
           <h3>Компоненты</h3>
           <div class="pc-character-components">
             ${components.map(item => `
-              <div class="pc-character-component">
-                ${esc(item)}
-              </div>
+              <div class="pc-character-component"><strong>${esc(item)}</strong><span>элемент структуры</span></div>
             `).join('')}
           </div>
         </section>
       ` : ''}
 
-      <section class="pc-character-section">
+      <section class="pc-character-memory">
+        <h3>Ассоциации для запоминания</h3>
+        <p>Персональная мнемоническая ассоциация для этого знака пока не подготовлена.</p>
+      </section>
+
+      <div class="pc-character-strokes">
+        <h3>Последовательность черт · схематично</h3>
+        <p>Посмотри, в каком порядке создаётся этот знак.</p>
+        <button class="pc-stroke-animation-button stroke-choice" data-char="${esc(ch)}" type="button">
+          ✎ Показать порядок черт
+        </button>
+      </div>
+    </article>
+  `;
+}ass="pc-character-section">
         <h3>Другие значения</h3>
         <p>${esc(d.m || 'Дополнительные значения пока не найдены.')}</p>
       </section>
