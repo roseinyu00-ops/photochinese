@@ -2041,6 +2041,7 @@ const strokeSection=document.getElementById('strokeSection');
 let selectedStrokeChar='好', strokeWriter=null;
 const makeMeCharacterDictionary=Object.create(null);
 let characterStructurePromise=Promise.resolve();
+let dictionaryPromise=Promise.resolve();
 function esc(s){return String(s).replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));}
 function getCharInfo(ch){return {...(databaseCharDictionary[ch]||{}),...(makeMeCharacterDictionary[ch]||{}),...(charDictionary[ch]||{})};}
 function formatDecomposition(value){
@@ -2193,7 +2194,7 @@ function buildCharacterCard(ch, d) {
     return;
   }
 
-  await characterStructurePromise;
+  await Promise.all([dictionaryPromise, characterStructurePromise]);
 
   await enrichStrokeCounts(
     [...text].filter(ch => /\p{Script=Han}/u.test(ch))
@@ -2277,7 +2278,7 @@ document.getElementById('analyzeOcr').addEventListener('click',()=>{
  analyzeChineseText();
  document.getElementById('analysisPanel').scrollIntoView({behavior:'smooth',block:'start'});
 });
-loadLargeDictionary();
+dictionaryPromise=loadLargeDictionary();
 characterStructurePromise=loadCharacterStructureData();
 
 document.getElementById('translateBtn').onclick=()=>{
