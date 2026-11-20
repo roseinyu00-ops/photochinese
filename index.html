@@ -1506,6 +1506,13 @@ body.dark-theme .pc-character-synonym span { color: #d5aebb; }
   .pc-stroke-tile svg { width: 42px; height: 42px; }
 }
 
+
+.pc-character-sources { margin:22px 0 0; color:#9b8990; font-size:11px; line-height:1.5; }
+.pc-character-sources a { color:#b65d73; text-decoration:underline; }
+.pc-character-section-note { line-height:1.6; }
+.pc-character-meaning-row { line-height:1.65; }
+body.dark-theme .pc-character-sources { color:#c4aeb6; }
+
 </style>
 </head>
 <body>
@@ -2243,6 +2250,10 @@ function buildCharacterCard(ch, d) {
     '对': {partOfSpeech:'Прилагательное «правильный»; предлог; глагол «отвечать / относиться».', other:['по отношению к — 对我来说 (duì wǒ lái shuō)','пара, комплект — в некоторых счётных конструкциях'], synonyms:[['正确','zhèngquè','правильный'],['没错','méicuò','верно'],['回答','huídá','отвечать']], memory:'对 часто встречается как ответ «верно» и в конструкции 对… — «по отношению к…».', usage:'对不起 — извини; 对吗 — правильно?; 对我来说 — по моему мнению.'},
     '可': {partOfSpeech:'Модальный элемент: можно, возможно; «достойный» в составных словах.', other:['но, однако — в книжном 可是 (kěshì)','очень, действительно — усилительная частица в разговорной речи'], synonyms:[['可以','kěyǐ','можно'],['能够','nénggòu','быть в состоянии'],['可能','kěnéng','возможно']], memory:'Запоминай через 可以 — можно, допустимо.', usage:'可以 — можно; 可爱 — милый; 可能 — возможно.'},
     '以': {partOfSpeech:'Предлог или служебный элемент; самостоятельно обычно не переводится одним словом.', other:['с помощью, посредством — 以…为…','чтобы, для того чтобы — в книжных конструкциях'], synonyms:[['用','yòng','использовать'],['凭','píng','опираясь на, посредством']], memory:'Чаще всего встречается в составе грамматических конструкций, например 可以 (kěyǐ).', usage:'可以 — можно; 以前 — раньше; 以后 — потом.'}
+,
+
+    '猫': {meanings:'кошка; кот',partOfSpeech:'Существительное: кошка, кот.',other:['Редкое диалектное значение: прятаться, скрываться.','В разговорном заимствованном употреблении может обозначать модем.'],synonyms:[['猫咪','māomī','ласкательное «кошечка»'],['小猫','xiǎomāo','котёнок'],['家猫','jiāmāo','домашняя кошка'],['野猫','yěmāo','дикая или бездомная кошка']],memory:'Слева 犭 — подсказка «животное», справа 苗 (miáo) — фонетическая часть. Представь кошку, крадущуюся между молодыми ростками: левый элемент помогает вспомнить значение, а 苗 — звучание. Сегодня māo и miáo не рифмуются точно: это историческая звуковая подсказка.',usage:'猫喜欢在阳光下睡觉。 (māo xǐhuan zài yángguāng xià shuìjiào) — Кошки любят спать на солнце. 我养了一只猫。 (wǒ yǎng le yì zhī māo) — Я завёл(а) кошку. 熊猫 (xióngmāo) — панда; 小猫 (xiǎomāo) — котёнок.'},
+    '白': {meanings:'белый; светлый; ясный; напрасно',partOfSpeech:'Прилагательное: белый, светлый, чистый. Наречие: зря, напрасно (白等 — ждать зря). В устойчивых сочетаниях также «бесплатно», «ясно, очевидно».',other:['Бесплатно: 白吃 (bái chī) — есть бесплатно; 白送 (bái sòng) — отдать даром.','Напрасно: 白等 (bái děng) — ждать зря; 白跑一趟 (bái pǎo yí tàng) — зря сходить / съездить.','Ясно, очевидно: 真相大白 (zhēnxiàng dàbái) — правда раскрылась.','Простой, без добавок: 白开水 (báikāishuǐ) — обычная кипячёная вода.'],synonyms:[['雪白','xuěbái','снежно-белый'],['洁白','jiébái','чисто-белый; незапятнанный'],['苍白','cāngbái','бледный'],['明白','míngbai','ясный, понятный; понимать — зависит от конструкции']],memory:'Представь горящую свечу в темноте: яркий свет делает окружающее белым. В Make Me a Hanzi также приводится образ солнечных лучей. Это мнемоника для запоминания, а не единственное бесспорное объяснение исторического происхождения.',usage:'白天 (báitiān) — дневное время; 白色 (báisè) — белый цвет; 白纸 (báizhǐ) — белая бумага; 明白 (míngbai) — понимать, ясный; 白白 (báibái) — зря, напрасно.'}
   };
   const extra = learningData[ch] || {};
   const pinyinSource = d.p || d.pinyinMMH || '';
@@ -2254,6 +2265,7 @@ function buildCharacterCard(ch, d) {
   const rawMeanings = String(d.m || '').split(/\s*;\s*/).filter(Boolean);
   const displayMeaning = extra.meanings || rawMeanings.join('; ') || d.definition || 'Перевод пока не найден';
   const frequencyRank = Number(String(d.frequencyRank || '').replace(/[^0-9]/g, ''));
+  const relatedWords = Object.entries(databaseWordDictionary).filter(([word,entry]) => word.includes(ch) && word !== ch && entry?.m && entry?.p).sort((a,b) => (Number(a[1].frequencyRank)||999999)-(Number(b[1].frequencyRank)||999999) || a[0].length-b[0].length).slice(0,5);
   const radicalMeanings = {
     '人':'человек','亻':'человек','口':'рот, речь','女':'женщина','子':'ребёнок','宀':'крыша',
     '心':'сердце, чувства','忄':'сердце, чувства','手':'рука','扌':'рука','水':'вода','氵':'вода',
@@ -2268,7 +2280,7 @@ function buildCharacterCard(ch, d) {
     '冫':'лёд, холод','气':'воздух, пар','风':'ветер','馬':'лошадь',
     '鸟':'птица','魚':'рыба','鱼':'рыба','虫':'насекомое','犬':'собака','犭':'животное',
     '牛':'корова, бык','羊':'овца','豕':'свинья','王':'нефрит','玉':'нефрит',
-    '白':'белый','黑':'чёрный','赤':'красный','青':'сине-зелёный','色':'цвет',
+    '白':'белый','苗':'росток; фонетический компонент','黑':'чёрный','赤':'красный','青':'сине-зелёный','色':'цвет',
     '見':'видеть','见':'видеть','立':'стоять','走':'идти, бежать','止':'останавливаться',
     '方':'сторона, направление','厂':'склон, утёс','穴':'пещера, отверстие','工':'работа',
     '弓':'лук','矢':'стрела','斤':'топор','戈':'копьё','皿':'сосуд, посуда',
@@ -2300,32 +2312,45 @@ function buildCharacterCard(ch, d) {
   const radical = String(d.r || '').split(/[—–-]/)[0].trim();
   const radicalMeaning = radicalMeanings[radical] || '';
   const radicalCard = radical ? '<div class="pc-character-info"><b>Радикал</b><span class="pc-character-radical">' + esc(radical) + (radicalMeaning ? ' — ' + esc(radicalMeaning) : '') + '</span></div>' : '';
-  const partOfSpeech = extra.partOfSpeech || d.partOfSpeech || 'Определяется по слову и контексту: один иероглиф может выполнять разные грамматические роли.';
-  const otherMeanings = extra.other || [];
-  const otherTable = otherMeanings.length ? '<div class="pc-character-meaning-table">' + otherMeanings.map(item => '<div class="pc-character-meaning-row"><span>' + esc(item) + '</span></div>').join('') + '</div>' : '';
+  const exampleWordText = relatedWords.map(([word,e]) => word + ' (' + e.p + ') — ' + e.m).join('; ');
+  const partOfSpeech = extra.partOfSpeech || d.partOfSpeech || ('Роль знака определяется словом и предложением. Примеры сочетаний: ' + (exampleWordText || 'нужен контекст целой фразы.'));
+  const otherMeanings = extra.other || rawMeanings.slice(1).map(v => 'Дополнительное словарное значение: ' + v);
+  const otherRows = otherMeanings.length ? otherMeanings : [relatedWords.length ? 'Отдельные переносные значения в краткой записи не выделены. В словах знак встречается так: ' + relatedWords.slice(0,3).map(([w,e])=>w+' — '+e.m).join('; ')+'.' : 'В краткой словарной записи отдельные дополнительные значения не указаны; неподтверждённые значения не добавляем.'];
+  const otherTable = '<div class="pc-character-meaning-table">' + otherRows.map(item => '<div class="pc-character-meaning-row"><span>' + esc(item) + '</span></div>').join('') + '</div>';
   const synonyms = extra.synonyms || [];
-  const synonymsBlock = synonyms.length ? '<div class="pc-character-synonyms">' + synonyms.map(item => '<div class="pc-character-synonym"><strong>' + esc(item[0]) + '</strong><span>' + esc(item[1]) + '</span><small>' + esc(item[2]) + '</small></div>').join('') + '</div>' : '';
-  const memory = extra.memory || d.note || '';
-  const usage = extra.usage || '';
-  const etymologyLabels = {
-    pictographic:'Пиктографический знак: ранняя форма была связана с изображением предмета или явления.',
-    ideographic:'Идеографический знак: значение связано с идеей или сочетанием элементов.',
-    pictophonetic:'Фоно-семантический знак: один элемент обычно связан со значением, другой — с произношением.'
+  const synonymsBlock = synonyms.length
+    ? '<div class="pc-character-synonyms">' + synonyms.map(item => '<div class="pc-character-synonym"><strong>' + esc(item[0]) + '</strong><span>' + esc(item[1]) + '</span><small>' + esc(item[2]) + '</small></div>').join('') + '</div>'
+    : relatedWords.length
+      ? '<p class="pc-character-section-note">Это не прямые синонимы, а реальные слова из словаря, в которых встречается данный знак.</p><div class="pc-character-synonyms">' + relatedWords.map(([w,e])=>'<div class="pc-character-synonym"><strong>'+esc(w)+'</strong><span>'+esc(e.p)+'</span><small>'+esc(e.m)+'</small></div>').join('')+'</div>'
+      : '<p class="pc-character-section-note">Прямые синонимы для этого знака в доступной базе не подтверждены. Ниже смотри примеры употребления и близкие конструкции.</p>';
+  const componentMeanings = components.map(item => { const info=getCharInfo(item); return item+' — '+(radicalMeanings[item]||info.m||'элемент без отдельного перевода'); });
+  const generatedMemory = componentMeanings.length ? 'Представь короткую сцену из частей: '+componentMeanings.join('; ')+'. Свяжи её с основным значением «'+(rawMeanings[0]||ch)+'». Это мнемоника, а не научная этимология.' : relatedWords.length ? 'Запомни знак через слово «'+relatedWords[0][0]+'» ('+relatedWords[0][1].p+') — '+relatedWords[0][1].m+'. Представь ситуацию, в которой используешь это слово.' : 'Закрепи форму через произношение и короткое слово или предложение. Надёжную образную подсказку для этого знака пока не удалось подтвердить — не будем её выдумывать.';
+  const memory = extra.memory || generatedMemory;
+  const usage = extra.usage || (relatedWords.length ? 'Примеры из словаря: '+exampleWordText+'.' : 'Используй знак в составе знакомых слов и проверяй значение по контексту целой фразы.');
+  const semanticPart=d.etymologySemantic||'', phoneticPart=d.etymologyPhonetic||'';
+  const semanticGloss=radicalMeanings[semanticPart]||getCharInfo(semanticPart).m||'';
+  const phoneticInfo=getCharInfo(phoneticPart), phoneticPinyin=phoneticInfo.p||phoneticInfo.pinyinMMH||'';
+  const hintMap={
+    'animal':'Компонент 犭 связан с животными и подсказывает смысловую область знака.',
+    'A burning candle; the rays of the sun':'Образ горящей свечи или солнечных лучей помогает представить яркий белый свет.',
+    'A woman 女 with a son 子':'Сочетание 女 («женщина») и 子 («ребёнок»). Это мнемоническая трактовка, а не бесспорное буквальное объяснение происхождения.',
+    'A person standing with arms outstretched':'Схематичный образ человека, стоящего с широко расставленными руками.',
+    'A person with arms outstretched':'Образ человека с широко расставленными руками.',
+    'The sun':'Образ солнца.','The moon':'Образ луны.','A mouth':'Образ рта.','A tree':'Образ дерева.','A hand':'Образ руки.','A heart':'Образ сердца.'
   };
-  const semanticPart = d.etymologySemantic || '';
-  const phoneticPart = d.etymologyPhonetic || '';
-  const semanticGloss = radicalMeanings[semanticPart] || '';
-  const phoneticInfo = getCharInfo(phoneticPart);
-  const phoneticPinyin = phoneticInfo.p || phoneticInfo.pinyinMMH || '';
-  const originDetails = d.etymologyType === 'pictophonetic'
-    ? [
-        semanticPart ? 'Смысловой элемент: ' + semanticPart + (semanticGloss ? ' — ' + semanticGloss : '') : '',
-        phoneticPart ? 'Звуковой элемент: ' + phoneticPart + (phoneticPinyin ? ' (' + phoneticPinyin + ')' : '') + ' — фонетический ориентир, но современное чтение может отличаться' : ''
-      ].filter(Boolean).join('. ')
-    : '';
-  const originText = [etymologyLabels[d.etymologyType] || '', d.etymologyHint || '', originDetails].filter(Boolean).join(' ');
+  const translateHint=(hint)=>{
+    const v=String(hint||'').trim(); if(!v)return ''; if(hintMap[v])return hintMap[v];
+    const words={woman:'женщина',man:'мужчина',son:'сын',child:'ребёнок',person:'человек',mouth:'рот',sun:'солнце',moon:'луна',fire:'огонь',water:'вода',tree:'дерево',hand:'рука',eye:'глаз',heart:'сердце',roof:'крыша',field:'поле',grass:'трава',animal:'животное',dog:'собака',horse:'лошадь',bird:'птица',fish:'рыба',candle:'свеча',burning:'горящий',rays:'лучи',ray:'луч',light:'свет',white:'белый',bright:'яркий',big:'большой',small:'маленький',together:'вместе',two:'два',three:'три',above:'над',below:'под',inside:'внутри',outside:'снаружи',standing:'стоящий',holding:'держащий',with:'с',and:'и',the:'',a:'',an:''};
+    const t=v.replace(/[A-Za-z]+/g,w=>words[w.toLowerCase()]??w);
+    return /[A-Za-z]{2,}/.test(t)?'':'Образ из словарной подсказки: '+t.replace(/\s+/g,' ').trim()+'.';
+  };
+  const hintText=translateHint(d.etymologyHint);
+  const originDetails=d.etymologyType==='pictophonetic'
+    ? [semanticPart?'Смысловая часть '+semanticPart+(semanticGloss?' («'+semanticGloss+'»)':'')+' указывает на область значения':'',phoneticPart?'Фонетическая часть '+phoneticPart+(phoneticPinyin?' (чтение компонента '+phoneticPinyin+')':'')+' служит подсказкой к звучанию; современное чтение может отличаться':''].filter(Boolean).join('. ')+'.'
+    : components.length?'Видимые компоненты: '+componentMeanings.join('; ')+'.':'';
+  const originText=[hintText,originDetails].filter(Boolean).join(' ');
   const tags = (hskLevel ? '<span>HSK · уровень ' + esc(hskLevel) + '</span>' : '') +
-    (d.n ? '<span>' + esc(d.n) + ' черт</span>' : '') +
+    '<span class="pc-character-stroke-count" data-stroke-count-for="' + esc(ch) + '">' + (d.n ? esc(d.n) + ' черт' : 'Число черт · загружается…') + '</span>' +
     (frequencyRank > 0 ? '<span title="Место в частотном списке: чем меньше номер, тем чаще встречается">Частотный ранг · №' + frequencyRank.toLocaleString('ru-RU') + '</span>' : '');
   const toneText = toneLabel ? '<span class="pc-character-tone">• ' + esc(toneLabel) + '</span>' : '';
   return '<article class="pc-character-card">' +
@@ -2340,10 +2365,11 @@ function buildCharacterCard(ch, d) {
       radicalCard +
       (componentCards ? '<div class="pc-character-info pc-character-components-info"><b>Компоненты иероглифа</b><div class="pc-character-components">' + componentCards + '</div></div>' : '') +
     '</div>' +
-    (otherTable ? '<section class="pc-character-section"><h3>Другие значения</h3>' + otherTable + '</section>' : '') +
-    (synonymsBlock ? '<section class="pc-character-section"><h3>Синонимы по контексту</h3><p class="pc-character-section-note">Близкие по смыслу слова и выражения — точный выбор зависит от фразы.</p>' + synonymsBlock + '</section>' : '') +
-    (usage ? '<section class="pc-character-section"><h3>Как употребляется</h3><p>' + esc(usage) + '</p></section>' : '') +
-    (memory ? '<section class="pc-character-section"><h3>Ассоциация для запоминания</h3><div class="pc-character-memory">' + esc(memory) + '</div></section>' : '') +
+    '<section class="pc-character-section"><h3>Другие значения и оттенки</h3>' + otherTable + '</section>' +
+    '<section class="pc-character-section"><h3>Синонимы и близкие слова</h3><p class="pc-character-section-note">Синонимы не всегда взаимозаменяемы: смотрим на оттенок значения и пример употребления.</p>' + synonymsBlock + '</section>' +
+    '<section class="pc-character-section"><h3>Как употребляется</h3><p>' + esc(usage) + '</p></section>' +
+    '<section class="pc-character-section"><h3>Ассоциация для запоминания</h3><div class="pc-character-memory">' + esc(memory) + '</div></section>' +
+    '<p class="pc-character-sources">Структура и подсказки по происхождению: <a href="https://wangwave.github.io/makeme_word/" target="_blank" rel="noopener">Make Me a Hanzi</a>. Словарные примеры берутся из подключённой учебной базы.</p>' +
     '<div class="pc-character-strokes"><h3>Схема последовательности черт</h3><p>Каждая миниатюра показывает отдельную черту в порядке написания. Нажми на анимацию, чтобы увидеть движение.</p><div class="pc-stroke-scheme" data-char="' + esc(ch) + '">Подготавливаем схему черт…</div><button class="pc-stroke-animation-button stroke-choice" data-char="' + esc(ch) + '" type="button">✎ Показать анимацию написания</button></div>' +
     '</article>';
 }
@@ -2430,6 +2456,7 @@ function buildCharacterCard(ch, d) {
         container.textContent = 'Для этого знака схема пока не найдена.';
         return;
       }
+      analysisResults.querySelectorAll('.pc-character-stroke-count').forEach(tag => { if(tag.dataset.strokeCountFor===ch) tag.textContent=data.strokes.length+' черт'; });
       container.innerHTML = data.strokes.map((path, index) => {
         const median = data.medians && data.medians[index] ? data.medians[index] : [];
         const points = median.flat ? median.flat() : [];
