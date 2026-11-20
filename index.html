@@ -2144,12 +2144,33 @@ function buildCharacterCard(ch, d) {
   const toneLabel = numericTone ? (numericTone[0] === '5' ? 'нейтральный тон' : numericTone[0] + ' тон')
     : pinyin.includes('\u0304') ? '1 тон' : pinyin.includes('\u0301') ? '2 тон' : pinyin.includes('\u030c') ? '3 тон' : pinyin.includes('\u0300') ? '4 тон' : '';
   const hskLevel = d.hsk2025 || d.hsk30 || d.hsk20 || '';
-  const components = d.c ? String(d.c).split(/[,;]+/).map(x => x.trim()).filter(Boolean) : [];
-  let originText = d.etymologyHint || d.note || '';
-  if (!originText && d.etymologyType === 'pictophonetic') originText = 'Фоно-семантический иероглиф: один компонент связан со значением, другой подсказывает произношение.';
-  else if (!originText && d.etymologyType === 'pictographic') originText = 'В базе знак отмечен как пиктографический: его ранняя форма была связана с изображением предмета или явления.';
-  else if (!originText && d.etymologyType === 'ideographic') originText = 'В базе знак отмечен как идеографический: его значение связано с идеей или сочетанием элементов.';
-  const infoBox = (title, value) => '<div class="pc-character-info"><b>' + title + '</b><span>' + esc(value || 'Пока нет данных') + '</span></div>';
+  const radicalMeanings = {
+    '人':'человек','亻':'человек','口':'рот','女':'женщина','子':'ребёнок','宀':'крыша',
+    '心':'сердце','忄':'сердце','手':'рука','扌':'рука','水':'вода','氵':'вода',
+    '火':'огонь','灬':'огонь','木':'дерево','艹':'трава, растения','日':'солнце, день',
+    '月':'луна; в некоторых знаках — часть тела','言':'речь, слова','讠':'речь, слова',
+    '辶':'движение, путь','土':'земля','金':'металл','钅':'металл','糸':'нить, шёлк',
+    '纟':'нить, шёлк','食':'еда','饣':'еда','足':'нога','⻊':'нога','目':'глаз',
+    '耳':'ухо','山':'гора','石':'камень','雨':'дождь','禾':'зерно','米':'рис',
+    '力':'сила','刀':'нож','刂':'нож','门':'ворота','車':'повозка','车':'повозка',
+    '马':'лошадь','贝':'раковина','田':'поле','疒':'болезнь','广':'навес, строение',
+    '彳':'шаг, движение','攵':'действие','攴':'действие','竹':'бамбук','⺮':'бамбук'
+  };
+  const etymologyLabels = {
+    pictographic:'В источнике этот знак отнесён к пиктографическим: его ранняя форма была связана с изображением предмета или явления.',
+    ideographic:'В источнике этот знак отнесён к идеографическим: его значение объясняется через идею или сочетание элементов.',
+    pictophonetic:'В источнике этот знак отнесён к фоно-семантическим: обычно один элемент связан со значением, а другой — с произношением.'
+  };
+  const radicalText = d.r ? d.r + (radicalMeanings[d.r] ? ' — ' + radicalMeanings[d.r] : '') : '';
+  const components = d.c ? String(d.c).split(/[+;,]+/).map(x => x.trim()).filter(Boolean) : [];
+  const infoBox = (title, value) => value ? '<div class="pc-character-info"><b>' + title + '</b><span>' + esc(value) + '</span></div>' : '';
+  const infoCards = [infoBox('Радикал', radicalText), infoBox('Количество черт', d.n)].filter(Boolean).join('');
+  const componentCards = components.map(item => {
+    const gloss = radicalMeanings[item];
+    return '<div class="pc-character-component"><strong>' + esc(item) + '</strong>' +
+      (gloss ? '<span>' + esc(gloss) + '</span>' : '') + '</div>';
+  }).join('');
+  const originText = etymologyLabels[d.etymologyType] || '';
   return '<article class="pc-character-card">' +
     '<h2>Разбор иероглифа</h2>' +
     '<p class="pc-character-intro">Познакомимся со строением и значением знака</p>' +
@@ -2159,8 +2180,8 @@ function buildCharacterCard(ch, d) {
     '<div class="pc-character-meaning">' + esc(d.m || 'Перевод пока не найден') + '</div></div></div>' +
     (originText ? '<section class="pc-character-origin"><h3>Состав и происхождение</h3><p class="pc-character-description">' + esc(originText) + '</p></section>' : '') +
     '<div class="pc-character-tags">' + (hskLevel ? '<span>HSK · уровень ' + esc(hskLevel) + '</span>' : '') + (d.n ? '<span>' + esc(d.n) + ' черт</span>' : '') + '</div>' +
-    '<div class="pc-character-info-grid">' + infoBox('Радикал', d.r) + infoBox('Количество черт', d.n) + '</div>' +
-    (components.length ? '<section class="pc-character-section"><h3>Компоненты</h3><div class="pc-character-components">' + components.map(item => '<div class="pc-character-component">' + esc(item) + '</div>').join('') + '</div></section>' : '') +
+    (infoCards ? '<div class="pc-character-info-grid">' + infoCards + '</div>' : '') +
+    (componentCards ? '<section class="pc-character-section"><h3>Компоненты</h3><div class="pc-character-components">' + componentCards + '</div></section>' : '') +
     '<div class="pc-character-strokes"><h3>Последовательность черт</h3><p>Посмотри, в каком порядке создаётся этот знак.</p><button class="pc-stroke-animation-button stroke-choice" data-char="' + esc(ch) + '" type="button">✎ Показать порядок черт</button></div>' +
     '</article>';
 }
