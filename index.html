@@ -1834,29 +1834,156 @@ function roughGloss(tokens){
  return parts.join(' + ');
 }
 async function analyzeChineseText(){
- const text=analysisInput.value.trim();
- if(!text){analysisResults.textContent='Сначала введи китайский текст или отправь его из распознанного фото.';return;}
- await characterStructurePromise;
- await enrichStrokeCounts([...text].filter(ch=>/\p{Script=Han}/u.test(ch)));
- const tokens=tokenizeChinese(text);
- const sentence=sentenceTranslations[text]||sentenceTranslations[text.replace(/[\s]/g,'')];
- const pinyin=tokens.map(t=>t.p||t.text).join(' ').replace(/\s+([，。！？；：、,.!?;:])/g,'$1');
- let html='<div class="result"><b>Пиньинь:</b> '+esc(pinyin)+'<br><b>'+(sentence?'Перевод:':'Смысл по частям (черновой):')+'</b> '+esc(sentence||roughGloss(tokens))+(sentence?'':'<div class="small">Это подсказка по значениям слов, а не полноценный контекстный перевод. Проверь порядок слов и смысл по контексту.</div>')+'</div>';
- html+='<h3 class="section">Разбор по словам и иероглифам</h3>';
- tokens.forEach(t=>{
-  if(t.type==='punct'){html+='<span class="word">'+esc(t.text)+'</span>';return;}
-  if(t.type==='word'){
-   html+='<div class="info section"><b>Слово</b><strong style="font-size:23px">'+esc(t.text)+'</strong><br><span class="pinyin">'+esc(t.p)+'</span><br>'+esc(t.m)+'<div class="small">Состав: '+[...t.text].map(c=>c+' — '+(getCharInfo(c).m||'значение пока нет в словаре')).map(esc).join('; ')+'</div><div class="small">Анимация каждого иероглифа:</div><div class="actions">'+[...t.text].map(c=>'<button class="secondary stroke-choice" data-char="'+esc(c)+'" type="button">'+esc(c)+' · черты</button>').join('')+'</div></div>';
-  } else {
-   const d=getCharInfo(t.text);
-   html+='<div class="info section"><b>Иероглиф</b><strong style="font-size:30px">'+esc(t.text)+'</strong>';
-   if(d.p||d.m||d.r||d.c){html+='<br><span class="pinyin">'+esc(d.p||'пиньинь не найден')+'</span><br>'+esc(d.m||'перевод не найден')+'<div class="small">Ключ: '+esc(d.r||'нет данных')+' · Черт: '+esc(d.n||'нет данных')+'<br>Компоненты: '+esc(d.c||'нет данных')+'<br>'+esc(d.note||'Состав — графическая подсказка, а не всегда историческое происхождение иероглифа.')+'</div>';}else{html+='<br><span class="small">Для этого знака пока нет сведений о структуре. Можно посмотреть анимацию черт, если знак поддерживается Hanzi Writer.</span>';}
-   html+='<div class="actions"><button class="secondary stroke-choice" data-char="'+esc(t.text)+'" type="button">Показать написание</button></div></div>';
+
+function buildCharacterCard(ch, d) {
+  const tags = [
+    d.r ? `Ключ: ${d.r}` : '',
+    d.n ? `${d.n} черт` : ''
+  ].filter(Boolean);
+
+  const infoBox = (title, value) => `
+    <div class="pc-character-info">
+      <b>${title}</b>
+      <span>${esc(value || 'Пока нет данных')}</span>
+    </div>
+  `;
+
+  return `
+    <article class="pc-character-card">
+      <h2>Разбор иероглифа</h2>
+      <p class="pc-character-intro">
+        Познакомимся со строением и значением знака
+      </p>
+
+      <div class="pc-character-head">
+        <div class="pc-character-symbol">${esc(ch)}</div>
+
+        <div>
+          <div class="pc-character-pinyin">
+            ${esc(d.p || 'Пиньинь не найден')}
+          </div>
+
+          <div class="pc-character-meaning">
+            ${esc(d.m || 'Перевод пока не найден')}
+          </div>
+
+          <p class="pc-character-description">
+            ${esc(d.note || 'Дополнительное объяснение пока отсутствует.')}
+          </p>
+
+          <div class="pc-character-tags">
+            ${tags.map(tag => `<span>${esc(tag)}</span>`).join('')}
+          </div>
+        </div>
+      </div>
+
+      <div class="pc-character-info-grid">
+        ${infoBox('Радикал / ключ', d.r)}
+        ${infoBox('Количество черт', d.n)}
+        ${infoBox('Компоненты', d.c)}
+        ${infoBox('Состав и происхождение', d.note)}
+      </div>
+
+      <div class="pc-character-strokes">
+        <h3>Написание иероглифа</h3>
+        <p>Посмотри, в каком порядке создаётся этот знак.</p>
+
+        <button
+          class="pc-stroke-animation-button stroke-choice"
+          data-char="${esc(ch)}"
+          type="button"
+        >
+          ✎ Показать порядок черт
+        </button>
+      </div>
+    </article>
+  `;
+}
+
+async function analyzeChineseText() {
+  const text = analysisInput.value.trim();
+
+  if (!text) {
+    analysisResults.textContent =
+      'Сначала введи китайский текст или отправь его из распознанного фото.';
+    return;
   }
- });
- analysisResults.innerHTML=html;
- analysisResults.querySelectorAll('.stroke-choice').forEach(b=>b.addEventListener('click',()=>showStrokeAnimation(b.dataset.char)));
- const first=[...text].find(c=>/\p{Script=Han}/u.test(c)); if(first)showStrokeAnimation(first);
+
+  await characterStructurePromise;
+
+  await enrichStrokeCounts(
+    [...text].filter(ch => /\p{Script=Han}/u.test(ch))
+  );
+
+  const tokens = tokenizeChinese(text);
+
+  const sentence =
+    sentenceTranslations[text] ||
+    sentenceTranslations[text.replace(/[\s]/g, '')];
+
+  const pinyin = tokens
+    .map(t => t.p || t.text)
+    .join(' ')
+    .replace(/\s+([，。！？；：、,.!?;:])/g, '$1');
+
+  let html = `
+    <div class="result">
+      <b>Пиньинь:</b> ${esc(pinyin)}
+      <br>
+      <b>${sentence ? 'Перевод:' : 'Смысл по частям (черновой):'}</b>
+      ${esc(sentence || roughGloss(tokens))}
+      ${sentence ? '' : `
+        <div class="small">
+          Это подсказка по значениям слов, а не полноценный контекстный перевод.
+        </div>
+      `}
+    </div>
+    <h3 class="section">Разбор по словам и иероглифам</h3>
+  `;
+
+  tokens.forEach(t => {
+    if (t.type === 'punct') {
+      html += `<span class="word">${esc(t.text)}</span>`;
+      return;
+    }
+
+    if (t.type === 'word') {
+      html += `
+        <div class="info section">
+          <b>Слово</b>
+          <strong style="font-size:23px">${esc(t.text)}</strong>
+          <br>
+          <span class="pinyin">${esc(t.p || '')}</span>
+          <br>
+          ${esc(t.m || '')}
+        </div>
+      `;
+
+      [...t.text].forEach(ch => {
+        html += buildCharacterCard(ch, getCharInfo(ch));
+      });
+
+      return;
+    }
+
+    html += buildCharacterCard(t.text, getCharInfo(t.text));
+  });
+
+  analysisResults.innerHTML = html;
+
+  analysisResults
+    .querySelectorAll('.stroke-choice')
+    .forEach(button => {
+      button.addEventListener('click', () => {
+        showStrokeAnimation(button.dataset.char);
+      });
+    });
+
+  const first = [...text].find(
+    ch => /\p{Script=Han}/u.test(ch)
+  );
+
+  if (first) showStrokeAnimation(first);
 }
 document.getElementById('analyzeText').addEventListener('click',analyzeChineseText);
 document.getElementById('analyzeOcr').addEventListener('click',()=>{
