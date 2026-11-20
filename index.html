@@ -996,7 +996,183 @@ body.dark-theme .account-button {
   margin-top: 14px;
   font-size: 13px;
 }
-    
+    /* ===== НОВЫЙ ДИЗАЙН РАЗБОРА ИЕРОГЛИФА ===== */
+
+.pc-character-card {
+  margin-top: 22px;
+  padding: 28px;
+  background: #fff;
+  border: 1px solid var(--line);
+  border-radius: 24px;
+  box-shadow: 0 8px 30px #4a25300a;
+}
+
+.pc-character-card h2 {
+  font-size: 25px;
+  margin-bottom: 8px;
+}
+
+.pc-character-intro {
+  font-size: 16px;
+  margin-bottom: 26px;
+}
+
+.pc-character-head {
+  display: grid;
+  grid-template-columns: 170px 1fr;
+  gap: 24px;
+  align-items: start;
+}
+
+.pc-character-symbol {
+  width: 100%;
+  aspect-ratio: 1;
+  display: grid;
+  place-items: center;
+  border-radius: 24px;
+  background: #fff2f5;
+  border: 1px solid var(--line);
+  font: 112px/1 serif;
+  color: #30272a;
+}
+
+.pc-character-pinyin {
+  color: #b65d73;
+  font-size: 27px;
+  font-weight: 800;
+}
+
+.pc-character-meaning {
+  font-size: 23px;
+  font-weight: 750;
+  color: #292326;
+  margin: 8px 0;
+}
+
+.pc-character-description {
+  font-size: 16px;
+  line-height: 1.7;
+}
+
+.pc-character-tags {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 9px;
+  margin-top: 16px;
+}
+
+.pc-character-tags span {
+  padding: 8px 13px;
+  border-radius: 10px;
+  background: #fff0f4;
+  color: #925066;
+  font-size: 14px;
+}
+
+.pc-character-info-grid {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: 12px;
+  margin-top: 25px;
+}
+
+.pc-character-info {
+  padding: 17px;
+  min-height: 100px;
+  background: #fffafb;
+  border: 1px solid var(--line);
+  border-radius: 19px;
+}
+
+.pc-character-info b {
+  display: block;
+  color: #98858a;
+  margin-bottom: 8px;
+  font-size: 15px;
+}
+
+.pc-character-info span {
+  font-size: 18px;
+  line-height: 1.5;
+}
+
+.pc-character-strokes {
+  margin-top: 28px;
+}
+
+.pc-character-strokes h3 {
+  font-size: 19px;
+  margin-bottom: 13px;
+}
+
+.pc-stroke-animation-button {
+  margin-top: 15px;
+  padding: 12px 18px;
+  border-radius: 12px;
+  background: #f8dce3;
+  color: #813d50;
+  font-weight: 700;
+}
+
+body.dark-theme .pc-character-card {
+  background: #3d3034;
+  border-color: #634850;
+}
+
+body.dark-theme .pc-character-symbol,
+body.dark-theme .pc-character-info {
+  background: #49383d;
+  border-color: #76545d;
+}
+
+body.dark-theme .pc-character-meaning {
+  color: #fff1ed;
+}
+
+body.dark-theme .pc-character-tags span {
+  background: #62434c;
+  color: #ffe1e8;
+}
+
+@media(max-width:600px) {
+  .pc-character-card {
+    padding: 17px;
+  }
+
+  .pc-character-head {
+    grid-template-columns: 115px minmax(0, 1fr);
+    gap: 14px;
+  }
+
+  .pc-character-symbol {
+    font-size: 76px;
+    border-radius: 17px;
+  }
+
+  .pc-character-pinyin {
+    font-size: 21px;
+  }
+
+  .pc-character-meaning {
+    font-size: 18px;
+  }
+
+  .pc-character-description {
+    font-size: 14px;
+  }
+
+  .pc-character-info-grid {
+    gap: 8px;
+  }
+
+  .pc-character-info {
+    padding: 12px;
+  }
+
+  .pc-character-info span {
+    font-size: 15px;
+  }
+}
   </style>
 </head>
 <body>
