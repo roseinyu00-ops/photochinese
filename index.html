@@ -872,6 +872,12 @@ body.dark-theme #editProfileBtn {
   color: #ffe1e8;
   border-color: #76545d;
 }
+    .header-actions {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  flex-shrink: 0;
+    }
 .account-button {
   width: 42px;
   height: 42px;
@@ -1009,18 +1015,20 @@ body.dark-theme .account-button {
  <button data-tab="profile">Профиль</button>
   </nav>
 
+  <div class="header-actions">
   <button class="theme-toggle" id="themeToggle" type="button" aria-label="Сменить тему">🌙</button>
-</header>
 
-<button
-  class="account-button"
-  id="accountButton"
-  type="button"
-  aria-label="Аккаунт"
-  onclick="openAccountModal()"
->
-  ♙
-</button>
+  <button
+    class="account-button"
+    id="accountButton"
+    type="button"
+    aria-label="Аккаунт"
+    onclick="openAccountModal()"
+  >
+    ♙
+  </button>
+</div>
+</header>
   
 <section id="learn" class="tab">
   <div class="panel hero">
