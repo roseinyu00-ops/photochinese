@@ -49,6 +49,7 @@ This file records which sources currently power character cards and how their da
 4. Keep historical etymology separate from memory aids. A mnemonic is a learning device, not a historical claim.
 5. Keep source provenance in project documentation and data metadata. In the learner-facing card, avoid technical source notes; show a concise, natural message only when a useful field is genuinely unavailable.
 6. Keep simplified and traditional glyphs available as separate searchable character records when the upstream dataset provides them.
+7. Prefer the Make Me a Hanzi `matches` stroke mapping for immediate stroke counts when available; load Hanzi Writer stroke paths separately for the visual sequence so a slow animation asset does not delay the count.
 
 ## Next enrichment priorities
 
