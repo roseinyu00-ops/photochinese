@@ -2552,7 +2552,96 @@ async function loadCloudProfile(user) {
 
   document.getElementById("bioInput").value = profile.bio || "";
 }
+let accountMode = "login";
 
+function openAccountModal() {
+  document.getElementById("accountModal").hidden = false;
+}
+
+function closeAccountModal() {
+  document.getElementById("accountModal").hidden = true;
+}
+
+function switchAccountMode(mode) {
+  accountMode = mode;
+
+  document.getElementById("loginTab").classList.toggle("active", mode === "login");
+  document.getElementById("registerTab").classList.toggle("active", mode === "register");
+
+  document.getElementById("accountSubmit").textContent =
+    mode === "login" ? "Войти" : "Создать аккаунт";
+
+  document.getElementById("accountMessage").textContent = "";
+}
+
+// Загрузка профиля из облака
+async function loadCloudProfile(user) {
+  const client = window.photoChineseSupabase;
+
+  const { data, error } = await client
+    .from("profiles")
+    .select("*")
+    .eq("id", user.id)
+    .maybeSingle();
+
+  if (error) throw error;
+
+  let profile = data;
+
+  // Если профиля ещё нет — создаём его
+  if (!profile) {
+    const username =
+      localStorage.getItem("profileNickname") ||
+      localStorage.getItem("photoChineseNickname") ||
+      null;
+
+    const bio = localStorage.getItem("profileBio") || "";
+
+    let result = await client
+      .from("profiles")
+      .insert({
+        id: user.id,
+        username: username,
+        bio: bio
+      })
+      .select()
+      .single();
+
+    // Если ник занят другим пользователем
+    if (result.error && result.error.code === "23505") {
+      result = await client
+        .from("profiles")
+        .insert({
+          id: user.id,
+          bio: bio
+        })
+        .select()
+        .single();
+    }
+
+    if (result.error) throw result.error;
+
+    profile = result.data;
+  }
+
+  // Отображаем никнейм
+  if (profile.username) {
+    document.getElementById("profileNickname").textContent =
+      profile.username;
+
+    document.getElementById("nicknameInput").value =
+      profile.username;
+  }
+
+  // Отображаем описание
+  document.getElementById("profileBioText").textContent =
+    profile.bio || "Расскажи немного о себе ♡";
+
+  document.getElementById("bioInput").value =
+    profile.bio || "";
+}
+
+// Вход и регистрация
 document.getElementById("accountForm").addEventListener("submit", async function(event) {
   event.preventDefault();
 
@@ -2560,11 +2649,10 @@ document.getElementById("accountForm").addEventListener("submit", async function
   const password = document.getElementById("accountPassword").value;
   const message = document.getElementById("accountMessage");
   const submit = document.getElementById("accountSubmit");
+  const client = window.photoChineseSupabase;
 
-  const supabaseClient = window.photoChineseSupabase;
-
-  if (!supabaseClient) {
-    message.textContent = "Не удалось подключиться к серверу. Попробуй обновить страницу.";
+  if (!client) {
+    message.textContent = "Нет подключения к серверу. Обнови страницу.";
     return;
   }
 
@@ -2575,7 +2663,7 @@ document.getElementById("accountForm").addEventListener("submit", async function
     let result;
 
     if (accountMode === "register") {
-      result = await supabaseClient.auth.signUp({
+      result = await client.auth.signUp({
         email: email,
         password: password,
         options: {
@@ -2583,27 +2671,26 @@ document.getElementById("accountForm").addEventListener("submit", async function
         }
       });
 
-      if (!result.error) {
-        message.textContent = result.data.session
-          ? "Аккаунт создан! Ты вошла в систему."
-          : "Аккаунт создан! Проверь почту и подтверди регистрацию.";
+      if (!result.error && result.data.session) {
+        await loadCloudProfile(result.data.user);
+        message.textContent = "Аккаунт создан! Профиль готов ❤️";
+      } else if (!result.error) {
+        message.textContent = "Аккаунт создан! Проверь почту и подтверди регистрацию.";
       }
+
     } else {
-      result = await supabaseClient.auth.signInWithPassword({
+      result = await client.auth.signInWithPassword({
         email: email,
         password: password
       });
 
       if (!result.error) {
-        try {
-  await loadCloudProfile(result.data.user);
-  message.textContent = "Успешный вход! Профиль загружен ❤️";
-} catch (profileError) {
-  console.error("Ошибка загрузки профиля:", profileError);
-  message.textContent = "Вход выполнен, но профиль не загрузился.";
-}
+        await loadCloudProfile(result.data.user);
 
-document.getElementById("accountButton").title = "Ты вошла в аккаунт";
+        message.textContent = "Успешный вход! Профиль загружен ❤️";
+
+        document.getElementById("accountButton").title =
+          "Ты вошла в аккаунт";
 
         setTimeout(closeAccountModal, 1200);
       }
@@ -2614,13 +2701,16 @@ document.getElementById("accountButton").title = "Ты вошла в аккау�
     }
 
   } catch (error) {
-    message.textContent = "Что-то пошло не так. Попробуй ещё раз.";
+    message.textContent = "Не удалось загрузить профиль. Проверь подключение.";
     console.error(error);
+
   } finally {
     submit.disabled = false;
   }
 });
-    (async function() {
+
+// Восстановление аккаунта после обновления страницы
+(async function() {
   const client = window.photoChineseSupabase;
   if (!client) return;
 
@@ -2634,7 +2724,10 @@ document.getElementById("accountButton").title = "Ты вошла в аккау�
   if (data.session) {
     try {
       await loadCloudProfile(data.session.user);
-      document.getElementById("accountButton").title = "Ты вошла в аккаунт";
+
+      document.getElementById("accountButton").title =
+        "Ты вошла в аккаунт";
+
     } catch (error) {
       console.error("Не удалось восстановить профиль:", error);
     }
@@ -2644,8 +2737,7 @@ document.getElementById("accountButton").title = "Ты вошла в аккау�
 window.addEventListener("keydown", function(event) {
   if (event.key === "Escape") closeAccountModal();
 });
- 
-  </script>
+ </script>
   
 </body>
 </html>
