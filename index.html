@@ -2315,6 +2315,7 @@ documenfunction buildCharacterCard(ch, d) {
           <span class="pinyin">${esc(t.p || '')}</span>
           <br>
           ${esc(t.m || '')}
+          ${t.hsk2025 || t.hsk30 || t.hsk20 ? `<div class="small">HSK · уровень ${esc(t.hsk2025 || t.hsk30 || t.hsk20)}</div>` : ''}
         </div>
       `;
 
