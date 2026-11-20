@@ -2145,6 +2145,10 @@ function buildCharacterCard(ch, d) {
   const toneLabel = numericTone ? (numericTone[0] === '5' ? 'нейтральный тон' : numericTone[0] + ' тон')
     : pinyin.includes('\u0304') ? '1 тон' : pinyin.includes('\u0301') ? '2 тон' : pinyin.includes('\u030c') ? '3 тон' : pinyin.includes('\u0300') ? '4 тон' : '';
   const hskLevel = d.hsk2025 || d.hsk30 || d.hsk20 || '';
+  const meanings = String(d.m || '').split(/\\s*;\\s*/).filter(Boolean);
+  const mainMeaning = meanings.shift() || '';
+  const extraMeanings = meanings;
+  const frequencyRank = Number(String(d.frequencyRank || '').replace(/[^0-9]/g, ''));
   const radicalMeanings = {
     '人':'человек','亻':'человек','口':'рот','女':'женщина','子':'ребёнок','宀':'крыша',
     '心':'сердце','忄':'сердце','手':'рука','扌':'рука','水':'вода','氵':'вода',
@@ -2210,10 +2214,11 @@ function buildCharacterCard(ch, d) {
     '<div class="pc-character-head"><div class="pc-character-symbol">' + esc(ch) + '</div><div>' +
     '<div class="pc-character-reading"><span class="pc-character-pinyin">' + esc(d.p || 'Пиньинь не найден') + '</span>' +
     (toneLabel ? '<span class="pc-character-tone">• ' + esc(toneLabel) + '</span>' : '') + '</div>' +
-    '<div class="pc-character-meaning">' + esc(d.m || 'Перевод пока не найден') + '</div></div></div>' +
+    '<div class="pc-character-meaning">' + esc(mainMeaning || 'Перевод пока не найден') + '</div></div></div>' +
     (originText ? '<section class="pc-character-origin"><h3>Состав и происхождение</h3><p class="pc-character-description">' + esc(originText) + '</p></section>' : '') +
-    '<div class="pc-character-tags">' + (hskLevel ? '<span>HSK · уровень ' + esc(hskLevel) + '</span>' : '') + (d.n ? '<span>' + esc(d.n) + ' черт</span>' : '') + '</div>' +
+    '<div class="pc-character-tags">' + (hskLevel ? '<span>HSK · уровень ' + esc(hskLevel) + '</span>' : '') + (d.n ? '<span>' + esc(d.n) + ' черт</span>' : '') + (frequencyRank > 0 ? '<span>Частотность · №' + frequencyRank.toLocaleString('ru-RU') + '</span>' : '') + '</div>' +
     (infoCards ? '<div class="pc-character-info-grid">' + infoCards + '</div>' : '') +
+    (extraMeanings.length ? '<section class="pc-character-section"><h3>Другие значения</h3><p>' + extraMeanings.map(esc).join(' · ') + '</p></section>' : '') +
     (componentCards ? '<section class="pc-character-section"><h3>Компоненты</h3><div class="pc-character-components">' + componentCards + '</div></section>' : '') +
     '<div class="pc-character-strokes"><h3>Последовательность черт</h3><p>Посмотри, в каком порядке создаётся этот знак.</p><button class="pc-stroke-animation-button stroke-choice" data-char="' + esc(ch) + '" type="button">✎ Показать порядок черт</button></div>' +
     '</article>';
