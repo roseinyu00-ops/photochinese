@@ -2273,9 +2273,9 @@ body.profile-editing #profileAvatar::after {
   </div>
   <div class="panel">
     <h2>Слово дня</h2>
-    <div style="font:64px/1.1 serif;text-align:center;margin:8px">学</div>
-    <div class="pinyin" style="text-align:center">xué</div>
-    <p style="text-align:center">учиться; изучать</p>
+    <div data-daily-word="character" style="font:64px/1.1 serif;text-align:center;margin:8px">学</div>
+    <div class="pinyin" data-daily-word="pinyin" style="text-align:center">xué</div>
+    <p data-daily-word="meaning" style="text-align:center">учиться; изучать</p>
   </div>
 </aside>
 
@@ -2464,9 +2464,9 @@ body.profile-editing #profileAvatar::after {
       <!-- СЛОВО ДНЯ -->
       <section class="profile-section word-of-day">
         <h2>今日单词 · Слово дня</h2>
-        <div class="word-character">学</div>
-        <div class="pinyin">xué</div>
-        <p>учиться; изучать</p>
+        <div class="word-character" data-daily-word="character">学</div>
+        <div class="pinyin" data-daily-word="pinyin">xué</div>
+        <p data-daily-word="meaning">учиться; изучать</p>
       </section>
     </div>
   </div>
@@ -4240,5 +4240,52 @@ window.addEventListener("keydown", function(event) {
 });
  </script>
   
+
+<script>
+// ===== PHOTOCHINESE: СЛОВО ДНЯ =====
+(function initDailyWord() {
+  const words = [
+    { character: "你", pinyin: "nǐ", meaning: "ты; вы" },
+    { character: "好", pinyin: "hǎo", meaning: "хороший; хорошо" },
+    { character: "我", pinyin: "wǒ", meaning: "я; меня" },
+    { character: "人", pinyin: "rén", meaning: "человек; люди" },
+    { character: "大", pinyin: "dà", meaning: "большой" },
+    { character: "小", pinyin: "xiǎo", meaning: "маленький" },
+    { character: "中", pinyin: "zhōng", meaning: "середина; центр" },
+    { character: "国", pinyin: "guó", meaning: "страна; государство" },
+    { character: "文", pinyin: "wén", meaning: "письменность; культура" },
+    { character: "字", pinyin: "zì", meaning: "иероглиф; письменный знак" },
+    { character: "学", pinyin: "xué", meaning: "учиться; изучать" },
+    { character: "生", pinyin: "shēng", meaning: "жизнь; рождаться" },
+    { character: "水", pinyin: "shuǐ", meaning: "вода" },
+    { character: "火", pinyin: "huǒ", meaning: "огонь" },
+    { character: "木", pinyin: "mù", meaning: "дерево; древесина" },
+    { character: "日", pinyin: "rì", meaning: "солнце; день" },
+    { character: "月", pinyin: "yuè", meaning: "луна; месяц" },
+    { character: "明", pinyin: "míng", meaning: "светлый; ясный" },
+    { character: "女", pinyin: "nǚ", meaning: "женщина; женский" },
+    { character: "子", pinyin: "zǐ", meaning: "ребёнок; сын" },
+    { character: "是", pinyin: "shì", meaning: "быть; являться" },
+    { character: "不", pinyin: "bù", meaning: "не; нет" },
+    { character: "吃", pinyin: "chī", meaning: "есть; кушать" },
+    { character: "看", pinyin: "kàn", meaning: "смотреть; читать" },
+    { character: "猫", pinyin: "māo", meaning: "кошка; кот" }
+  ];
+
+  function update() {
+    const now = new Date();
+    const dayNumber = Math.floor(Date.UTC(now.getFullYear(), now.getMonth(), now.getDate()) / 86400000);
+    const word = words[((dayNumber % words.length) + words.length) % words.length];
+    document.querySelectorAll('[data-daily-word="character"]').forEach(el => el.textContent = word.character);
+    document.querySelectorAll('[data-daily-word="pinyin"]').forEach(el => el.textContent = word.pinyin);
+    document.querySelectorAll('[data-daily-word="meaning"]').forEach(el => el.textContent = word.meaning);
+  }
+
+  update();
+  setInterval(update, 60000);
+  document.addEventListener("visibilitychange", update);
+})();
+</script>
+
 </body>
 </html>
