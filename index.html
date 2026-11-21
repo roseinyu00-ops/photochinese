@@ -2542,7 +2542,7 @@ body.profile-editing #profileAvatar::after {
   </div>
 </section>
 
-<aside class="side section">
+<aside id="learningSidebar" class="side section">
   <div class="panel learning-progress-panel">
     <div class="learning-progress-heading">
       <h2>Твой прогресс</h2>
@@ -2840,6 +2840,11 @@ const tabs = document.querySelectorAll('nav button');
 tabs.forEach(btn => btn.addEventListener('click', () => {
   tabs.forEach(b => b.classList.toggle('active', b === btn));
   document.querySelectorAll('.tab').forEach(s => s.hidden = s.id !== btn.dataset.tab);
+
+  // Общая панель прогресса относится только к вкладке «Изучение».
+  // Иначе она остаётся видимой поверх остальных вкладок и сдвигает их вниз.
+  const learningSidebar = document.getElementById("learningSidebar");
+  if (learningSidebar) learningSidebar.hidden = btn.dataset.tab !== "learn";
 
   document.body.classList.toggle("profile-open", btn.dataset.tab === "profile");
   if (btn.dataset.tab === "profile") updateProfileAccess();
