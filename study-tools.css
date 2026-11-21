@@ -41,3 +41,9 @@ body.dark-theme .study-tools-stat strong,body.dark-theme .study-tools-hanzi,body
 body.dark-theme .study-tools-word-pinyin{color:#f2a9ba}
 body.dark-theme .study-tools-input{background:#49383d;color:#fff1ed;border-color:#76545d}
 @media(max-width:520px){.study-tools-stats{grid-template-columns:repeat(3,minmax(0,1fr));gap:6px}.study-tools-stat{padding:10px 7px}.study-tools-stat strong{font-size:19px}.study-tools-stat span{font-size:10px}.study-tools-hanzi{font-size:54px}.study-tools-rating{grid-template-columns:repeat(2,minmax(0,1fr))}.study-tools-form{grid-template-columns:1fr}.study-tools-form .wide{grid-column:auto}}
+
+/* Dictionary-first layout and inline audio feedback */
+.study-tools-hero{padding:20px 22px;margin-bottom:12px}
+.study-tools-tabs{position:sticky;top:8px;z-index:5;padding:8px;background:var(--cream);border:1px solid var(--line);border-radius:15px}
+.study-tools-word-status{grid-column:1/-1;font-size:12px;color:var(--muted);padding:0 3px}
+.study-tools-word{margin-bottom:2px}
