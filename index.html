@@ -99,7 +99,8 @@ label{font-weight:700;font-size:13px;display:block;margin:12px 0 6px}
 .coach-lesson-card:disabled{opacity:.55;cursor:not-allowed}.coach-lesson-number{width:34px;height:34px;border-radius:11px;background:#fff0f4;display:grid;place-items:center;flex-shrink:0;font-weight:800;color:#a85c72}
 .coach-lesson-meta{display:block;font-size:12px;color:var(--muted);margin-top:3px}.coach-lesson-status{margin-left:auto;color:#9b6b7a;font-size:18px}
 .coach-lesson-top{display:flex;justify-content:space-between;align-items:center;gap:10px}.coach-word-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(125px,1fr));gap:9px;margin:16px 0}
-.coach-word{border:1px solid var(--line);border-radius:12px;padding:12px;background:rgba(255,245,248,.65);text-align:center}.coach-word strong{display:block;font-size:25px;line-height:1.35}.coach-word-pinyin{display:block;color:var(--muted);font-size:13px;font-weight:600;margin-top:3px}.coach-word-translation{display:block;color:var(--ink);font-size:13px;margin-top:5px}.coach-word-learned{margin-top:9px;border:1px solid var(--line);border-radius:999px;padding:5px 9px;background:transparent;color:var(--muted);font-size:11px}.coach-word-learned.is-known{background:rgba(70,160,110,.12);color:var(--ink);border-color:rgba(70,160,110,.35)}.coach-example-hanzi{font-size:20px;font-weight:800;line-height:1.5}.coach-example-pinyin{font-size:14px;font-weight:600;color:var(--muted);margin-top:3px}.coach-example-translation{font-size:14px;font-weight:400;margin-top:5px}.coach-final-exam{border-top:1px solid var(--line);margin-top:18px;padding-top:16px}.coach-final-exam h3{margin:0 0 6px}.coach-objectives{border:1px solid var(--line);border-radius:12px;padding:12px;margin:12px 0;background:rgba(255,245,248,.4)}.coach-objectives ul{margin:8px 0 0;padding-left:20px}.coach-dialogue-line{padding:10px 0;border-bottom:1px solid var(--line)}.coach-dialogue-line:last-child{border-bottom:0}.coach-dialogue-line strong{font-size:18px}.coach-practice-actions{display:flex;gap:8px;flex-wrap:wrap;margin-top:12px}
+.coach-word{border:1px solid var(--line);border-radius:12px;padding:12px;background:rgba(255,245,248,.65);text-align:center}.coach-word strong{display:block;font-size:25px;line-height:1.35}.coach-word-pinyin{display:block;color:var(--muted);font-size:13px;font-weight:600;margin-top:3px}.coach-word-translation{display:block;color:var(--ink);font-size:13px;margin-top:5px}.coach-phrase-list{display:grid;gap:9px;margin-top:10px}.coach-phrase-item{padding:12px;border:1px solid var(--line);border-radius:12px;background:rgba(255,245,248,.55)}.coach-phrase-item strong{display:block;font-size:17px;line-height:1.5}.coach-phrase-item .coach-word-pinyin,.coach-phrase-item .coach-word-translation{display:block;margin-top:4px}
+.coach-word-learned{margin-top:9px;border:1px solid var(--line);border-radius:999px;padding:5px 9px;background:transparent;color:var(--muted);font-size:11px}.coach-word-learned.is-known{background:rgba(70,160,110,.12);color:var(--ink);border-color:rgba(70,160,110,.35)}.coach-example-hanzi{font-size:20px;font-weight:800;line-height:1.5}.coach-example-pinyin{font-size:14px;font-weight:600;color:var(--muted);margin-top:3px}.coach-example-translation{font-size:14px;font-weight:400;margin-top:5px}.coach-final-exam{border-top:1px solid var(--line);margin-top:18px;padding-top:16px}.coach-final-exam h3{margin:0 0 6px}.coach-objectives{border:1px solid var(--line);border-radius:12px;padding:12px;margin:12px 0;background:rgba(255,245,248,.4)}.coach-objectives ul{margin:8px 0 0;padding-left:20px}.coach-dialogue-line{padding:10px 0;border-bottom:1px solid var(--line)}.coach-dialogue-line:last-child{border-bottom:0}.coach-dialogue-line strong{font-size:18px}.coach-practice-actions{display:flex;gap:8px;flex-wrap:wrap;margin-top:12px}
 .coach-grammar-box{padding:15px;border-radius:14px;background:#fff5f7;border:1px solid var(--line);margin:14px 0}.coach-example{font-size:18px;font-weight:700}
 .coach-practice{border-top:1px solid var(--line);padding-top:14px;margin-top:16px}.coach-practice-option{display:block;width:100%;text-align:left;border:1px solid var(--line);border-radius:11px;padding:11px;margin:7px 0;background:white;color:var(--ink)}
 .coach-practice-option.correct{border-color:#70ad88;background:#eff9f1}.coach-practice-option.wrong{border-color:#d98798;background:#fff1f3}
@@ -2381,6 +2382,14 @@ body.profile-editing #profileAvatar::after {
         <button class="primary" id="completeCoachLesson" type="button" hidden disabled>Завершить урок</button>
       </div>
     </div>
+    <div id="coachLessonSupplement" class="coach-grammar-box" hidden>
+      <h3>Полный список новых слов и фраз</h3>
+      <p class="small">Дополнительная лексика по теме урока. Отмечай слова, которые уже выучила.</p>
+      <h4>Слова и выражения</h4>
+      <div id="coachLessonSupplementWords" class="coach-word-grid"></div>
+      <h4>Готовые фразы</h4>
+      <div id="coachLessonSupplementPhrases" class="coach-phrase-list"></div>
+    </div>
     <div class="coach-teacher-help">
       <h3>Спросить преподавателя</h3>
       <p class="small">Выбери, что нужно объяснить подробнее.</p>
@@ -3731,6 +3740,30 @@ extendedCoachLessons[4][0].dialogue=[['A：这条新闻可靠吗？','A: Zhè ti
 extendedCoachLessons[5][0].dialogue=[['A：这个结论有什么局限？','A: Zhège jiélùn yǒu shénme júxiàn?','Какие ограничения есть у этого вывода?'],['B：样本数量有限，还需要进一步验证。','B: Yàngběn shùliàng yǒuxiàn, hái xūyào jìnyíbù yànzhèng.','Выборка ограничена, нужны дальнейшие проверки.']];
 
 
+
+// Расширенный словарь и речевые модели для первых уроков HSK 1.
+// Дополнительные слова показываются отдельным полным списком внизу урока.
+const coachSupplementalVocabulary={
+  1:{
+    0:{
+      words:[
+        ['您好','nín hǎo','здравствуйте (вежливо)'],['早上好','zǎoshang hǎo','доброе утро'],['上午好','shàngwǔ hǎo','доброе утро (до полудня)'],['下午好','xiàwǔ hǎo','добрый день'],['晚上好','wǎnshang hǎo','добрый вечер'],['晚安','wǎn ān','спокойной ночи'],['再见','zàijiàn','до свидания'],['明天见','míngtiān jiàn','до завтра'],['回头见','huítóu jiàn','увидимся позже'],['谢谢','xièxie','спасибо'],['不客气','bú kèqi','не за что'],['对不起','duìbuqǐ','извините; прости'],['没关系','méi guānxi','ничего страшного'],['请问','qǐngwèn','простите, можно спросить'],['请','qǐng','пожалуйста; просить; приглашать'],['很高兴','hěn gāoxìng','очень рад(а)'],['认识','rènshi','быть знакомым; познакомиться'],['朋友','péngyou','друг'],['同学','tóngxué','однокурсник; одноклассник'],['老师','lǎoshī','учитель'],['学生','xuésheng','ученик; студент'],['他','tā','он'],['她','tā','она'],['我们','wǒmen','мы'],['你们','nǐmen','вы (мн. число)'],['他们','tāmen','они (мужчины или смешанная группа)'],['她们','tāmen','они (женщины)'],['呢','ne','частица для встречного вопроса']
+      ],
+      phrases:[
+        ['你叫什么名字？','Nǐ jiào shénme míngzi?','Как тебя зовут?'],['我叫……','Wǒ jiào…','Меня зовут…'],['你呢？','Nǐ ne?','А ты?'],['你是哪国人？','Nǐ shì nǎ guó rén?','Ты из какой страны?'],['我是……人。','Wǒ shì… rén.','Я из…'],['你是学生吗？','Nǐ shì xuésheng ma?','Ты студент(ка)?'],['很高兴认识你。','Hěn gāoxìng rènshi nǐ.','Очень приятно познакомиться.'],['请多关照。','Qǐng duō guānzhào.','Прошу заботиться обо мне; приятно познакомиться (вежл.)'],['你好吗？','Nǐ hǎo ma?','Как дела?'],['我很好，谢谢。','Wǒ hěn hǎo, xièxie.','У меня всё хорошо, спасибо.'],['你怎么样？','Nǐ zěnmeyàng?','Как ты?'],['再见，明天见！','Zàijiàn, míngtiān jiàn!','До свидания, до завтра!']
+      ]
+    },
+    1:{
+      words:[
+        ['零','líng','ноль'],['四','sì','четыре'],['五','wǔ','пять'],['六','liù','шесть'],['七','qī','семь'],['八','bā','восемь'],['九','jiǔ','девять'],['十','shí','десять'],['十一','shíyī','одиннадцать'],['十二','shí’èr','двенадцать'],['二十','èrshí','двадцать'],['三十','sānshí','тридцать'],['四十','sìshí','сорок'],['五十','wǔshí','пятьдесят'],['六十','liùshí','шестьдесят'],['七十','qīshí','семьдесят'],['八十','bāshí','восемьдесят'],['九十','jiǔshí','девяносто'],['百','bǎi','сто'],['零岁','líng suì','ноль лет'],['今年','jīnnián','в этом году'],['明年','míngnián','в следующем году'],['去年','qùnián','в прошлом году'],['多大','duō dà','сколько лет; какого возраста'],['年龄','niánlíng','возраст'],['生日','shēngrì','день рождения'],['出生','chūshēng','родиться'],['小','xiǎo','маленький; младший'],['大','dà','большой; старший'],['孩子','háizi','ребёнок'],['男孩','nánhái','мальчик'],['女孩','nǚhái','девочка']
+      ],
+      phrases:[
+        ['你几岁？','Nǐ jǐ suì?','Сколько тебе лет? (обычно ребёнку или молодому человеку)'],['你多大？','Nǐ duō dà?','Сколько тебе лет?'],['你今年多大？','Nǐ jīnnián duō dà?','Сколько тебе лет в этом году?'],['我今年十八岁。','Wǒ jīnnián shíbā suì.','Мне в этом году восемнадцать лет.'],['我二十岁了。','Wǒ èrshí suì le.','Мне уже двадцать лет.'],['他十岁。','Tā shí suì.','Ему десять лет.'],['她今年十二岁。','Tā jīnnián shí’èr suì.','Ей в этом году двенадцать лет.'],['你生日是几月几号？','Nǐ shēngrì shì jǐ yuè jǐ hào?','Когда у тебя день рождения?'],['我是一九九八年出生的。','Wǒ shì yī jiǔ jiǔ bā nián chūshēng de.','Я родился/родилась в 1998 году.'],['我比他大两岁。','Wǒ bǐ tā dà liǎng suì.','Я старше его на два года.']
+      ]
+    }
+  }
+};
+
 Object.values(coachCourses).flat().forEach(lesson=>lesson.words.forEach(word=>{const m=word[0].match(/^([\u3400-\u9fff]+)\s+(.+)$/);if(m){word[0]=m[1];word[1]=(m[2]+" "+word[1]).trim();}}));
 const coachOriginalExamplePinyin={"Приветствие и знакомство":"Nǐ hǎo ma? Wǒ jiào Ānnà. — Nǐ hǎo! Wǒ jiào Lǐ.","Числа и возраст":"Wǒ shíbā suì.","Местоимения и 是":"Tā shì lǎoshī.","Повседневные действия":"Wǒ měitiān chī zǎofàn.","Опыт и завершённое действие":"Wǒ zuótiān kàn le diànyǐng.","Сравнение с 比":"Jīntiān bǐ zuótiān lěng.","Планы и намерения":"Wǒ dǎsuàn míngnián qù Zhōngguó.","Потому что и поэтому":"Yīnwèi Zhōngwén hěn yǒu yìsi, suǒyǐ wǒ xǐhuan xuéxí.","Возможность и умение":"Wǒ huì shuō yìdiǎnr Zhōngwén.","Сложные дополнения результата":"Wǒ méi tīngdǒng lǎoshī de huà.","虽然…但是…":"Suīrán hěn nán, dànshì wǒ huì jiānchí.","把-конструкция":"Qǐng bǎ shū fàng zài zhuōzi shàng.","Письменная и формальная лексика":"Cǐwài, zhè zhǒng xiànxiàng yě huì chǎnshēng yǐngxiǎng.","Устойчивые сочетания":"Wǒmen yīnggāi cǎiqǔ cuòshī gǎishàn huánjìng.","Аргументация и мнение":"Wǒ rènwéi zhège guāndiǎn zhídé tǎolùn.","Абстрактная лексика и оттенки смысла":"Zhège biànhuà tǐxiàn le shèhuì fāzhǎn de qūshì.","Сложные логические связи":"Jíshǐ yùdào kùnnan, wǒmen yě bú huì fàngqì.","Точность и стиль":"Zhège cí zài bùtóng yǔjìng zhōng hányì bùtóng."};
 
@@ -3744,7 +3777,7 @@ function currentCoachLevel(){return Number(document.getElementById('coachLevel')
 function renderCoachCourse(){
  const level=currentCoachLevel(), lessons=coachCourses[level], progress=readCoachProgress(), done=progress[level]||[];
  document.getElementById('coachCourseTitle').textContent='Курс HSK '+level;
- const vocabList=[...new Map(lessons.flatMap(l=>l.words).map(w=>[w[0]+'|'+w[1],w])).values()];
+ const vocabList=[...new Map(lessons.flatMap((l,i)=>l.words.concat((coachSupplementalVocabulary[level]&&coachSupplementalVocabulary[level][i]&&coachSupplementalVocabulary[level][i].words)||[])).map(w=>[w[0]+'|'+w[1],w])).values()];
  let vocabProgress={};try{vocabProgress=JSON.parse(localStorage.getItem('photoChineseCoachVocabulary')||'{}')||{};}catch(e){vocabProgress={};}
  const learned=(vocabProgress[level]||[]);
  document.getElementById('coachCourseSubtitle').textContent=lessons.length+' уроков · '+done.length+' из '+lessons.length+' завершено · словарь: '+learned.length+' из '+vocabList.length+' слов';
@@ -3770,7 +3803,7 @@ function renderCoachCourse(){
 function shuffleCoachItems(items){return items.slice().sort(()=>Math.random()-.5);}
 function buildCoachPractice(lesson){
  const questions=[{question:lesson.question,options:lesson.options.slice(),answer:lesson.answer,explanation:(lesson.help&&lesson.help.grammar)||lesson.explanation||'Вспомни правило из урока.'}];
- lesson.words.forEach(word=>{
+ (lesson.words||[]).concat(lesson.extraWords||[]).forEach(word=>{
   const translations=[...new Set(lesson.words.map(w=>w[2]).filter(v=>v&&v!==word[2]))];
   const pinyins=[...new Set(lesson.words.map(w=>w[1]).filter(v=>v&&v!==word[1]))];
   const translationDistractors=shuffleCoachItems(translations).slice(0,2);
@@ -3809,6 +3842,7 @@ function renderCoachPracticeQuestion(){
 }
 function openCoachLesson(index){
  const lesson=coachCourses[currentCoachLevel()][index];if(!lesson)return;
+ const supplemental=(coachSupplementalVocabulary[currentCoachLevel()]||{})[index]||{};lesson.extraWords=supplemental.words||[];lesson.extraPhrases=supplemental.phrases||[];
  activeCoachLesson=index;coachPracticePassed=false;activeCoachQuestions=buildCoachPractice(lesson);
  coachPracticeIndex=0;coachPracticeCorrect=0;coachPracticeAnswered=false;
  document.getElementById('coachLessonPanel').hidden=false;
@@ -3848,6 +3882,22 @@ function openCoachLesson(index){
   });
   card.append(hanziNode,pinyinNode,translationNode,learnedBtn);words.appendChild(card);
  });
+ const supplementBox=document.getElementById('coachLessonSupplement'),supplementWords=document.getElementById('coachLessonSupplementWords'),supplementPhrases=document.getElementById('coachLessonSupplementPhrases');
+ supplementWords.innerHTML='';supplementPhrases.innerHTML='';
+ const extraWords=lesson.extraWords||[],extraPhrases=lesson.extraPhrases||[];
+ supplementBox.hidden=!extraWords.length&&!extraPhrases.length;
+ extraWords.forEach(w=>{
+  const card=document.createElement('div');card.className='coach-word';
+  const h=document.createElement('strong');h.textContent=w[0];
+  const p=document.createElement('span');p.className='coach-word-pinyin';p.textContent=w[1];
+  const t=document.createElement('span');t.className='coach-word-translation';t.textContent=w[2];
+  const key=w[0]+'|'+w[1];let saved={};try{saved=JSON.parse(localStorage.getItem('photoChineseCoachVocabulary')||'{}')||{};}catch(e){saved={};}
+  const known=(saved[String(currentCoachLevel())]||[]).includes(key);
+  const btn=document.createElement('button');btn.type='button';btn.className='coach-word-learned'+(known?' is-known':'');btn.textContent=known?'✓ Выучено':'Отметить выученным';
+  btn.addEventListener('click',()=>{let data={};try{data=JSON.parse(localStorage.getItem('photoChineseCoachVocabulary')||'{}')||{};}catch(e){data={};}const levelKey=String(currentCoachLevel());data[levelKey]=data[levelKey]||[];if(data[levelKey].includes(key)){data[levelKey]=data[levelKey].filter(x=>x!==key);btn.classList.remove('is-known');btn.textContent='Отметить выученным';}else{data[levelKey].push(key);btn.classList.add('is-known');btn.textContent='✓ Выучено';}localStorage.setItem('photoChineseCoachVocabulary',JSON.stringify(data));renderCoachCourse();});
+  card.append(h,p,t,btn);supplementWords.appendChild(card);
+ });
+ extraPhrases.forEach(line=>{const item=document.createElement('div');item.className='coach-phrase-item';const h=document.createElement('strong');h.textContent=line[0];const p=document.createElement('div');p.className='coach-word-pinyin';p.textContent=line[1];const t=document.createElement('div');t.className='coach-word-translation';t.textContent=line[2];item.append(h,p,t);supplementPhrases.appendChild(item);});
  document.getElementById('coachHelpAnswer').hidden=true;renderCoachPracticeQuestion();
  document.getElementById('coachLessonPanel').scrollIntoView({behavior:'smooth',block:'start'});
 }
