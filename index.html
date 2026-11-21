@@ -57,6 +57,18 @@ p{margin:6px 0;color:var(--muted)}
 .ocr-output textarea{min-height:130px;font-size:18px;line-height:1.7}
 .ocr-preview{max-width:100%;max-height:260px;object-fit:contain;border-radius:12px;margin-top:12px;border:1px solid var(--line)}
 .ocr-actions{display:flex;gap:8px;flex-wrap:wrap;margin-top:10px}
+.meme-upload{margin:16px 0;padding:16px;border:1px dashed #edc5cf;border-radius:16px;background:#fffafb}
+#memePreview{display:block}
+.meme-analysis-card{margin-top:12px;padding:14px;border:1px solid var(--line);border-radius:14px;background:#fffafb}
+.meme-analysis-card h3{margin-bottom:6px}
+.meme-token{display:grid;grid-template-columns:minmax(50px,.5fr) minmax(70px,.7fr) 2fr;gap:10px;padding:8px 0;border-bottom:1px solid var(--line);align-items:center}
+.meme-token:last-child{border-bottom:0}
+.meme-token b{font-size:19px}
+.meme-token span{font-size:13px}
+.meme-analysis-note{margin-top:12px;padding:12px;border-radius:12px;background:#fff2f5;color:var(--muted);font-size:13px}
+body.dark-theme .meme-upload,body.dark-theme .meme-analysis-card{background:#49383d;border-color:#76545d}
+body.dark-theme .meme-analysis-note{background:#49383d;color:#e8c9d0}
+@media(max-width:520px){.meme-token{grid-template-columns:1fr 1fr}.meme-token span:last-child{grid-column:1/-1}}
 .small{font-size:12px;color:var(--muted)}
 .section{margin-top:18px}
 .char-layout{display:grid;grid-template-columns:170px 1fr;gap:18px;align-items:start}
@@ -2273,12 +2285,18 @@ body.profile-editing #profileAvatar::after {
 <section id="meme" class="tab" hidden>
   <div class="panel">
     <h1>Переведи мем 🇨🇳</h1>
-    <p>Вставь китайский текст с картинки или загрузи изображение. Перевод должен учитывать сленг, шутки и интернет-контекст.</p>
-    <label for="memeText">Китайский текст</label>
+    <p>Загрузи мем с китайским текстом или вставь фразу вручную. PhotoChinese распознает надпись и поможет разобрать слова.</p>
+    <div class="meme-upload">
+      <input id="memePhoto" type="file" accept="image/*" hidden>
+      <label class="primary" for="memePhoto" style="display:inline-block;cursor:pointer">＋ Загрузить мем</label>
+      <img id="memePreview" class="ocr-preview" alt="Предпросмотр мема" hidden>
+      <div id="memeOcrStatus" class="ocr-status" role="status" aria-live="polite" hidden></div>
+    </div>
+    <label for="memeText">Китайский текст (можно исправить после распознавания)</label>
     <textarea id="memeText" placeholder="Например: 这也太好笑了吧！"></textarea>
-    <div class="actions"><button class="primary" id="translateBtn">Перевести и объяснить</button></div>
-    <div id="memeResult" class="result" hidden></div>
-    <p class="small">Для перевода реальных мемов подключи OCR для изображения и LLM для контекстного объяснения. Не отправляй личные данные.</p>
+    <div class="actions"><button class="primary" id="translateBtn" type="button">Разобрать текст</button></div>
+    <div id="memeResult" class="result" hidden aria-live="polite"></div>
+    <p class="small">Распознавание работает в браузере. Текст не отправляется на сервер. Контекстный разбор сленга и скрытого смысла с помощью ИИ появится после подключения защищённого ИИ-сервиса.</p>
   </div>
 </section>
 
@@ -2658,6 +2676,7 @@ document.getElementById('copyOcr').onclick=async()=>{
 document.getElementById('sendToMeme').onclick=()=>{
   document.getElementById('memeText').value=recognizedText.value;
   document.querySelector('nav button[data-tab="meme"]').click();
+  setMemeOcrStatus('Текст перенесён из раздела «Изучение». Нажми «Разобрать текст», чтобы продолжить.',true);
 };
 // Небольшой встроенный словарь для стартового уровня. Неизвестные слова
 // показываются посимвольно, чтобы приложение не выдумывало перевод.
@@ -3276,10 +3295,66 @@ document.getElementById('analyzeOcr').addEventListener('click',()=>{
 dictionaryPromise=loadLargeDictionary();
 characterStructurePromise=loadCharacterStructureData();
 
-document.getElementById('translateBtn').onclick=()=>{
-  const t=document.getElementById('memeText').value.trim(), r=document.getElementById('memeResult');
-  r.hidden=false;
-  r.textContent=t ? 'Демо-перевод для фразы «'+t+'»:\n«Это так смешно!» (пример для 这也太好笑了吧！)\n\nПодключи AI API, чтобы перевод строился по введённому тексту, с разбором сленга и контекста.' : 'Сначала введи китайский текст.';
+const memePhoto=document.getElementById('memePhoto');
+const memePreview=document.getElementById('memePreview');
+const memeOcrStatus=document.getElementById('memeOcrStatus');
+function setMemeOcrStatus(message,show=true){
+  memeOcrStatus.textContent=message;
+  memeOcrStatus.hidden=!show;
+}
+memePhoto.addEventListener('change',async()=>{
+  const file=memePhoto.files && memePhoto.files[0];
+  if(!file || !file.type.startsWith('image/')) return;
+  if(memePreview.dataset.url) URL.revokeObjectURL(memePreview.dataset.url);
+  const url=URL.createObjectURL(file);
+  memePreview.dataset.url=url;
+  memePreview.src=url;
+  memePreview.hidden=false;
+  setMemeOcrStatus('Подготавливаем распознавание китайского текста…');
+  try{
+    if(!window.Tesseract) throw new Error('Модуль распознавания не загрузился. Проверь интернет.');
+    if(!ocrWorkerPromise){
+      ocrWorkerPromise=Tesseract.createWorker('chi_sim',1,{
+        logger:m=>{
+          if(m.status==='loading language traineddata') setMemeOcrStatus('Загружаем китайскую языковую модель… '+Math.round((m.progress||0)*100)+'%');
+          else if(m.status==='recognizing text') setMemeOcrStatus('Распознаём текст… '+Math.round((m.progress||0)*100)+'%');
+        }
+      });
+    }
+    const worker=await ocrWorkerPromise;
+    setMemeOcrStatus('Читаем текст на изображении…');
+    const result=await worker.recognize(file);
+    const recognized=(result.data.text||'').trim();
+    document.getElementById('memeText').value=recognized;
+    setMemeOcrStatus(recognized?'Готово! Проверь распознанные иероглифы и нажми «Разобрать текст».':'Китайский текст не найден. Попробуй более чёткое изображение или введи его вручную.');
+  }catch(error){
+    console.error(error);
+    ocrWorkerPromise=null;
+    setMemeOcrStatus('Не удалось распознать изображение: '+(error.message||'неизвестная ошибка'));
+  }
+});
+document.getElementById('translateBtn').onclick=async()=>{
+  const input=document.getElementById('memeText');
+  const t=input.value.trim(), result=document.getElementById('memeResult');
+  result.hidden=false;
+  if(!t){result.textContent='Сначала загрузи мем или введи китайский текст.';return;}
+  result.textContent='Подготавливаем словарь…';
+  await dictionaryPromise;
+  const normalized=t.replace(/\\s/g,'');
+  const tokens=tokenizeChinese(t);
+  const exact=sentenceTranslations[normalized]||sentenceTranslations[t];
+  const pinyin=tokens.map(token=>token.p||token.text).join(' ').replace(/\\s+([，。！？；：、,.!?;:])/g,'$1');
+  const gloss=tokens.map(token=>{
+    if(token.type==='punct') return token.text;
+    return token.text+' — '+(token.m||'значение пока не найдено в словаре');
+  });
+  const hasChinese=/\\p{Script=Han}/u.test(t);
+  if(!hasChinese){result.textContent='В тексте не нашлись китайские иероглифы. Проверь ввод или распознавание.';return;}
+  result.innerHTML='<div class="meme-analysis-card"><h3>Пиньинь</h3><p>'+esc(pinyin)+'</p></div>'+
+    '<div class="meme-analysis-card"><h3>'+(exact?'Перевод':'Значение по словам')+'</h3><p>'+esc(exact||gloss.join(' · '))+'</p>'+
+    (exact?'':'<p class="small">Это словарная подсказка, а не точный перевод всей фразы: смысл зависит от контекста.</p>')+'</div>'+
+    '<div class="meme-analysis-card"><h3>Разбор</h3>'+tokens.map(token=>token.type==='punct'?'<span>'+esc(token.text)+'</span>':'<div class="meme-token"><b>'+esc(token.text)+'</b><span>'+esc(token.p||'')+'</span><span>'+esc(token.m||'Значение не найдено')+'</span></div>').join('')+'</div>'+
+    '<div class="meme-analysis-note">Пока это словарный разбор. Ирония, мемный сленг, игра слов и культурные отсылки требуют отдельного ИИ-сервиса — мы не будем выдавать догадки за точное объяснение.</div>';
 };
 let teacher='balanced';
 document.querySelectorAll('#teacherChoices button').forEach(b=>b.onclick=()=>{
