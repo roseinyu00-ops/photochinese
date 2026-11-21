@@ -2888,7 +2888,7 @@ function prepareChineseOcrImage(file) {
 
 function scoreChineseOcrResult(result) {
   const text = (result?.data?.text || '').trim();
-  const hanziCount = (text.match(/\\p{Script=Han}/gu) || []).length;
+  const hanziCount = (text.match(/\p{Script=Han}/gu) || []).length;
   const confidence = Number(result?.data?.confidence);
   // Учитываем уверенность движка, но слегка предпочитаем вариант,
   // в котором действительно распознано больше китайских знаков.
