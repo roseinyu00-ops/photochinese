@@ -2819,13 +2819,18 @@ body.profile-editing #profileAvatar::after {
         <div id="studyReviewHanzi" class="study-tools-hanzi">你好</div>
         <button id="studyReviewAudio" type="button" class="secondary">🔊 Послушать</button>
         <p id="studyReviewAudioStatus" class="study-tools-audio-status" aria-live="polite"></p>
+        <div id="studyReviewInputArea" class="study-review-input-area">
+          <label for="studyReviewPinyinInput">Произношение (пиньинь)</label>
+          <input id="studyReviewPinyinInput" class="study-tools-input" type="text" autocomplete="off" placeholder="Например, nǐ hǎo">
+          <label for="studyReviewMeaningInput">Значение</label>
+          <input id="studyReviewMeaningInput" class="study-tools-input" type="text" autocomplete="off" placeholder="Напиши перевод своими словами">
+          <button id="studyReviewReveal" type="button" class="primary">Проверить ответ</button>
+          <p id="studyReviewCheckResult" class="study-review-check-result" aria-live="polite"></p>
+        </div>
         <div id="studyReviewAnswer" hidden>
           <div id="studyReviewPinyin" class="study-tools-pinyin"></div>
           <div id="studyReviewMeaning" class="study-tools-meaning"></div>
           <div id="studyReviewLevel" class="study-tools-word-meta"></div>
-        </div>
-        <div class="study-tools-actions">
-          <button id="studyReviewReveal" type="button" class="primary">Показать ответ</button>
         </div>
         <div id="studyReviewRatings" class="study-tools-rating" hidden>
           <button type="button" data-rating="again">Снова<strong>1 мин</strong></button>
