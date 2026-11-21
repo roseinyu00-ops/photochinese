@@ -1881,6 +1881,71 @@ body.dark-theme .achievement-mark { color: #d6a2af; }
   .profile-collection .collection-item small { font-size: 9px; }
 }
 
+
+/* Последние штрихи: позиция имени, обрезка blur и тонкие иконки */
+.profile-identity {
+  transform: translateY(8px);
+}
+.profile-banner {
+  overflow: hidden !important;
+  clip-path: inset(0);
+  isolation: isolate;
+}
+#chooseBannerBtn {
+  overflow: hidden;
+  clip-path: inset(0 round 999px);
+  contain: paint;
+  backdrop-filter: blur(5px);
+  -webkit-backdrop-filter: blur(5px);
+  box-shadow: 0 2px 8px rgba(73,53,61,.10);
+}
+.achievement-mark {
+  width: 23px;
+  height: 23px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: #b77f8d;
+}
+.achievement-mark svg,
+.collection-icon svg,
+#equippedDecoration svg {
+  width: 100%;
+  height: 100%;
+  display: block;
+  fill: none;
+  stroke: currentColor;
+  stroke-width: 1.45;
+  stroke-linecap: round;
+  stroke-linejoin: round;
+}
+.profile-collection .collection-item .achievement-mark {
+  font-size: 0;
+}
+.collection-icon {
+  width: 26px;
+  height: 26px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  color: #b77f8d;
+}
+#equippedDecoration {
+  display: inline-flex;
+  width: 21px;
+  height: 21px;
+  color: #b77f8d;
+  vertical-align: middle;
+}
+body.dark-theme .achievement-mark,
+body.dark-theme .collection-icon,
+body.dark-theme #equippedDecoration {
+  color: #d6a2af;
+}
+@media (max-width: 560px) {
+  .profile-identity { transform: translateY(6px); }
+}
+
 </style>
 </head>
 <body>
@@ -2135,19 +2200,19 @@ body.dark-theme .achievement-mark { color: #d6a2af; }
   <div class="profile-collection" id="achievementsList">
 
     <div class="collection-item" data-achievement="first_steps">
-      <span class="achievement-mark" aria-hidden="true">○</span>
+      <span class="achievement-mark" aria-hidden="true"><svg viewBox="0 0 24 24"><path d="M12 20C8 16 4 12 7 7c2-3 4-3 5-1 1-2 3-2 5 1 3 5-1 9-5 13Z"/><path d="M12 7c-1 4-1 8 0 13"/></svg></span>
       <span>Первые шаги</span>
       <small>Изучи первый иероглиф</small>
     </div>
 
     <div class="collection-item" data-achievement="curious">
-      <span class="achievement-mark" aria-hidden="true">◇</span>
+      <span class="achievement-mark" aria-hidden="true"><svg viewBox="0 0 24 24"><path d="M4 5.5c3-1.5 6-1 8 1v13c-2-2-5-2.5-8-1z"/><path d="M20 5.5c-3-1.5-6-1-8 1v13c2-2 5-2.5 8-1z"/></svg></span>
       <span>Любознательный</span>
       <small>Изучи 10 иероглифов</small>
     </div>
 
     <div class="collection-item" data-achievement="beginner">
-      <span class="achievement-mark" aria-hidden="true">✦</span>
+      <span class="achievement-mark" aria-hidden="true"><svg viewBox="0 0 24 24"><path d="m12 3 2.6 5.7 6.2.7-4.6 4.2 1.2 6.1-5.4-3.1-5.4 3.1 1.2-6.1-4.6-4.2 6.2-.7z"/></svg></span>
       <span>Новичок</span>
       <small>Заверши первый урок</small>
     </div>
@@ -3481,7 +3546,8 @@ function renderCollection() {
     card.className = "collection-item";
 
     const emoji = document.createElement("span");
-    emoji.textContent = item;
+    emoji.className = "collection-icon";
+    emoji.innerHTML = profileIconMarkup(item);
 
     const name = document.createElement("span");
     name.textContent = "Награда " + (index + 1);
@@ -3502,10 +3568,22 @@ renderCollection();
 // ===== PHOTOCHINESE: ДОСТИЖЕНИЯ И КОЛЛЕКЦИЯ =====
 
 const achievementRewards = {
-  first_steps: "🌱",
-  curious: "📖",
-  beginner: "⭐"
+  first_steps: "petal",
+  curious: "book",
+  beginner: "star"
 };
+
+const profileIconSvgs = {
+  petal: '<svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 20C8 16 4 12 7 7c2-3 4-3 5-1 1-2 3-2 5 1 3 5-1 9-5 13Z"/><path d="M12 7c-1 4-1 8 0 13"/></svg>',
+  book: '<svg viewBox="0 0 24 24" aria-hidden="true"><path d="M4 5.5c3-1.5 6-1 8 1v13c-2-2-5-2.5-8-1z"/><path d="M20 5.5c-3-1.5-6-1-8 1v13c2-2 5-2.5 8-1z"/></svg>',
+  star: '<svg viewBox="0 0 24 24" aria-hidden="true"><path d="m12 3 2.6 5.7 6.2.7-4.6 4.2 1.2 6.1-5.4-3.1-5.4 3.1 1.2-6.1-4.6-4.2 6.2-.7z"/></svg>',
+  bow: '<svg viewBox="0 0 32 24" aria-hidden="true"><path d="M15 11C10 4 4 3 3 6c-1 4 3 9 11 7l2-2-2-2Zm2 0c5-7 11-8 12-5 1 4-3 9-11 7l-2-2 2-2Z"/><path d="m14 12-3 10 5-5 5 5-3-10"/></svg>'
+};
+
+function profileIconMarkup(key) {
+  const legacy = {"🌱":"petal","📖":"book","⭐":"star"};
+  return profileIconSvgs[legacy[key] || key] || profileIconSvgs.star;
+}
 
 // Обновление сохранённых наград
 function updateCollection() {
@@ -3568,7 +3646,8 @@ function renderCollection() {
     card.className = "collection-item";
 
     const emoji = document.createElement("span");
-    emoji.textContent = item;
+    emoji.className = "collection-icon";
+    emoji.innerHTML = profileIconMarkup(item);
 
     const name = document.createElement("span");
 
@@ -3600,7 +3679,7 @@ function renderEquippedDecoration() {
   if (!equippedDecoration) return;
 
   const saved = localStorage.getItem("equippedDecoration");
-  equippedDecoration.textContent = saved || "";
+  equippedDecoration.innerHTML = saved ? profileIconMarkup(saved) : "";
 }
 
 function equipDecoration(emoji) {
