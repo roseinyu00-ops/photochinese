@@ -3440,6 +3440,7 @@ bannerUpload.addEventListener("change", async () => {
   try {
     await saveBannerFile(file);
     showBanner(file);
+    window.photoChineseSync?.();
   } catch (error) {
     console.error(error);
     alert("Не удалось сохранить баннер. Попробуй файл поменьше.");
@@ -3485,6 +3486,7 @@ saveNickname.addEventListener("click", () => {
   }
 
   localStorage.setItem("profileNickname", newNickname);
+  window.photoChineseSync?.();
   profileNickname.textContent = newNickname;
 
   alert("Никнейм успешно сохранён! ♡");
@@ -3531,6 +3533,7 @@ avatarUpload.addEventListener("change", () => {
   reader.onload = () => {
     try {
       localStorage.setItem("profileAvatar", reader.result);
+      window.photoChineseSync?.();
 
       profileAvatarImage.src = reader.result;
       profileAvatarImage.hidden = false;
@@ -3583,6 +3586,7 @@ saveProfileInfo.addEventListener("click", () => {
   localStorage.setItem("profileBio", bio);
   localStorage.setItem("profileSubtitle", subtitle);
   localStorage.setItem("favoriteCharacter", character || "—");
+  window.photoChineseSync?.();
 
   profileBioText.textContent = bio || "Расскажи немного о себе ♡";
   profileSubtitle.textContent = subtitle || "学习中文 ♡";
@@ -3644,20 +3648,10 @@ const progress = {
 
 // Сохранение прогресса
 function saveProgress() {
-  localStorage.setItem(
-    "learnedCharacters",
-    JSON.stringify(progress.learnedCharacters)
-  );
-
-  localStorage.setItem(
-    "completedLessons",
-    JSON.stringify(progress.completedLessons)
-  );
-
-  localStorage.setItem(
-    "achievements",
-    JSON.stringify(progress.achievements)
-  );
+  localStorage.setItem("learnedCharacters", JSON.stringify(progress.learnedCharacters));
+  localStorage.setItem("completedLessons", JSON.stringify(progress.completedLessons));
+  localStorage.setItem("achievements", JSON.stringify(progress.achievements));
+  window.photoChineseSync?.();
 }
 
 // Добавление изученного иероглифа
@@ -3803,10 +3797,8 @@ function updateCollection() {
     .filter(id => progress.achievements.includes(id))
     .map(id => achievementRewards[id]);
 
-  localStorage.setItem(
-    "profileCollection",
-    JSON.stringify(unlockedItems)
-  );
+  localStorage.setItem("profileCollection", JSON.stringify(unlockedItems));
+  window.photoChineseSync?.();
 }
 
 // Отображение достижений
@@ -3896,12 +3888,14 @@ function renderEquippedDecoration() {
 
 function equipDecoration(emoji) {
   localStorage.setItem("equippedDecoration", emoji);
+  window.photoChineseSync?.();
   renderEquippedDecoration();
   renderCollection();
 }
 
 function removeDecoration() {
   localStorage.removeItem("equippedDecoration");
+  window.photoChineseSync?.();
   renderEquippedDecoration();
   renderCollection();
 }
@@ -3988,6 +3982,95 @@ function switchAccountMode(mode) {
 }
 
 // Загрузка профиля из облака
+const PHOTOCHINESE_SYNC_KEYS = [
+  "profileNickname", "photoChineseNickname", "profileBio",
+  "profileSubtitle", "favoriteCharacter", "learnedCharacters",
+  "completedLessons", "achievements", "profileCollection",
+  "equippedDecoration", "profileAvatar"
+];
+
+let photoChineseSyncTimer = null;
+let photoChineseSyncQueue = Promise.resolve();
+
+function collectPhotoChineseData() {
+  const storage = {};
+  PHOTOCHINESE_SYNC_KEYS.forEach(key => {
+    const value = localStorage.getItem(key);
+    if (value !== null) storage[key] = value;
+  });
+  return { storage, updatedAt: new Date().toISOString() };
+}
+
+function applyPhotoChineseData(appData) {
+  if (!appData || !appData.storage) return;
+  PHOTOCHINESE_SYNC_KEYS.forEach(key => {
+    if (Object.prototype.hasOwnProperty.call(appData.storage, key)) {
+      localStorage.setItem(key, appData.storage[key]);
+    }
+  });
+
+  progress.learnedCharacters = JSON.parse(localStorage.getItem("learnedCharacters") || "[]");
+  progress.completedLessons = JSON.parse(localStorage.getItem("completedLessons") || "[]");
+  progress.achievements = JSON.parse(localStorage.getItem("achievements") || "[]");
+
+  const nickname = localStorage.getItem("profileNickname") || localStorage.getItem("photoChineseNickname");
+  if (nickname) {
+    document.getElementById("profileNickname").textContent = nickname;
+    document.getElementById("nicknameInput").value = nickname;
+  }
+
+  const bio = localStorage.getItem("profileBio") || "";
+  document.getElementById("profileBioText").textContent = bio || "Расскажи немного о себе ♡";
+  document.getElementById("bioInput").value = bio;
+
+  const subtitle = localStorage.getItem("profileSubtitle") || "学习中文 ♡";
+  document.getElementById("profileSubtitle").textContent = subtitle;
+  document.getElementById("subtitleInput").value = subtitle;
+
+  const favorite = localStorage.getItem("favoriteCharacter") || "愛";
+  document.getElementById("favoriteCharacter").textContent = favorite;
+  document.getElementById("favoriteCharacterInput").value = favorite;
+
+  const avatar = localStorage.getItem("profileAvatar");
+  if (avatar) {
+    profileAvatarImage.src = avatar;
+    profileAvatarImage.hidden = false;
+    profileAvatarPlaceholder.hidden = true;
+  }
+
+  updateAchievements();
+  updateProfileProgress();
+  updateCollection();
+  renderAchievements();
+  renderCollection();
+  renderEquippedDecoration();
+}
+
+function savePhotoChineseDataNow() {
+  if (!photoChineseUser || !window.photoChineseSupabase) return Promise.resolve();
+  const userId = photoChineseUser.id;
+  const payload = collectPhotoChineseData();
+  photoChineseSyncQueue = photoChineseSyncQueue.then(async () => {
+    const { error } = await window.photoChineseSupabase
+      .from("profiles")
+      .update({ app_data: payload })
+      .eq("id", userId);
+    if (error) {
+      console.error("Не удалось сохранить данные PhotoChinese в облако:", error);
+      throw error;
+    }
+  });
+  return photoChineseSyncQueue;
+}
+
+window.photoChineseSync = function() {
+  if (!photoChineseUser) return;
+  clearTimeout(photoChineseSyncTimer);
+  photoChineseSyncTimer = setTimeout(() => {
+    savePhotoChineseDataNow().catch(() => {});
+  }, 500);
+};
+
 async function loadCloudProfile(user) {
   photoChineseUser = user;
   updateProfileAccess();
@@ -4002,58 +4085,33 @@ async function loadCloudProfile(user) {
   if (error) throw error;
 
   let profile = data;
-
-  // Если профиля ещё нет — создаём его
   if (!profile) {
-    const username =
-      localStorage.getItem("profileNickname") ||
-      localStorage.getItem("photoChineseNickname") ||
-      null;
-
+    const username = localStorage.getItem("profileNickname") || localStorage.getItem("photoChineseNickname") || null;
     const bio = localStorage.getItem("profileBio") || "";
-
-    let result = await client
-      .from("profiles")
-      .insert({
-        id: user.id,
-        username: username,
-        bio: bio
-      })
-      .select()
-      .single();
-
-    // Если ник занят другим пользователем
-    if (result.error && result.error.code === "23505") {
-      result = await client
-        .from("profiles")
-        .insert({
-          id: user.id,
-          bio: bio
-        })
-        .select()
-        .single();
-    }
-
+    const result = await client.from("profiles")
+      .insert({ id: user.id, username, bio, app_data: collectPhotoChineseData() })
+      .select().single();
     if (result.error) throw result.error;
-
     profile = result.data;
   }
 
-  // Отображаем никнейм
-  if (profile.username) {
-    document.getElementById("profileNickname").textContent =
-      profile.username;
-
-    document.getElementById("nicknameInput").value =
-      profile.username;
+  if (profile.app_data && profile.app_data.storage && Object.keys(profile.app_data.storage).length) {
+    applyPhotoChineseData(profile.app_data);
+  } else {
+    // Первый вход: переносим локальные данные в новый аккаунт.
+    if (profile.username) localStorage.setItem("profileNickname", profile.username);
+    if (profile.bio) localStorage.setItem("profileBio", profile.bio);
+    await savePhotoChineseDataNow();
   }
 
-  // Отображаем описание
-  document.getElementById("profileBioText").textContent =
-    profile.bio || "Расскажи немного о себе ♡";
-
-  document.getElementById("bioInput").value =
-    profile.bio || "";
+  const finalNickname = localStorage.getItem("profileNickname") || profile.username;
+  if (finalNickname) {
+    document.getElementById("profileNickname").textContent = finalNickname;
+    document.getElementById("nicknameInput").value = finalNickname;
+  }
+  const finalBio = localStorage.getItem("profileBio") ?? profile.bio ?? "";
+  document.getElementById("profileBioText").textContent = finalBio || "Расскажи немного о себе ♡";
+  document.getElementById("bioInput").value = finalBio;
 }
 
 // Вход и регистрация
