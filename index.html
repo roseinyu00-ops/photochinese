@@ -2285,6 +2285,14 @@ body.profile-editing #profileAvatar::after {
 .learning-progress-sync-note{margin:13px 0 0}
 @media(max-width:760px){.learning-progress-stats{gap:8px}.learning-progress-stat{padding:11px}}
 </style>
+<style>
+.learned-vocabulary-list{display:grid;grid-template-columns:repeat(auto-fit,minmax(190px,1fr));gap:10px}
+.learned-vocabulary-card{display:grid;gap:4px;padding:12px;border:1px solid var(--line);border-radius:13px;background:var(--surface-soft,rgba(230,170,190,.08));min-width:0}
+.learned-vocabulary-card .hanzi{font:28px/1.2 serif}
+.learned-vocabulary-card .pinyin{font-size:13px}
+.learned-vocabulary-card .translation{font-size:13px;color:var(--muted)}
+.learned-vocabulary-card .level{font-size:11px;color:var(--accent);margin-top:3px}
+</style>
 </head>
 <body>
 <div class="app">
@@ -2692,6 +2700,13 @@ body.profile-editing #profileAvatar::after {
     <p>Пока ничего не сохранено...</p>
   </div>
   <p id="savedCharactersCount">Сохранено иероглифов: 0</p>
+
+  <h3 class="saved-characters-heading">Выученные слова</h3>
+  <p class="small">Слова, которые ты отметила как выученные в ИИ-учителе. Они сохраняются здесь вместе с пиньинем, переводом и уровнем курса.</p>
+  <div class="profile-collection learned-vocabulary-list" id="learnedCoachVocabularyList">
+    <p>Пока нет отмеченных слов. Выучи первые слова в ИИ-учителе — и они появятся здесь.</p>
+  </div>
+  <p id="learnedCoachVocabularyCount">Выучено слов: 0</p>
 
   <h3 class="saved-characters-heading">Награды</h3>
   <div class="profile-collection" id="collectionList">
@@ -4262,7 +4277,8 @@ function openCoachLesson(index){
    const key=String(currentCoachLevel()),wordKey=w[0]+'|'+w[1];data[key]=data[key]||[];
    if(data[key].includes(wordKey)){data[key]=data[key].filter(x=>x!==wordKey);learnedBtn.classList.remove('is-known');learnedBtn.textContent='Отметить выученным';}
    else{data[key].push(wordKey);learnedBtn.classList.add('is-known');learnedBtn.textContent='✓ Выучено';}
-   localStorage.setItem('photoChineseCoachVocabulary',JSON.stringify(data));renderCoachCourse();
+   localStorage.setItem('photoChineseCoachVocabulary',JSON.stringify(data));
+   recordLearningActivity();updateLearningDashboard();renderCollection();window.photoChineseSync?.();renderCoachCourse();
   });
   card.append(hanziNode,pinyinNode,translationNode,learnedBtn);words.appendChild(card);
  });
@@ -4288,7 +4304,7 @@ function openCoachLesson(index){
   const key=w[0]+'|'+w[1];let saved={};try{saved=JSON.parse(localStorage.getItem('photoChineseCoachVocabulary')||'{}')||{};}catch(e){saved={};}
   const known=(saved[String(currentCoachLevel())]||[]).includes(key);
   const btn=document.createElement('button');btn.type='button';btn.className='coach-word-learned'+(known?' is-known':'');btn.textContent=known?'✓ Выучено':'Отметить выученным';
-  btn.addEventListener('click',()=>{let data={};try{data=JSON.parse(localStorage.getItem('photoChineseCoachVocabulary')||'{}')||{};}catch(e){data={};}const levelKey=String(currentCoachLevel());data[levelKey]=data[levelKey]||[];if(data[levelKey].includes(key)){data[levelKey]=data[levelKey].filter(x=>x!==key);btn.classList.remove('is-known');btn.textContent='Отметить выученным';}else{data[levelKey].push(key);btn.classList.add('is-known');btn.textContent='✓ Выучено';}localStorage.setItem('photoChineseCoachVocabulary',JSON.stringify(data));renderCoachCourse();});
+  btn.addEventListener('click',()=>{let data={};try{data=JSON.parse(localStorage.getItem('photoChineseCoachVocabulary')||'{}')||{};}catch(e){data={};}const levelKey=String(currentCoachLevel());data[levelKey]=data[levelKey]||[];if(data[levelKey].includes(key)){data[levelKey]=data[levelKey].filter(x=>x!==key);btn.classList.remove('is-known');btn.textContent='Отметить выученным';}else{data[levelKey].push(key);btn.classList.add('is-known');btn.textContent='✓ Выучено';}localStorage.setItem('photoChineseCoachVocabulary',JSON.stringify(data));recordLearningActivity();updateLearningDashboard();renderCollection();window.photoChineseSync?.();renderCoachCourse();});
   card.append(h,p,t,btn);supplementWords.appendChild(card);
  });
  extraPhrases.forEach(line=>{const item=document.createElement('div');item.className='coach-phrase-item';const h=document.createElement('strong');h.textContent=line[0];const p=document.createElement('div');p.className='coach-word-pinyin';p.textContent=line[1];const t=document.createElement('div');t.className='coach-word-translation';t.textContent=line[2];item.append(h,p,t);supplementPhrases.appendChild(item);});
@@ -5036,7 +5052,9 @@ function updateLearningDashboard() {
   const lessonsDone = courseDone + legacyDone;
   let vocab = {};
   try { vocab = JSON.parse(localStorage.getItem("photoChineseCoachVocabulary") || "{}") || {}; } catch(e) { vocab = {}; }
-  const vocabularyCount = Object.values(vocab).reduce((sum, items) => sum + (Array.isArray(items) ? items.length : 0), 0);
+  const vocabularyCount = typeof getLearnedCoachVocabularyRecords === "function"
+    ? getLearnedCoachVocabularyRecords().length
+    : Object.values(vocab).reduce((sum, items) => sum + (Array.isArray(items) ? items.length : 0), 0);
   let diagnostic = null;
   try { diagnostic = JSON.parse(localStorage.getItem("photoChineseHskDiagnostic") || "null"); } catch(e) { diagnostic = null; }
   const level = diagnostic && Number(diagnostic.level);
@@ -5269,6 +5287,46 @@ function renderSavedCharacters() {
   count.textContent = "Сохранено иероглифов: " + saved.length;
 }
 
+// Собираем подробные карточки слов, отмеченных как выученные в ИИ-учителе.
+function getLearnedCoachVocabularyRecords() {
+  let saved = {};
+  try { saved = JSON.parse(localStorage.getItem("photoChineseCoachVocabulary") || "{}") || {}; } catch(e) { saved = {}; }
+  const records = new Map();
+  const addWords = (level, words) => {
+    (words || []).forEach(word => {
+      if (!Array.isArray(word) || !word[0]) return;
+      const key = word[0] + "|" + (word[1] || "");
+      if ((saved[String(level)] || []).includes(key)) {
+        records.set(String(level) + "|" + key, { level:Number(level), hanzi:word[0], pinyin:word[1] || "", translation:word[2] || "" });
+      }
+    });
+  };
+  if (typeof coachCourses !== "undefined") {
+    Object.entries(coachCourses).forEach(([level, lessons]) => {
+      lessons.forEach(lesson => {
+        addWords(level, lesson.words);
+        addWords(level, lesson.extraWords);
+      });
+    });
+  }
+  if (typeof coachSupplementalVocabulary !== "undefined") {
+    Object.entries(coachSupplementalVocabulary).forEach(([level, lessons]) => {
+      Object.values(lessons || {}).forEach(group => addWords(level, group && group.words));
+    });
+  }
+  // Если в сохранении есть слово из старой/удалённой версии курса, не теряем его.
+  Object.entries(saved).forEach(([level, keys]) => {
+    (Array.isArray(keys) ? keys : []).forEach(key => {
+      const id = String(level) + "|" + key;
+      if (!records.has(id)) {
+        const parts = String(key).split("|");
+        records.set(id, { level:Number(level), hanzi:parts[0] || "?", pinyin:parts[1] || "", translation:"Слово из сохранённого словаря" });
+      }
+    });
+  });
+  return Array.from(records.values()).sort((a,b) => a.level-b.level || a.hanzi.localeCompare(b.hanzi));
+}
+
 // Отображение коллекции
 function renderCollection() {
   const collectionList = document.getElementById("collectionList");
@@ -5316,6 +5374,36 @@ function renderCollection() {
 
   collectionCount.textContent =
     "Получено предметов: " + items.length;
+
+  const vocabularyList = document.getElementById("learnedCoachVocabularyList");
+  const vocabularyCount = document.getElementById("learnedCoachVocabularyCount");
+  if (vocabularyList && vocabularyCount) {
+    const learnedWords = getLearnedCoachVocabularyRecords();
+    vocabularyList.innerHTML = "";
+    if (!learnedWords.length) {
+      vocabularyList.textContent = "Пока нет отмеченных слов. Выучи первые слова в ИИ-учителе — и они появятся здесь.";
+    } else {
+      learnedWords.forEach(word => {
+        const card = document.createElement("article");
+        card.className = "learned-vocabulary-card";
+        const hanzi = document.createElement("strong");
+        hanzi.className = "hanzi";
+        hanzi.textContent = word.hanzi;
+        const pinyin = document.createElement("span");
+        pinyin.className = "pinyin";
+        pinyin.textContent = word.pinyin;
+        const translation = document.createElement("span");
+        translation.className = "translation";
+        translation.textContent = word.translation;
+        const level = document.createElement("span");
+        level.className = "level";
+        level.textContent = "HSK " + word.level;
+        card.append(hanzi, pinyin, translation, level);
+        vocabularyList.appendChild(card);
+      });
+    }
+    vocabularyCount.textContent = "Выучено слов: " + learnedWords.length;
+  }
 }
 
 // ===== УКРАШЕНИЯ ПРОФИЛЯ =====
