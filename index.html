@@ -4508,7 +4508,7 @@ function finishHskDiagnostic(){
  document.getElementById('hskLevelBreakdown').innerHTML='';
  scores.forEach((score,i)=>{const row=document.createElement('div');row.className='hsk-level-row';const label=document.createElement('strong');label.textContent='HSK '+(i+1);const bar=document.createElement('div');bar.className='hsk-level-bar';const fill=document.createElement('span');fill.style.width=(score/5*100)+'%';bar.appendChild(fill);const status=document.createElement('span');status.className='hsk-level-status';status.textContent=score+'/5 '+(score>=4?'· пройден':'· повторить');row.append(label,bar,status);document.getElementById('hskLevelBreakdown').appendChild(row)});
  document.getElementById('hskResultAdvice').textContent='Для перехода на следующую ступень нужен результат не менее 4 из 5 заданий на каждом предыдущем уровне. Оценка приблизительная: тест проверяет только выбранные навыки чтения, лексики и грамматики.';
- localStorage.setItem('photoChineseHskDiagnostic',JSON.stringify({level:hskSuggestedLevel,score:totalCorrect,scores,at:new Date().toISOString()}));
+ localStorage.setItem('photoChineseHskDiagnostic',JSON.stringify({level:hskSuggestedLevel,score:totalCorrect,scores,at:new Date().toISOString()}));updateLearningDashboard();window.photoChineseSync?.();
  const badge=document.getElementById('profileHskBadge');if(badge)badge.textContent='HSK '+hskSuggestedLevel;
  document.getElementById('applyHskLevel').textContent='Открыть курс HSK '+hskSuggestedLevel+' в ИИ-учителе';
 }
@@ -5052,7 +5052,8 @@ function updateLearningDashboard() {
   const fill = byId("learningProgressCourseFill");
   if (fill) fill.style.width = percent + "%";
   const syncNote = byId("learningProgressSyncNote");
-  if (syncNote) syncNote.textContent = window.photoChineseUser ? "Прогресс синхронизируется с твоим аккаунтом." : "Данные сохраняются на этом устройстве. После входа в аккаунт они синхронизируются.";
+  const hasAccount = typeof photoChineseUser !== "undefined" && !!photoChineseUser;
+  if (syncNote) syncNote.textContent = hasAccount ? "Прогресс синхронизируется с твоим аккаунтом." : "Данные сохраняются на этом устройстве. После входа в аккаунт они синхронизируются.";
 }
 
 // Добавление изученного иероглифа
