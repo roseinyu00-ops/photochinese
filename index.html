@@ -3821,6 +3821,8 @@ coachSupplementalVocabulary[1][9]=mergeCoachVocab(hsk1MoreVocabulary[14],hsk1Mor
 coachSupplementalVocabulary[1][10]=mergeCoachVocab(hsk1MoreVocabulary[8],hsk1MoreVocabulary[17]);
 coachSupplementalVocabulary[1][11]=hsk1MoreVocabulary[18];
 const hsk1Digits=[['零','líng'],['一','yī'],['二','èr'],['三','sān'],['四','sì'],['五','wǔ'],['六','liù'],['七','qī'],['八','bā'],['九','jiǔ']];
+const hsk1RussianSmall=['ноль','один','два','три','четыре','пять','шесть','семь','восемь','девять','десять','одиннадцать','двенадцать','тринадцать','четырнадцать','пятнадцать','шестнадцать','семнадцать','восемнадцать','девятнадцать'];
+const hsk1RussianTens={2:'двадцать',3:'тридцать',4:'сорок',5:'пятьдесят',6:'шестьдесят',7:'семьдесят',8:'восемьдесят',9:'девяносто'};
 const hsk1NumberWords=[];
 for(let n=0;n<=100;n++){
  let hanzi='',pinyin='';
@@ -3829,7 +3831,8 @@ for(let n=0;n<=100;n++){
  else if(n<20){hanzi='十'+hsk1Digits[n-10][0];pinyin='shí '+hsk1Digits[n-10][1];}
  else if(n<100){const t=Math.floor(n/10),u=n%10;hanzi=hsk1Digits[t][0]+'十';pinyin=hsk1Digits[t][1]+' shí';if(u){hanzi+=hsk1Digits[u][0];pinyin+=' '+hsk1Digits[u][1];}}
  else{hanzi='一百';pinyin='yì bǎi';}
- hsk1NumberWords.push([hanzi,pinyin,String(n)]);
+ const russian=n<20?hsk1RussianSmall[n]:n<100?hsk1RussianTens[Math.floor(n/10)]+(n%10?' '+hsk1RussianSmall[n%10]: ''):'сто';
+ hsk1NumberWords.push([hanzi,pinyin,russian]);
 }
 coachSupplementalVocabulary[1][1].words=[
  ...coachSupplementalVocabulary[1][1].words.filter(w=>!/^([零一二三四五六七八九十百]+)$/.test(w[0])),
