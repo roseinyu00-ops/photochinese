@@ -1746,6 +1746,141 @@ body.dark-theme .profile-hsk-track span { background: linear-gradient(90deg,#d49
 body.dark-theme .profile-divider { background: #604751; }
 body.dark-theme .profile-edit { background: #403039; border-color: #604751; }
 
+
+/* Тонкая настройка профиля: меньше визуального шума */
+#bannerPlaceholder {
+  font-size: clamp(22px, 3vw, 30px);
+  font-weight: 700;
+  letter-spacing: .015em;
+  text-transform: lowercase;
+  color: #fffaf8;
+  text-shadow: 0 2px 12px rgba(73,53,61,.16);
+  transition: opacity .18s ease;
+}
+.profile-top {
+  margin-top: -56px;
+  padding-top: 56px;
+  min-height: 116px;
+  align-items: end;
+  flex-wrap: nowrap;
+  gap: 14px;
+}
+.profile-avatar {
+  transform: translateY(-56px);
+  margin-bottom: -56px;
+}
+.profile-identity {
+  align-self: flex-end;
+  min-width: 0;
+  padding-bottom: 8px;
+}
+.profile-name-line h2 { font-size: 24px; line-height: 1.2; }
+.profile-subtitle { font-size: 13px; margin-top: 4px; }
+.profile-hsk-badge {
+  flex: 0 0 auto;
+  align-self: flex-end;
+  margin: 0 0 12px auto;
+  padding: 6px 10px;
+  font-size: 11px;
+  line-height: 1.2;
+  letter-spacing: .02em;
+}
+#editProfileBtn {
+  top: -108px;
+  right: 0;
+  padding: 8px 13px;
+  font-size: 13px;
+  line-height: 1.2;
+  z-index: 4;
+}
+#chooseBannerBtn {
+  left: 50%;
+  top: 50%;
+  right: auto;
+  bottom: auto;
+  transform: translate(-50%,-50%);
+  padding: 9px 15px;
+  border-radius: 999px;
+  font-size: 13px;
+  background: rgba(255,250,248,.88);
+  color: #76515c;
+  box-shadow: 0 3px 14px rgba(73,53,61,.12);
+  backdrop-filter: blur(8px);
+}
+#chooseBannerBtn:hover { transform: translate(-50%,-50%) scale(1.03); }
+body.profile-editing #bannerPlaceholder { opacity: 0; }
+#profileAvatar::after {
+  content: "изменить";
+  inset: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 0;
+  background: rgba(53,41,46,.16);
+  color: #fff;
+  font-size: 10px;
+  font-weight: 600;
+  letter-spacing: .03em;
+  backdrop-filter: blur(3px);
+  opacity: 0;
+}
+body.profile-editing #profileAvatar::after { opacity: 1; }
+body.profile-editing #profileAvatar {
+  outline: 2px solid #e5c5cd;
+  outline-offset: 2px;
+}
+.profile-collection .collection-item {
+  min-height: 76px;
+  padding: 10px 8px;
+  gap: 5px;
+  font-size: 16px;
+}
+.profile-collection .collection-item span:not(.achievement-mark) {
+  font-size: 12px;
+  line-height: 1.3;
+  font-weight: 600;
+}
+.profile-collection .collection-item small {
+  font-size: 10px;
+  line-height: 1.3;
+}
+.achievement-mark {
+  display: block;
+  color: #b47d8b;
+  font-size: 18px;
+  line-height: 1;
+  font-weight: 400;
+}
+.profile-section h2, .profile-hsk-progress h2 {
+  font-size: 18px;
+  margin-bottom: 12px;
+}
+.profile-section { margin-top: 21px; }
+.profile-stat { min-height: 104px; padding: 15px 8px; }
+.profile-stat strong { font-size: 26px; }
+.profile-stat span { font-size: 12px; }
+.profile-hsk-progress { padding: 17px; }
+.companion-card { padding: 14px; gap: 13px; }
+.companion-picture { width: 68px; height: 68px; font-size: 40px; }
+body.dark-theme #chooseBannerBtn {
+  background: rgba(61,48,52,.9);
+  color: #fff1ed;
+}
+body.dark-theme .achievement-mark { color: #d6a2af; }
+@media (max-width: 560px) {
+  .profile-top { gap: 9px; padding-top: 50px; margin-top: -50px; min-height: 104px; }
+  .profile-avatar { transform: translateY(-50px); margin-bottom: -50px; width: 96px; height: 96px; flex-basis: 96px; }
+  .profile-identity { flex: 1 1 90px; padding-bottom: 7px; }
+  .profile-name-line h2 { font-size: 21px; }
+  .profile-subtitle { font-size: 12px; }
+  .profile-hsk-badge { padding: 5px 8px; font-size: 10px; margin-bottom: 10px; }
+  #editProfileBtn { top: -92px; padding: 7px 10px; font-size: 11px; }
+  #chooseBannerBtn { font-size: 12px; padding: 8px 13px; }
+  .profile-collection .collection-item { min-height: 72px; padding: 8px 5px; }
+  .profile-collection .collection-item span:not(.achievement-mark) { font-size: 11px; }
+  .profile-collection .collection-item small { font-size: 9px; }
+}
+
 </style>
 </head>
 <body>
@@ -1896,7 +2031,7 @@ body.dark-theme .profile-edit { background: #403039; border-color: #604751; }
     <!-- БАННЕР -->
     
 <div class="profile-banner" id="profileBanner">
-  <span id="bannerPlaceholder">Твой баннер</span>
+  <span id="bannerPlaceholder">your little world ✦</span>
   
  <button type="button" id="chooseBannerBtn" hidden>
   ✎ Изменить баннер
@@ -1944,7 +2079,7 @@ body.dark-theme .profile-edit { background: #403039; border-color: #604751; }
       </div>
 
       <div class="profile-facts">
-        <span>♡ Любимый иероглиф: <strong id="favoriteCharacter">愛</strong></span>
+        <span>Любимый иероглиф: <strong id="favoriteCharacter">愛</strong></span>
       </div>
 
       <div class="profile-edit" id="profileEditPanel" hidden>
@@ -1981,7 +2116,7 @@ body.dark-theme .profile-edit { background: #403039; border-color: #604751; }
 
       <!-- КОМПАНЬОН -->
       <section class="profile-section">
-        <h2>🦊 Мой компаньон</h2>
+        <h2>Мой компаньон</h2>
         <div class="companion-card">
           <div class="companion-picture">🦊</div>
           <div>
@@ -1995,24 +2130,24 @@ body.dark-theme .profile-edit { background: #403039; border-color: #604751; }
       
 <!-- ДОСТИЖЕНИЯ -->
 <section class="profile-section">
-  <h2>🏆 Достижения</h2>
+  <h2>Достижения</h2>
 
   <div class="profile-collection" id="achievementsList">
 
     <div class="collection-item" data-achievement="first_steps">
-      🌱
+      <span class="achievement-mark" aria-hidden="true">○</span>
       <span>Первые шаги</span>
       <small>Изучи первый иероглиф</small>
     </div>
 
     <div class="collection-item" data-achievement="curious">
-      📖
+      <span class="achievement-mark" aria-hidden="true">◇</span>
       <span>Любознательный</span>
       <small>Изучи 10 иероглифов</small>
     </div>
 
     <div class="collection-item" data-achievement="beginner">
-      ⭐
+      <span class="achievement-mark" aria-hidden="true">✦</span>
       <span>Новичок</span>
       <small>Заверши первый урок</small>
     </div>
@@ -2024,7 +2159,7 @@ body.dark-theme .profile-edit { background: #403039; border-color: #604751; }
       
 <!-- КОЛЛЕКЦИЯ -->
 <section class="profile-section">
-  <h2>🎀 Моя коллекция</h2>
+  <h2>Моя коллекция</h2>
 
   <div class="profile-collection" id="collectionList">
     <p>Пока коллекция пуста...</p>
