@@ -99,7 +99,7 @@ label{font-weight:700;font-size:13px;display:block;margin:12px 0 6px}
 .coach-lesson-card:disabled{opacity:.55;cursor:not-allowed}.coach-lesson-number{width:34px;height:34px;border-radius:11px;background:#fff0f4;display:grid;place-items:center;flex-shrink:0;font-weight:800;color:#a85c72}
 .coach-lesson-meta{display:block;font-size:12px;color:var(--muted);margin-top:3px}.coach-lesson-status{margin-left:auto;color:#9b6b7a;font-size:18px}
 .coach-lesson-top{display:flex;justify-content:space-between;align-items:center;gap:10px}.coach-word-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(125px,1fr));gap:9px;margin:16px 0}
-.coach-word{border:1px solid var(--line);border-radius:12px;padding:12px;background:rgba(255,245,248,.65);text-align:center}.coach-word strong{display:block;font-size:25px;line-height:1.35}.coach-word-pinyin{display:block;color:var(--muted);font-size:13px;font-weight:600;margin-top:3px}.coach-word-translation{display:block;color:var(--ink);font-size:13px;margin-top:5px}.coach-example-hanzi{font-size:20px;font-weight:800;line-height:1.5}.coach-example-pinyin{font-size:14px;font-weight:600;color:var(--muted);margin-top:3px}.coach-example-translation{font-size:14px;font-weight:400;margin-top:5px}.coach-final-exam{border-top:1px solid var(--line);margin-top:18px;padding-top:16px}.coach-final-exam h3{margin:0 0 6px}.coach-objectives{border:1px solid var(--line);border-radius:12px;padding:12px;margin:12px 0;background:rgba(255,245,248,.4)}.coach-objectives ul{margin:8px 0 0;padding-left:20px}.coach-dialogue-line{padding:10px 0;border-bottom:1px solid var(--line)}.coach-dialogue-line:last-child{border-bottom:0}.coach-dialogue-line strong{font-size:18px}.coach-practice-actions{display:flex;gap:8px;flex-wrap:wrap;margin-top:12px}
+.coach-word{border:1px solid var(--line);border-radius:12px;padding:12px;background:rgba(255,245,248,.65);text-align:center}.coach-word strong{display:block;font-size:25px;line-height:1.35}.coach-word-pinyin{display:block;color:var(--muted);font-size:13px;font-weight:600;margin-top:3px}.coach-word-translation{display:block;color:var(--ink);font-size:13px;margin-top:5px}.coach-word-learned{margin-top:9px;border:1px solid var(--line);border-radius:999px;padding:5px 9px;background:transparent;color:var(--muted);font-size:11px}.coach-word-learned.is-known{background:rgba(70,160,110,.12);color:var(--ink);border-color:rgba(70,160,110,.35)}.coach-example-hanzi{font-size:20px;font-weight:800;line-height:1.5}.coach-example-pinyin{font-size:14px;font-weight:600;color:var(--muted);margin-top:3px}.coach-example-translation{font-size:14px;font-weight:400;margin-top:5px}.coach-final-exam{border-top:1px solid var(--line);margin-top:18px;padding-top:16px}.coach-final-exam h3{margin:0 0 6px}.coach-objectives{border:1px solid var(--line);border-radius:12px;padding:12px;margin:12px 0;background:rgba(255,245,248,.4)}.coach-objectives ul{margin:8px 0 0;padding-left:20px}.coach-dialogue-line{padding:10px 0;border-bottom:1px solid var(--line)}.coach-dialogue-line:last-child{border-bottom:0}.coach-dialogue-line strong{font-size:18px}.coach-practice-actions{display:flex;gap:8px;flex-wrap:wrap;margin-top:12px}
 .coach-grammar-box{padding:15px;border-radius:14px;background:#fff5f7;border:1px solid var(--line);margin:14px 0}.coach-example{font-size:18px;font-weight:700}
 .coach-practice{border-top:1px solid var(--line);padding-top:14px;margin-top:16px}.coach-practice-option{display:block;width:100%;text-align:left;border:1px solid var(--line);border-radius:11px;padding:11px;margin:7px 0;background:white;color:var(--ink)}
 .coach-practice-option.correct{border-color:#70ad88;background:#eff9f1}.coach-practice-option.wrong{border-color:#d98798;background:#fff1f3}
@@ -3744,7 +3744,10 @@ function currentCoachLevel(){return Number(document.getElementById('coachLevel')
 function renderCoachCourse(){
  const level=currentCoachLevel(), lessons=coachCourses[level], progress=readCoachProgress(), done=progress[level]||[];
  document.getElementById('coachCourseTitle').textContent='Курс HSK '+level;
- document.getElementById('coachCourseSubtitle').textContent=lessons.length+' последовательных уроков · '+done.length+' из '+lessons.length+' завершено';
+ const vocabList=[...new Map(lessons.flatMap(l=>l.words).map(w=>[w[0]+'|'+w[1],w])).values()];
+ let vocabProgress={};try{vocabProgress=JSON.parse(localStorage.getItem('photoChineseCoachVocabulary')||'{}')||{};}catch(e){vocabProgress={};}
+ const learned=(vocabProgress[level]||[]);
+ document.getElementById('coachCourseSubtitle').textContent=lessons.length+' уроков · '+done.length+' из '+lessons.length+' завершено · словарь: '+learned.length+' из '+vocabList.length+' слов';
  const pct=Math.round(done.length/lessons.length*100);
  document.getElementById('coachProgress').textContent=pct+'%';
  const examButton=document.getElementById('startCoachExam'),examStatus=document.getElementById('coachExamStatus');
@@ -3832,7 +3835,18 @@ function openCoachLesson(index){
   const hanziNode=document.createElement('strong');hanziNode.textContent=w[0];
   const pinyinNode=document.createElement('span');pinyinNode.className='coach-word-pinyin';pinyinNode.textContent=w[1];
   const translationNode=document.createElement('span');translationNode.className='coach-word-translation';translationNode.textContent=w[2];
-  card.append(hanziNode,pinyinNode,translationNode);words.appendChild(card);
+  const vocabKey=currentCoachLevel()+'|'+w[0]+'|'+w[1];
+  let savedVocabulary={};try{savedVocabulary=JSON.parse(localStorage.getItem('photoChineseCoachVocabulary')||'{}')||{};}catch(e){savedVocabulary={};}
+  const known=(savedVocabulary[String(currentCoachLevel())]||[]).includes(w[0]+'|'+w[1]);
+  const learnedBtn=document.createElement('button');learnedBtn.type='button';learnedBtn.className='coach-word-learned'+(known?' is-known':'');learnedBtn.textContent=known?'✓ Выучено':'Отметить выученным';
+  learnedBtn.addEventListener('click',()=>{
+   let data={};try{data=JSON.parse(localStorage.getItem('photoChineseCoachVocabulary')||'{}')||{};}catch(e){data={};}
+   const key=String(currentCoachLevel()),wordKey=w[0]+'|'+w[1];data[key]=data[key]||[];
+   if(data[key].includes(wordKey)){data[key]=data[key].filter(x=>x!==wordKey);learnedBtn.classList.remove('is-known');learnedBtn.textContent='Отметить выученным';}
+   else{data[key].push(wordKey);learnedBtn.classList.add('is-known');learnedBtn.textContent='✓ Выучено';}
+   localStorage.setItem('photoChineseCoachVocabulary',JSON.stringify(data));renderCoachCourse();
+  });
+  card.append(hanziNode,pinyinNode,translationNode,learnedBtn);words.appendChild(card);
  });
  document.getElementById('coachHelpAnswer').hidden=true;renderCoachPracticeQuestion();
  document.getElementById('coachLessonPanel').scrollIntoView({behavior:'smooth',block:'start'});
