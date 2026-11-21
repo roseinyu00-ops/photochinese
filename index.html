@@ -1946,6 +1946,29 @@ body.dark-theme #equippedDecoration {
   .profile-identity { transform: translateY(6px); }
 }
 
+
+.profile-collection-title {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+.collection-title-icon {
+  width: 22px;
+  height: 18px;
+  display: inline-flex;
+  color: #b77f8d;
+}
+.collection-title-icon svg {
+  width: 100%;
+  height: 100%;
+  fill: none;
+  stroke: currentColor;
+  stroke-width: 1.45;
+  stroke-linecap: round;
+  stroke-linejoin: round;
+}
+body.dark-theme .collection-title-icon { color: #d6a2af; }
+
 </style>
 </head>
 <body>
@@ -2224,7 +2247,7 @@ body.dark-theme #equippedDecoration {
       
 <!-- КОЛЛЕКЦИЯ -->
 <section class="profile-section">
-  <h2>Моя коллекция</h2>
+  <h2 class="profile-collection-title"><span class="collection-title-icon" aria-hidden="true"><svg viewBox="0 0 32 24"><path d="M15 11C10 4 4 3 3 6c-1 4 3 9 11 7l2-2-2-2Zm2 0c5-7 11-8 12-5 1 4-3 9-11 7l-2-2 2-2Z"/><path d="m14 12-3 10 5-5 5 5-3-10"/></svg></span>Моя коллекция</h2>
 
   <div class="profile-collection" id="collectionList">
     <p>Пока коллекция пуста...</p>
