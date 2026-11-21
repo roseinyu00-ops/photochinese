@@ -2457,6 +2457,10 @@ body.profile-editing #profileAvatar::after {
         <p id="profileHskHint">Прогресс будет рассчитываться по изученным словам выбранного уровня.</p>
       </section>
 
+      <section class="profile-section profile-account-actions" id="profileAccountActions" hidden>
+        <button class="secondary" type="button" id="signOutButton">Выйти из аккаунта</button>
+      </section>
+
       <!-- СЛОВО ДНЯ -->
       <section class="profile-section word-of-day">
         <h2>今日单词 · Слово дня</h2>
@@ -3592,7 +3596,6 @@ saveProfileInfo.addEventListener("click", () => {
   profileBioText.textContent = bio || "Расскажи немного о себе ♡";
   profileSubtitle.textContent = subtitle || "学习中文 ♡";
   favoriteCharacter.textContent = character || "—";
-  alert("Информация профиля сохранена! ♡");
 });
 </script>
 
@@ -4051,7 +4054,7 @@ function savePhotoChineseDataNow() {
   if (!photoChineseUser || !window.photoChineseSupabase) return Promise.resolve();
   const userId = photoChineseUser.id;
   const payload = collectPhotoChineseData();
-  photoChineseSyncQueue = photoChineseSyncQueue.then(async () => {
+  photoChineseSyncQueue = photoChineseSyncQueue.catch(() => {}).then(async () => {
     if (window.photoChineseBannerDirty) {
       const bannerFile = await getSavedBanner();
       if (bannerFile) {
@@ -4144,6 +4147,26 @@ async function loadCloudProfile(user) {
   document.getElementById("profileBioText").textContent = finalBio || "Расскажи немного о себе ♡";
   document.getElementById("bioInput").value = finalBio;
 }
+
+// Выход из аккаунта
+const signOutButton = document.getElementById("signOutButton");
+const profileAccountActions = document.getElementById("profileAccountActions");
+
+signOutButton.addEventListener("click", async () => {
+  const client = window.photoChineseSupabase;
+  if (!client) return;
+  signOutButton.disabled = true;
+  const { error } = await client.auth.signOut();
+  signOutButton.disabled = false;
+  if (error) {
+    console.error("Не удалось выйти из аккаунта:", error);
+    return;
+  }
+  photoChineseUser = null;
+  updateProfileAccess();
+  openAccountModal();
+  switchAccountMode("login");
+});
 
 // Вход и регистрация
 document.getElementById("accountForm").addEventListener("submit", async function(event) {
