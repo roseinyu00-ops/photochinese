@@ -3440,6 +3440,7 @@ bannerUpload.addEventListener("change", async () => {
   try {
     await saveBannerFile(file);
     showBanner(file);
+    window.photoChineseBannerDirty = true;
     window.photoChineseSync?.();
   } catch (error) {
     console.error(error);
@@ -4051,6 +4052,21 @@ function savePhotoChineseDataNow() {
   const userId = photoChineseUser.id;
   const payload = collectPhotoChineseData();
   photoChineseSyncQueue = photoChineseSyncQueue.then(async () => {
+    if (window.photoChineseBannerDirty) {
+      const bannerFile = await getSavedBanner();
+      if (bannerFile) {
+        const extension = (bannerFile.name || "").split(".").pop().toLowerCase();
+        const safeExtension = /^[a-z0-9]{2,5}$/.test(extension) ? extension : (bannerFile.type === "video/webm" ? "webm" : bannerFile.type === "video/mp4" ? "mp4" : "jpg");
+        const path = userId + "/banner." + safeExtension;
+        const { error: uploadError } = await window.photoChineseSupabase.storage
+          .from("profile-media")
+          .upload(path, bannerFile, { upsert: true, contentType: bannerFile.type || "application/octet-stream" });
+        if (uploadError) throw uploadError;
+        payload.bannerPath = path;
+        window.photoChineseBannerDirty = false;
+      }
+    }
+
     const { error } = await window.photoChineseSupabase
       .from("profiles")
       .update({ app_data: payload })
@@ -4097,6 +4113,21 @@ async function loadCloudProfile(user) {
 
   if (profile.app_data && profile.app_data.storage && Object.keys(profile.app_data.storage).length) {
     applyPhotoChineseData(profile.app_data);
+    if (profile.app_data.bannerPath) {
+      const { data: mediaUrl } = client.storage.from("profile-media").getPublicUrl(profile.app_data.bannerPath);
+      if (mediaUrl && mediaUrl.publicUrl) {
+        try {
+          const mediaResponse = await fetch(mediaUrl.publicUrl);
+          if (mediaResponse.ok) {
+            const mediaBlob = await mediaResponse.blob();
+            await saveBannerFile(mediaBlob);
+            showBanner(mediaBlob);
+          }
+        } catch (mediaError) {
+          console.warn("Не удалось загрузить баннер из облака:", mediaError);
+        }
+      }
+    }
   } else {
     // Первый вход: переносим локальные данные в новый аккаунт.
     if (profile.username) localStorage.setItem("profileNickname", profile.username);
