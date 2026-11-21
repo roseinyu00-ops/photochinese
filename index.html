@@ -90,6 +90,23 @@ textarea{min-height:105px;resize:vertical}
 label{font-weight:700;font-size:13px;display:block;margin:12px 0 6px}
 .result{background:#fff7f9;border:1px solid var(--line);padding:14px;border-radius:13px;margin-top:12px;white-space:pre-wrap}
 .teacher{display:grid;grid-template-columns:repeat(3,1fr);gap:8px}
+.coach-level-row{display:flex;gap:12px;align-items:end;flex-wrap:wrap}.coach-test-link{white-space:nowrap}
+.coach-course-head{display:flex;align-items:center;justify-content:space-between;gap:12px}
+.coach-progress-ring{width:58px;height:58px;border:4px solid var(--pink);border-radius:50%;display:grid;place-items:center;font-weight:800;flex-shrink:0}
+.coach-progress-track{height:8px;background:var(--line);border-radius:20px;overflow:hidden;margin:12px 0 18px}
+#coachProgressFill{height:100%;width:0;background:var(--pink);border-radius:20px;transition:width .2s}
+.coach-lesson-list{display:grid;gap:9px}.coach-lesson-card{display:flex;align-items:center;gap:12px;text-align:left;width:100%;padding:13px;border:1px solid var(--line);border-radius:13px;background:var(--card,white);color:var(--ink);cursor:pointer}
+.coach-lesson-card:disabled{opacity:.55;cursor:not-allowed}.coach-lesson-number{width:34px;height:34px;border-radius:11px;background:#fff0f4;display:grid;place-items:center;flex-shrink:0;font-weight:800;color:#a85c72}
+.coach-lesson-meta{display:block;font-size:12px;color:var(--muted);margin-top:3px}.coach-lesson-status{margin-left:auto;color:#9b6b7a;font-size:18px}
+.coach-lesson-top{display:flex;justify-content:space-between;align-items:center;gap:10px}.coach-word-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(125px,1fr));gap:9px;margin:16px 0}
+.coach-word{border:1px solid var(--line);border-radius:12px;padding:12px;background:rgba(255,245,248,.65)}.coach-word strong{display:block;font-size:25px}.coach-word span{display:block;color:var(--muted);font-size:12px;margin-top:4px}
+.coach-grammar-box{padding:15px;border-radius:14px;background:#fff5f7;border:1px solid var(--line);margin:14px 0}.coach-example{font-size:18px;font-weight:700}
+.coach-practice{border-top:1px solid var(--line);padding-top:14px;margin-top:16px}.coach-practice-option{display:block;width:100%;text-align:left;border:1px solid var(--line);border-radius:11px;padding:11px;margin:7px 0;background:white;color:var(--ink)}
+.coach-practice-option.correct{border-color:#70ad88;background:#eff9f1}.coach-practice-option.wrong{border-color:#d98798;background:#fff1f3}
+.coach-teacher-help{border-top:1px solid var(--line);padding-top:14px;margin-top:18px}
+body.dark-theme .coach-grammar-box,body.dark-theme .coach-word{background:#49383d;color:#fff1ed;border-color:#76545d}
+body.dark-theme .coach-lesson-card,body.dark-theme .coach-practice-option{background:#49383d;color:#fff1ed;border-color:#76545d}
+@media(max-width:480px){.coach-level-row{display:block}.coach-test-link{margin-top:8px;width:100%}.coach-course-head{align-items:flex-start}}
 .teacher button{border:1px solid var(--line);background:white;border-radius:12px;padding:10px 5px;color:var(--muted)}
 .teacher button.chosen{border:2px solid var(--pink);background:#fff5f7;color:var(--ink);font-weight:700}
 .quiz-option{display:block;width:100%;text-align:left;background:#fff;border:1px solid var(--line);border-radius:12px;padding:11px;margin:8px 0}
@@ -2301,20 +2318,67 @@ body.profile-editing #profileAvatar::after {
 </section>
 
 <section id="coach" class="tab" hidden>
-  <div class="panel">
-    <h1>Твой ИИ-учитель</h1>
-    <p>Выбери стиль обратной связи. Режим меняет тон и строгость объяснений, но не точность проверки.</p>
-    <label>Стиль преподавателя</label>
-    <div class="teacher" id="teacherChoices">
-      <button data-teacher="strict">😐<br>Суперстрогий</button>
-      <button data-teacher="balanced" class="chosen">🙂<br>Средний</button>
-      <button data-teacher="kind">🌸<br>Добрый</button>
+  <div class="panel coach-hero">
+    <h1>Твой преподаватель китайского</h1>
+    <p>Последовательный курс, практика и подсказки. Выбери уровень сам или начни с результата теста HSK.</p>
+    <div class="coach-level-row">
+      <div style="flex:1;min-width:180px">
+        <label for="coachLevel">Уровень обучения</label>
+        <select id="coachLevel">
+          <option value="1">HSK 1 · Начальный</option><option value="2">HSK 2 · Базовый</option>
+          <option value="3">HSK 3 · Элементарный</option><option value="4">HSK 4 · Средний</option>
+          <option value="5">HSK 5 · Выше среднего</option><option value="6">HSK 6 · Продвинутый</option>
+        </select>
+      </div>
+      <button class="secondary coach-test-link" id="openHskTest" type="button">Определить уровень</button>
     </div>
-    <label for="studentText">Напиши предложение на китайском</label>
+    <div id="coachLevelNotice" class="small" aria-live="polite"></div>
+  </div>
+  <div class="panel section">
+    <div class="coach-course-head">
+      <div><h2 id="coachCourseTitle">Курс HSK 1</h2><p id="coachCourseSubtitle" class="small">Последовательно изучай темы и возвращайся к пройденному.</p></div>
+      <div class="coach-progress-ring" id="coachProgress">0%</div>
+    </div>
+    <div class="coach-progress-track"><div id="coachProgressFill"></div></div>
+    <div id="coachLessonList" class="coach-lesson-list"></div>
+  </div>
+  <div class="panel section" id="coachLessonPanel" hidden>
+    <div class="coach-lesson-top"><button class="secondary" id="backToLessons" type="button">← Все уроки</button><span id="coachLessonTag" class="small"></span></div>
+    <h2 id="coachLessonTitle"></h2>
+    <p id="coachLessonIntro"></p>
+    <div id="coachLessonWords" class="coach-word-grid"></div>
+    <div class="coach-grammar-box"><h3>Грамматика</h3><p id="coachLessonGrammar"></p><p id="coachLessonExample" class="coach-example"></p></div>
+    <div class="coach-practice">
+      <h3>Проверим, как ты понял(а)</h3>
+      <p id="coachPracticeQuestion"></p>
+      <div id="coachPracticeOptions"></div>
+      <div id="coachPracticeFeedback" class="small" aria-live="polite"></div>
+      <button class="primary" id="completeCoachLesson" type="button" disabled>Завершить урок</button>
+    </div>
+    <div class="coach-teacher-help">
+      <h3>Спросить преподавателя</h3>
+      <p class="small">Выбери, что нужно объяснить подробнее.</p>
+      <div class="actions">
+        <button class="secondary" data-coach-help="grammar" type="button">Объясни правило проще</button>
+        <button class="secondary" data-coach-help="example" type="button">Ещё примеры</button>
+        <button class="secondary" data-coach-help="memory" type="button">Как запомнить?</button>
+      </div>
+      <div id="coachHelpAnswer" class="result" hidden></div>
+    </div>
+  </div>
+  <div class="panel section">
+    <h2>Мой преподаватель</h2>
+    <p class="small">Выбери стиль обратной связи — содержание уроков от этого не меняется.</p>
+    <div class="teacher" id="teacherChoices">
+      <button data-teacher="strict">😐<br>Требовательный</button>
+      <button data-teacher="balanced" class="chosen">🙂<br>Спокойный</button>
+      <button data-teacher="kind">🌸<br>Поддерживающий</button>
+    </div>
+    <label for="studentText">Напиши свой вопрос или предложение на китайском</label>
     <textarea id="studentText" placeholder="Например: 我喜欢学习中文。"></textarea>
-    <div class="actions"><button class="primary" id="checkBtn">Проверить ошибки</button></div>
+    <div class="actions"><button class="primary" id="checkBtn" type="button">Разобрать с преподавателем</button></div>
     <div id="coachResult" class="result" hidden></div>
-    <p class="small">Демо-проверка показывает пример ответа. Для полноценной грамматики, естественности и персональных рекомендаций подключи языковую модель через защищённый сервер.</p>
+    <p class="small">Сейчас это учебный помощник на основе подготовленных уроков и правил, а не подключённая генеративная языковая модель. Свободная проверка любых фраз появится после отдельной ИИ-интеграции.</p>
   </div>
 </section>
 
@@ -3492,6 +3556,122 @@ document.getElementById('checkBtn').onclick=()=>{
   const intro={strict:'Проверка завершена. Будь внимательнее к структуре предложения.',balanced:'Хорошая попытка! Разберём предложение спокойно.',kind:'Здорово, что практикуешься! Давай посмотрим вместе.'};
   r.textContent=intro[teacher]+'\n\nТвой текст: '+t+'\n\nДемонстрационный режим: автоматическая проверка грамматики пока не подключена. После интеграции ИИ здесь появятся исправленная версия, объяснение каждой ошибки и похожее упражнение.';
 };
+
+// Учебный курс PhotoChinese: уровень, уроки и прогресс сохраняются локально.
+const coachCourses = {
+  1:[
+    {title:'Приветствие и знакомство',intro:'Научимся здороваться, представляться и спрашивать имя.',words:[['你好','nǐ hǎo','привет'],['我','wǒ','я'],['你','nǐ','ты'],['叫','jiào','звать'],['名字','míngzi','имя']],grammar:'Чтобы представиться, скажи 我叫… — «Меня зовут…». Вопрос с 吗 обычно образуется добавлением 吗 в конец утверждения.',example:'你好吗？ — Как ты? · 我叫安娜。— Меня зовут Анна.',question:'Как сказать «Меня зовут Ли»?',options:['我叫李。','你叫李吗？','李是我。'],answer:0,help:{grammar:'В китайском порядок простой: 我 (я) + 叫 (зваться) + имя. Получается 我叫… — «Меня зовут…».',example:'我叫王明。— Меня зовут Ван Мин。你叫什么名字？— Как тебя зовут? 你好！— Привет!',memory:'Запомни 叫 как действие «называть/звать». Представь, что ты называешь своё имя: 我叫…'}},
+    {title:'Числа и возраст',intro:'Познакомимся с числами и научимся спрашивать возраст.',words:[['一','yī','один'],['二','èr','два'],['三','sān','три'],['几','jǐ','сколько (небольшое число)'],['岁','suì','лет (о возрасте)']],grammar:'Возраст выражается конструкцией число + 岁. Вопрос «Сколько тебе лет?» — 你几岁？',example:'我十八岁。— Мне восемнадцать лет。',question:'Как сказать «Мне 20 лет»?',options:['我二十岁。','我岁二十。','二十我。'],answer:0,help:{grammar:'Сначала число, затем счётное слово 岁: 二十 + 岁. Не ставь 岁 перед числом.',example:'我十岁。— Мне 10 лет。你几岁？— Сколько тебе лет?',memory:'岁 всегда связано с возрастом. Представляй его как русское «лет» после числа.'}},
+    {title:'Местоимения и 是',intro:'Научимся говорить, кто мы и кем являются другие люди.',words:[['是','shì','быть; являться'],['他','tā','он'],['她','tā','она'],['学生','xuésheng','ученик; студент'],['老师','lǎoshī','учитель']],grammar:'Базовая схема: подлежащее + 是 + существительное. Например, «Я студент» — 我是学生。',example:'她是老师。— Она учитель。',question:'Как сказать «Он студент»?',options:['他是学生。','他学生是。','是他学生。'],answer:0,help:{grammar:'是 связывает человека или предмет с его ролью/названием: 他 + 是 + 学生.',example:'我是学生。— Я студент。她是老师。— Она учитель。',memory:'Запоминай 是 как связку «это/является» между темой и тем, кем она является.'}}
+  ],
+  2:[
+    {title:'Повседневные действия',intro:'Расскажем, что делаем каждый день.',words:[['每天','měitiān','каждый день'],['学习','xuéxí','учиться'],['工作','gōngzuò','работать'],['吃','chī','есть'],['饭','fàn','еда; рис']],grammar:'Часто обстоятельство времени ставится перед глаголом: 我每天学习。— Я учусь каждый день.',example:'我每天吃早饭。— Я каждый день завтракаю。',question:'Как сказать «Я каждый день работаю»?',options:['我每天工作。','每天我工作吗？','我工作每天了。'],answer:0,help:{grammar:'Поставь время перед действием: 我 + 每天 + 工作.',example:'我每天学习中文。— Я каждый день учу китайский。她每天运动。— Она каждый день занимается спортом。',memory:'Собирай предложение как конструктор: кто → когда → действие.'}},
+    {title:'Опыт и завершённое действие',intro:'Разберём частицу 了 в простых ситуациях.',words:[['了','le','показатель изменения/завершённости'],['昨天','zuótiān','вчера'],['买','mǎi','покупать'],['看','kàn','смотреть; читать'],['电影','diànyǐng','фильм']],grammar:'了 после глагола часто показывает завершённое действие. Время обычно уточняется словами вроде 昨天.',example:'我昨天看了电影。— Вчера я посмотрел(а) фильм。',question:'Как сказать «Вчера я купил(а) книгу»?',options:['我昨天买了书。','我买昨天书了。','昨天我书买。'],answer:0,help:{grammar:'Схема: кто + время + глагол + 了 + объект. Важно: 了 не является прямым аналогом русского прошедшего времени.',example:'我吃了饭。— Я поел(а)。他买了手机。— Он купил телефон。',memory:'Связывай 了 с сообщением о произошедшем изменении или завершённом действии, а не просто со словом «прошлое».'}},
+    {title:'Сравнение с 比',intro:'Научимся сравнивать людей и предметы.',words:[['比','bǐ','по сравнению с'],['高','gāo','высокий'],['大','dà','большой'],['小','xiǎo','маленький'],['一点儿','yìdiǎnr','немного']],grammar:'Конструкция A + 比 + B + прилагательное. Например, «А выше Б» — A比B高。',example:'今天比昨天冷。— Сегодня холоднее, чем вчера。',question:'Как сказать «Он выше меня»?',options:['他比我高。','他高比我。','比他我高。'],answer:0,help:{grammar:'Сначала тот, кого описываем, затем 比, потом объект сравнения и признак: 他 + 比 + 我 + 高.',example:'我比他大。— Я старше него。这个比那个贵。— Это дороже того。',memory:'比 стоит между двумя сравниваемыми объектами — как знак сравнения.'}}
+  ],
+  3:[
+    {title:'Планы и намерения',intro:'Научимся говорить о планах и желаниях.',words:[['打算','dǎsuàn','планировать'],['准备','zhǔnbèi','готовиться'],['明年','míngnián','в следующем году'],['旅行','lǚxíng','путешествовать'],['希望','xīwàng','надеяться']],grammar:'打算 + глагол обозначает намерение. 想 + глагол может выражать желание или план.',example:'我打算明年去中国。— Я планирую поехать в Китай в следующем году。',question:'Как сказать «Я хочу изучать китайский»?',options:['我想学习中文。','我学习想中文。','我中文想学了。'],answer:0,help:{grammar:'想 ставится перед действием: 我想 + 学习中文. Это «я хочу учить китайский».',example:'我想去旅行。— Я хочу путешествовать。她打算学汉语。— Она планирует учить китайский。',memory:'想 — желание/мысль, 打算 — более конкретный план.'}},
+    {title:'Потому что и поэтому',intro:'Соединим причины и результаты.',words:[['因为','yīnwèi','потому что'],['所以','suǒyǐ','поэтому'],['觉得','juéde','считать; чувствовать'],['有意思','yǒu yìsi','интересный'],['所以','suǒyǐ','поэтому']],grammar:'Частая связка: 因为 + причина，所以 + результат. В разговоре одну часть иногда опускают, если смысл понятен.',example:'因为中文很有意思，所以我喜欢学习。— Я люблю учиться, потому что китайский интересный。',question:'Какая связка означает «потому что… поэтому…»?',options:['虽然…但是…','因为…所以…','如果…就…'],answer:1,help:{grammar:'因为 вводит причину, 所以 — результат. Порядок: причина → следствие.',example:'因为下雨，所以我不去。— Из-за дождя я не пойду。因为很忙，所以没时间。— Я занят(а), поэтому нет времени。',memory:'因为 = причина, 所以 = итог. Можно запомнить как «потому что → поэтому».'}},
+    {title:'Возможность и умение',intro:'Разберём 会, 能 и 可以.',words:[['会','huì','уметь; вероятно'],['能','néng','мочь; быть в состоянии'],['可以','kěyǐ','можно; разрешено'],['说','shuō','говорить'],['游泳','yóuyǒng','плавать']],grammar:'会 часто обозначает приобретённый навык, 能 — возможность/способность в ситуации, 可以 — разрешение или допустимость.',example:'我会说一点儿中文。— Я умею немного говорить по-китайски。',question:'Как сказать «Я умею плавать»?',options:['我会游泳。','我可以游泳吗？','我游泳会了。'],answer:0,help:{grammar:'Если говоришь о навыке, который освоил(а), обычно используй 会. 能 — когда речь о возможности, 可以 — о разрешении.',example:'我会开车。— Я умею водить。今天我不能去。— Сегодня я не могу пойти。这里可以拍照吗？— Здесь можно фотографировать?',memory:'会 — навык, 能 — возможность, 可以 — разрешение. Это удобная стартовая подсказка.'}}
+  ],
+  4:[
+    {title:'Сложные дополнения результата',intro:'Научимся показывать результат действия.',words:[['听懂','tīngdǒng','понять на слух'],['看见','kànjiàn','увидеть'],['做完','zuòwán','закончить делать'],['找到','zhǎodào','найти'],['清楚','qīngchu','ясный']],grammar:'Глагол + результативный элемент показывает, к чему привело действие: 听懂 — услышать и понять, 做完 — сделать до конца.',example:'我没听懂老师的话。— Я не понял(а) слова учителя на слух。',question:'Что означает 做完?',options:['начать делать','закончить делать','забыть сделать'],answer:1,help:{grammar:'В таких сочетаниях первый компонент — действие, второй — результат. 完 подчёркивает завершение.',example:'看见 — увидеть; 找到 — найти; 写完 — дописать до конца.',memory:'Раздели слово на действие и результат: 做 (делать) + 完 (до конца).'}},
+    {title:'虽然…但是…',intro:'Выразим уступку и противопоставление.',words:[['虽然','suīrán','хотя'],['但是','dànshì','но'],['困难','kùnnan','трудность'],['坚持','jiānchí','продолжать; не сдаваться'],['重要','zhòngyào','важный']],grammar:'虽然…但是… соединяет уступку и противопоставление: «хотя…, но…».',example:'虽然很难，但是我会坚持。— Хотя это трудно, я продолжу。',question:'Как перевести 虽然很累，但是很开心。?',options:['Поскольку я устал(а), я счастлив(а).','Хотя я очень устал(а), я счастлив(а).','Я не устал(а) и не счастлив(а).'],answer:1,help:{grammar:'虽然 вводит факт, который мог бы помешать, а 但是 показывает неожиданный результат или контраст.',example:'虽然下雨，但是我们去了。— Хотя шёл дождь, мы пошли。',memory:'Сначала «хотя», затем «но»: две части работают парой.'}},
+    {title:'把-конструкция',intro:'Познакомимся с конструкцией, которая выдвигает объект на первый план.',words:[['把','bǎ','маркер 把-конструкции'],['放','fàng','класть; помещать'],['桌子','zhuōzi','стол'],['拿','ná','брать'],['手机','shǒujī','телефон']],grammar:'В 把-конструкции объект ставится перед глаголом: субъект + 把 + объект + действие/результат. Она часто подчёркивает, что сделали с объектом.',example:'请把书放在桌子上。— Пожалуйста, положи книгу на стол。',question:'Какой вариант грамматически подходит для «Положи телефон на стол»?',options:['把手机放在桌子上。','手机把在桌子放。','放把手机桌子上。'],answer:0,help:{grammar:'把 выдвигает объект перед действием: 把 + 手机 + 放在桌子上.',example:'请把门关上。— Закрой, пожалуйста, дверь。把书放在这里。— Положи книгу сюда。',memory:'Представь, что 把 берёт предмет в фокус: что именно мы сейчас перемещаем или меняем?'}}
+  ],
+  5:[
+    {title:'Письменная и формальная лексика',intro:'Разберём лексику, характерную для статей и формальных текстов.',words:[['此外','cǐwài','кроме того'],['因此','yīncǐ','поэтому; вследствие этого'],['然而','rán’ér','однако'],['现象','xiànxiàng','явление'],['影响','yǐngxiǎng','влияние']],grammar:'Связки 此外, 因此 и 然而 помогают логично соединять части текста. Обычно они относятся ко всему следующему высказыванию.',example:'此外，这种现象也会产生影响。— Кроме того, это явление тоже может оказывать влияние。',question:'Какое слово ближе всего по значению к «однако»?',options:['此外','然而','因此'],answer:1,help:{grammar:'然而 выражает контраст («однако»), 此外 добавляет информацию («кроме того»), 因此 вводит следствие («поэтому»).',example:'他很努力，然而没有成功。— Он очень старался, однако не преуспел。',memory:'Составь три пары: 此外 — добавление, 然而 — контраст, 因此 — следствие.'}},
+    {title:'Устойчивые сочетания',intro:'Учимся воспринимать слова не изолированно, а в устойчивых сочетаниях.',words:[['采取措施','cǎiqǔ cuòshī','принимать меры'],['获得机会','huòdé jīhuì','получить возможность'],['承担责任','chéngdān zérèn','нести ответственность'],['逐渐','zhújiàn','постепенно'],['改善','gǎishàn','улучшать']],grammar:'В китайском многие глаголы естественно сочетаются с определёнными существительными. Лучше запоминать такие сочетания целиком.',example:'我们应该采取措施改善环境。— Нам следует принять меры для улучшения окружающей среды。',question:'Как естественно сказать «нести ответственность»?',options:['承担责任','责任获得','措施责任'],answer:0,help:{grammar:'承担 — брать на себя/нести, 责任 — ответственность. Вместе это устойчивое сочетание 承担责任.',example:'获得机会 — получить возможность; 采取措施 — принять меры; 改善生活 — улучшить жизнь.',memory:'Записывай не отдельное слово, а пару «глагол + существительное».'}},
+    {title:'Аргументация и мнение',intro:'Научимся формулировать мнение и подкреплять его причинами.',words:[['观点','guāndiǎn','точка зрения'],['支持','zhīchí','поддерживать'],['反对','fǎnduì','выступать против'],['原因','yuányīn','причина'],['证明','zhèngmíng','доказывать']],grammar:'Для аргументации полезны конструкции 我认为… (я считаю…), 主要原因是… (главная причина в том, что…), 这说明… (это показывает, что…).',example:'我认为这个观点值得讨论。— Я считаю, что эту точку зрения стоит обсудить。',question:'Как начать фразу «Я считаю, что…»?',options:['我认为…','我反对…','因此…'],answer:0,help:{grammar:'我认为 вводит личное мнение. Затем добавь утверждение, которое собираешься обосновать.',example:'我认为学习语言很重要。— Я считаю, что изучать языки важно。',memory:'Строй ответ по схеме: мнение → причина → пример → вывод.'}}
+  ],
+  6:[
+    {title:'Абстрактная лексика и оттенки смысла',intro:'Разберём слова, которые помогают точно выражать сложные идеи.',words:[['本质','běnzhì','сущность'],['趋势','qūshì','тенденция'],['体现','tǐxiàn','отражать; воплощать'],['强调','qiángdiào','подчёркивать'],[' inevitably','—','']],grammar:'На продвинутом уровне важно различать близкие по смыслу слова и учитывать сочетаемость, регистр и контекст.',example:'这个变化体现了社会发展的趋势。— Это изменение отражает тенденцию общественного развития。',question:'Какое слово означает «подчёркивать»?',options:['强调','趋势','本质'],answer:0,help:{grammar:'强调 используется, когда говорящий особо выделяет важность идеи, факта или требования.',example:'作者强调了这一点。— Автор подчеркнул этот момент。',memory:'Связывай 强调 с акцентом: говорящий словно ставит на идее жирное выделение。'}},
+    {title:'Сложные логические связи',intro:'Свяжем уступку, условие и вывод в развёрнутой речи.',words:[['尽管','jǐnguǎn','несмотря на то что'],['即使','jíshǐ','даже если'],['除非','chúfēi','если только не'],['从而','cóng’ér','тем самым'],['反而','fǎn’ér','наоборот; напротив']],grammar:'尽管 часто вводит реальное препятствие, 即使 — гипотетическое условие, 除非 задаёт необходимое условие. Оттенок зависит от контекста.',example:'即使遇到困难，我们也不会放弃。— Даже если столкнёмся с трудностями, мы не сдадимся。',question:'Какое слово чаще вводит гипотетическое «даже если»?',options:['即使','除非','从而'],answer:0,help:{grammar:'即使 вводит возможную ситуацию, которая не изменит основной результат. Часто сочетается с 也 или 还.',example:'即使很忙，他也会来。— Даже если он занят, он всё равно придёт。',memory:'即使 = «даже если представить, что…» — мысленный сценарий.'}},
+    {title:'Точность и стиль',intro:'Потренируемся выбирать точные слова и избегать повторов.',words:[['措辞','cuòcí','формулировка'],['语境','yǔjìng','контекст'],['恰当','qiàdàng','уместный'],['含义','hányì','значение; смысл'],['表达','biǎodá','выражать']],grammar:'Выбор слова зависит не только от словарного перевода, но и от语境 (контекста), сочетаемости и стилистического регистра.',example:'这个词在不同语境中含义不同。— Это слово имеет разные значения в разных контекстах。',question:'Что означает 语境?',options:['произношение','контекст','грамматика'],answer:1,help:{grammar:'语境 — языковое окружение и ситуация, в которой употреблено выражение. Именно контекст помогает выбрать точный перевод.',example:'根据语境理解词语。— Понимать слова исходя из контекста。',memory:'语境: 语 — язык/речь, 境 — ситуация/окружение. Вместе — языковой контекст.'}}
+  ]
+};
+const coachStorageKey='photoChineseCoachProgress';
+let activeCoachLesson=null, coachPracticePassed=false;
+function readCoachProgress(){try{return JSON.parse(localStorage.getItem(coachStorageKey)||'{}')}catch(e){return {}}}
+function saveCoachProgress(data){localStorage.setItem(coachStorageKey,JSON.stringify(data))}
+function currentCoachLevel(){return Number(document.getElementById('coachLevel').value)||1}
+function renderCoachCourse(){
+ const level=currentCoachLevel(), lessons=coachCourses[level], progress=readCoachProgress(), done=progress[level]||[];
+ document.getElementById('coachCourseTitle').textContent='Курс HSK '+level;
+ document.getElementById('coachCourseSubtitle').textContent='3 последовательных урока · '+done.length+' из '+lessons.length+' завершено';
+ const pct=Math.round(done.length/lessons.length*100);
+ document.getElementById('coachProgress').textContent=pct+'%';
+ document.getElementById('coachProgressFill').style.width=pct+'%';
+ const list=document.getElementById('coachLessonList');list.innerHTML='';
+ lessons.forEach((lesson,index)=>{
+  const isDone=done.includes(index), locked=index>0&&!done.includes(index-1);
+  const b=document.createElement('button');b.type='button';b.className='coach-lesson-card';b.disabled=locked;
+  b.innerHTML='<span class="coach-lesson-number">'+(isDone?'✓':index+1)+'</span><span><strong>'+lesson.title+'</strong><span class="coach-lesson-meta">'+(isDone?'Урок завершён':locked?'Сначала пройди предыдущий урок':'Новый урок · 5 слов и практика')+'</span></span><span class="coach-lesson-status">'+(locked?'🔒':'›')+'</span>';
+  b.addEventListener('click',()=>openCoachLesson(index));list.appendChild(b);
+ });
+}
+function openCoachLesson(index){
+ const lesson=coachCourses[currentCoachLevel()][index];if(!lesson)return;
+ activeCoachLesson=index;coachPracticePassed=false;
+ document.getElementById('coachLessonPanel').hidden=false;
+ document.getElementById('coachLessonTag').textContent='HSK '+currentCoachLevel()+' · Урок '+(index+1);
+ document.getElementById('coachLessonTitle').textContent=lesson.title;
+ document.getElementById('coachLessonIntro').textContent=lesson.intro;
+ document.getElementById('coachLessonGrammar').textContent=lesson.grammar;
+ document.getElementById('coachLessonExample').textContent=lesson.example;
+ document.getElementById('coachPracticeQuestion').textContent=lesson.question;
+ document.getElementById('coachPracticeFeedback').textContent='Выбери один ответ.';
+ document.getElementById('coachHelpAnswer').hidden=true;
+ document.getElementById('completeCoachLesson').disabled=true;
+ const words=document.getElementById('coachLessonWords');words.innerHTML='';
+ lesson.words.forEach(w=>{const card=document.createElement('div');card.className='coach-word';card.innerHTML='<strong>'+w[0]+'</strong><span>'+w[1]+'</span><span>'+w[2]+'</span>';words.appendChild(card)});
+ const options=document.getElementById('coachPracticeOptions');options.innerHTML='';
+ lesson.options.forEach((option,i)=>{const b=document.createElement('button');b.type='button';b.className='coach-practice-option';b.textContent=option;b.addEventListener('click',()=>{
+  if(coachPracticePassed)return;
+  if(i===lesson.answer){coachPracticePassed=true;b.classList.add('correct');document.getElementById('coachPracticeFeedback').textContent='Верно! Отличная работа. Теперь можно завершить урок.';document.getElementById('completeCoachLesson').disabled=false}
+  else{b.classList.add('wrong');document.getElementById('coachPracticeFeedback').textContent='Пока не совсем. Попробуй ещё раз — обрати внимание на порядок слов и объяснение выше.'}
+ });options.appendChild(b)});
+ document.getElementById('coachLessonPanel').scrollIntoView({behavior:'smooth',block:'start'});
+}
+document.getElementById('coachLevel').addEventListener('change',()=>{document.getElementById('coachLessonPanel').hidden=true;renderCoachCourse();document.getElementById('coachLevelNotice').textContent='Выбран HSK '+currentCoachLevel()+'. Прогресс каждого уровня сохраняется отдельно.'});
+document.getElementById('backToLessons').addEventListener('click',()=>{document.getElementById('coachLessonPanel').hidden=true;renderCoachCourse()});
+document.getElementById('completeCoachLesson').addEventListener('click',()=>{
+ if(activeCoachLesson===null||!coachPracticePassed)return;
+ const level=String(currentCoachLevel()),progress=readCoachProgress();progress[level]=progress[level]||[];
+ if(!progress[level].includes(activeCoachLesson))progress[level].push(activeCoachLesson);
+ saveCoachProgress(progress);document.getElementById('coachLessonPanel').hidden=true;renderCoachCourse();
+});
+document.querySelectorAll('[data-coach-help]').forEach(button=>button.addEventListener('click',()=>{
+ if(activeCoachLesson===null)return;
+ const lesson=coachCourses[currentCoachLevel()][activeCoachLesson],kind=button.dataset.coachHelp;
+ document.getElementById('coachHelpAnswer').textContent=lesson.help[kind];document.getElementById('coachHelpAnswer').hidden=false;
+}));
+document.getElementById('openHskTest').addEventListener('click',()=>{
+ document.querySelector('nav button[data-tab="hsk"]').click();
+ document.getElementById('hsk').scrollIntoView({behavior:'smooth',block:'start'});
+});
+document.getElementById('teacherChoices').querySelectorAll('button').forEach(b=>b.addEventListener('click',()=>{
+ document.querySelectorAll('#teacherChoices button').forEach(x=>x.classList.toggle('chosen',x===b));
+ localStorage.setItem('photoChineseTeacherStyle',b.dataset.teacher);
+}));
+const savedTeacherStyle=localStorage.getItem('photoChineseTeacherStyle');
+if(savedTeacherStyle){const b=document.querySelector('#teacherChoices [data-teacher="'+savedTeacherStyle+'"]');if(b)b.classList.add('chosen')}
+document.getElementById('checkBtn').onclick=()=>{
+ const t=document.getElementById('studentText').value.trim(),r=document.getElementById('coachResult');
+ r.hidden=false;
+ if(!t){r.textContent='Напиши предложение или вопрос, и мы разберём его вместе.';return}
+ const style=localStorage.getItem('photoChineseTeacherStyle')||'balanced';
+ const intro={strict:'Разберём внимательно и по пунктам.',balanced:'Хорошая попытка! Посмотрим на твою фразу.',kind:'Здорово, что практикуешься! Давай разберём спокойно.'};
+ const tips=[];
+ if(/吗/.test(t))tips.push('Частица 吗 обычно ставится в конце общего вопроса.');
+ if(/因为/.test(t))tips.push('因为 вводит причину; в паре с ним часто используется 所以 для результата.');
+ if(/虽然/.test(t))tips.push('虽然 часто образует пару с 但是: «хотя…, но…».');
+ if(/比/.test(t))tips.push('В сравнении обычно используется порядок A + 比 + B + признак.');
+ if(/了/.test(t))tips.push('Обрати внимание на функцию 了: она может отмечать завершённость или изменение ситуации.');
+ r.textContent=intro[style]+'\n\nТвоя фраза: '+t+'\n\n'+(tips.length?tips.join('\n')+'\n\n':'Я пока не нашёл в этой фразе знакомую мне учебную конструкцию. Это не означает, что предложение неправильное. ')+'Я могу подсказать по знакомым правилам, но полноценная свободная проверка требует подключения языковой модели.';
+};
+renderCoachCourse();
+
 const questions=[
  {q:'1. Что означает 朋友 (péngyou)?',o:['Учитель','Друг','Семья'],a:1},
  {q:'2. Выбери правильный перевод 我是学生。',o:['Я студент.','Я учитель.','Я дома.'],a:0},
@@ -3514,11 +3694,27 @@ document.getElementById('nextQuestion').onclick=()=>{
  if(!answered){document.getElementById('quizFeedback').textContent='Сначала выбери ответ.';return}
  qi++;
  if(qi<questions.length)renderQ();
+const storedSuggestedLevel=localStorage.getItem('photoChineseHskSuggestedLevel');
+if(storedSuggestedLevel && document.getElementById('coachLevel')){
+ document.getElementById('coachLevel').value=storedSuggestedLevel;
+ document.getElementById('coachLevelNotice').textContent='Последняя рекомендация теста: '+(localStorage.getItem('photoChineseHskSuggestedLabel')||('HSK '+storedSuggestedLevel))+'. Уровень можно изменить.';
+ renderCoachCourse();
+}
+
  else{
   document.getElementById('quiz').hidden=true;
-  const level=score<=1?'Начальный уровень — начни с HSK 1':score<=3?'Примерно HSK 2–3':'Примерно HSK 3–4';
+  const level=score<=1?1:score<=3?2:3;
+  const levelLabel=score<=1?'Начальный ориентир — HSK 1':score<=3?'Ориентир — HSK 2–3':'Ориентир — HSK 3–4';
+  localStorage.setItem('photoChineseHskSuggestedLevel',String(level));
+  localStorage.setItem('photoChineseHskSuggestedLabel',levelLabel);
   const out=document.getElementById('hskResult');out.hidden=false;
-  out.textContent='Твой результат: '+score+' из '+questions.length+'.\n'+level+'.\n\nЭто очень короткий ознакомительный тест. Для точной оценки нужны задания на аудирование, чтение, лексику и грамматику.';
+  out.innerHTML='Твой результат: '+score+' из '+questions.length+'.<br>'+levelLabel+'.<br><br>Это короткая ознакомительная проверка, а не официальный экзамен. Учитель использует результат как стартовую рекомендацию — уровень можно изменить вручную.<br><br><button class="primary" id="startCoachFromHsk" type="button">Начать обучение с этим уровнем</button>';
+  document.getElementById('startCoachFromHsk').addEventListener('click',()=>{
+    document.getElementById('coachLevel').value=String(level);
+    document.getElementById('coachLevelNotice').textContent='Уровень предложен тестом HSK: '+levelLabel+'. Его можно изменить в любое время.';
+    renderCoachCourse();
+    document.querySelector('nav button[data-tab="coach"]').click();
+  });
  }
 };
 renderQ();
