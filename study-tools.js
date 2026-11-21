@@ -36,13 +36,26 @@
         getLearnedCoachVocabularyRecords().forEach(w => add({hanzi:w.hanzi,pinyin:w.pinyin,translation:w.translation,level:w.level,source:"Курс HSK"}));
       }
     } catch (e) { console.warn("Не удалось прочитать слова курса:", e); }
+    // В общий прогресс и коллекцию символы записываются в разные ключи.
+    // Читаем оба источника, чтобы выученные иероглифы не терялись в словаре.
+    const learnedChars = safeRead("learnedCharacters", []);
     const savedChars = safeRead("savedCharacters", []);
-    if (Array.isArray(savedChars) && typeof getCharInfo === "function") {
-      savedChars.forEach(ch => {
-        const info = getCharInfo(ch) || {};
-        add({hanzi:ch,pinyin:info.p || info.pinyin || info.pinyinMMH || "",translation:info.m || info.meaning || info.definition || "Сохранённый иероглиф",level:0,source:"Коллекция"});
+    const allChars = new Set([
+      ...(Array.isArray(learnedChars) ? learnedChars : []),
+      ...(Array.isArray(savedChars) ? savedChars : [])
+    ]);
+    allChars.forEach(ch => {
+      if (typeof ch !== "string" || !ch.trim()) return;
+      let info = {};
+      try { info = typeof getCharInfo === "function" ? (getCharInfo(ch) || {}) : {}; } catch (_) {}
+      add({
+        hanzi:ch,
+        pinyin:info.p || info.pinyin || info.pinyinMMH || "",
+        translation:info.m || info.meaning || info.definition || "Выученный иероглиф",
+        level:0,
+        source:Array.isArray(savedChars) && savedChars.includes(ch) ? "Коллекция" : "Выученные иероглифы"
       });
-    }
+    });
     const custom = safeRead(WORDS_KEY, []);
     if (Array.isArray(custom)) custom.forEach(w => add({...w,source:w.source || "Мой словарь"}));
     return Array.from(words.values()).sort((a,b) => (a.level||99)-(b.level||99) || a.hanzi.localeCompare(b.hanzi));
@@ -65,46 +78,71 @@
     chineseVoices = synth.getVoices().filter(v => /^zh([_-]|$)/i.test(v.lang) || /chinese|中文|mandarin/i.test(v.name));
   }
 
-  function speak(text, statusElement) {
+  let activeAudio = null;
+  function speakWithBrowser(text, statusElement) {
     const synth = window.speechSynthesis;
     if (!synth || typeof window.SpeechSynthesisUtterance !== "function") {
-      if (statusElement) statusElement.textContent = "В этом браузере нет системной озвучки. Попробуй открыть сайт в Chrome и проверить системный движок преобразования текста в речь.";
-      return;
-    }
-    const phrase = clean(text);
-    if (!phrase) {
-      if (statusElement) statusElement.textContent = "Нет текста для озвучивания.";
+      if (statusElement) statusElement.textContent = "Браузерная озвучка недоступна. Не удалось загрузить аудио.";
       return;
     }
     try {
       refreshChineseVoices();
       synth.cancel();
-      const utterance = new SpeechSynthesisUtterance(phrase);
+      const utterance = new SpeechSynthesisUtterance(text);
       utterance.lang = "zh-CN";
       utterance.rate = 0.82;
-      utterance.pitch = 1;
       const voice = chineseVoices.find(v => /^zh[-_]?(cn|hans)/i.test(v.lang))
-        || chineseVoices.find(v => /^zh/i.test(v.lang))
-        || chineseVoices[0];
+        || chineseVoices.find(v => /^zh/i.test(v.lang)) || chineseVoices[0];
       if (voice) utterance.voice = voice;
-      utterance.onstart = () => {
-        if (statusElement) statusElement.textContent = voice
-          ? "▶ Воспроизводится китайский голос: " + voice.name
-          : "▶ Запущена системная озвучка zh-CN. Если звука нет, на устройстве не установлен китайский голос.";
-      };
-      utterance.onend = () => {
-        if (statusElement) statusElement.textContent = "Воспроизведение завершено.";
-      };
-      utterance.onerror = event => {
-        if (statusElement) statusElement.textContent = "Браузер не смог воспроизвести звук: " + (event.error || "ошибка синтеза") + ". Проверь системный движок TTS и установленный голос китайского языка.";
-      };
+      utterance.onstart = () => { if (statusElement) statusElement.textContent = "▶ Воспроизводится системная китайская озвучка."; };
+      utterance.onend = () => { if (statusElement) statusElement.textContent = "Воспроизведение завершено."; };
+      utterance.onerror = event => { if (statusElement) statusElement.textContent = "Системная озвучка не сработала (" + (event.error || "ошибка") + "). Проверь звук и TTS на устройстве."; };
       synth.resume();
       synth.speak(utterance);
-      if (statusElement) statusElement.textContent = voice
-        ? "Подготавливаю китайскую озвучку…"
-        : "Китайский голос не найден в списке браузера. Пробую системный голос zh-CN…";
-    } catch (error) {
-      if (statusElement) statusElement.textContent = "Не удалось запустить озвучку. Проверь настройки преобразования текста в речь на устройстве.";
+      if (statusElement) statusElement.textContent = "Пробую системную китайскую озвучку…";
+    } catch (_) {
+      if (statusElement) statusElement.textContent = "Не удалось запустить системную озвучку.";
+    }
+  }
+
+  function speak(text, statusElement) {
+    const phrase = clean(text);
+    if (!phrase) {
+      if (statusElement) statusElement.textContent = "Нет текста для озвучивания.";
+      return;
+    }
+
+    // Сначала используем аудиофайл с китайской речью: это не зависит
+    // от наличия установленного китайского голоса в Android/Yandex Browser.
+    if (activeAudio) {
+      try { activeAudio.pause(); activeAudio.currentTime = 0; } catch (_) {}
+      activeAudio = null;
+    }
+    if (window.speechSynthesis) window.speechSynthesis.cancel();
+    const url = "https://translate.google.com/translate_tts?ie=UTF-8&client=tw-ob&tl=zh-CN&q=" + encodeURIComponent(phrase);
+    try {
+      const audio = new Audio(url);
+      activeAudio = audio;
+      audio.preload = "auto";
+      audio.onplaying = () => { if (statusElement) statusElement.textContent = "▶ Воспроизводится китайская аудиозапись."; };
+      audio.onended = () => { if (statusElement) statusElement.textContent = "Воспроизведение завершено."; };
+      audio.onerror = () => {
+        if (activeAudio === audio) activeAudio = null;
+        if (statusElement) statusElement.textContent = "Онлайн-аудио недоступно. Пробую системную озвучку…";
+        speakWithBrowser(phrase, statusElement);
+      };
+      const result = audio.play();
+      if (result && typeof result.catch === "function") {
+        result.catch(() => {
+          if (activeAudio === audio) activeAudio = null;
+          if (statusElement) statusElement.textContent = "Браузер заблокировал онлайн-аудио. Пробую системную озвучку…";
+          speakWithBrowser(phrase, statusElement);
+        });
+      }
+      if (statusElement) statusElement.textContent = "Загружаю китайское произношение…";
+    } catch (_) {
+      if (statusElement) statusElement.textContent = "Онлайн-аудио недоступно. Пробую системную озвучку…";
+      speakWithBrowser(phrase, statusElement);
     }
   }
   function renderReview() {
@@ -274,6 +312,19 @@
     $("studyReviewAudio").addEventListener("click",()=>{const w=getWords().find(x=>x.id===currentReviewId);if(w)speak(w.hanzi, $("studyReviewAudioStatus"));});
     $("studySpeakMic").addEventListener("click",startRecognition);
     setView("dictionary");
+    // При переходе в раздел словаря обновляем данные: пользователь мог
+    // отметить новые слова в ИИ-учителе после первоначальной загрузки.
+    const studySection = $("studytools");
+    if (studySection && typeof MutationObserver === "function") {
+      const observer = new MutationObserver(() => {
+        if (!studySection.hidden) {
+          renderDictionary();
+          renderReview();
+          populateSpeakSelect();
+        }
+      });
+      observer.observe(studySection, {attributes:true, attributeFilter:["hidden"]});
+    }
   }
 
   if(document.readyState==="loading") document.addEventListener("DOMContentLoaded",init,{once:true}); else init();
