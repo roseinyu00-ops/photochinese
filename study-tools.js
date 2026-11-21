@@ -58,48 +58,58 @@
     return state;
   }
 
+  let chineseVoices = [];
+  function refreshChineseVoices() {
+    const synth = window.speechSynthesis;
+    if (!synth || !synth.getVoices) return;
+    chineseVoices = synth.getVoices().filter(v => /^zh([_-]|$)/i.test(v.lang) || /chinese|中文|mandarin/i.test(v.name));
+  }
+
   function speak(text, statusElement) {
     const synth = window.speechSynthesis;
     if (!synth || typeof window.SpeechSynthesisUtterance !== "function") {
-      const message = "Озвучивание не поддерживается этим браузером. Открой сайт в Chrome и проверь настройки синтеза речи.";
-      if (statusElement) statusElement.textContent = message; else alert(message);
+      if (statusElement) statusElement.textContent = "В этом браузере нет системной озвучки. Попробуй открыть сайт в Chrome и проверить системный движок преобразования текста в речь.";
+      return;
+    }
+    const phrase = clean(text);
+    if (!phrase) {
+      if (statusElement) statusElement.textContent = "Нет текста для озвучивания.";
       return;
     }
     try {
+      refreshChineseVoices();
       synth.cancel();
-      const utterance = new SpeechSynthesisUtterance(String(text || ""));
+      const utterance = new SpeechSynthesisUtterance(phrase);
       utterance.lang = "zh-CN";
-      utterance.rate = 0.78;
+      utterance.rate = 0.82;
       utterance.pitch = 1;
-      const voices = synth.getVoices ? synth.getVoices() : [];
-      const chineseVoice = voices.find(v => /^zh(-|_)?cn$/i.test(v.lang))
-        || voices.find(v => /^zh/i.test(v.lang))
-        || voices.find(v => /chinese|中文|mandarin/i.test(v.name));
-      if (chineseVoice) utterance.voice = chineseVoice;
-      utterance.onstart = () => { if (statusElement) statusElement.textContent = "▶ Воспроизводится китайское произношение…"; };
-      utterance.onend = () => { if (statusElement) statusElement.textContent = "Готово. Можно прослушать ещё раз или повторить самостоятельно."; };
+      const voice = chineseVoices.find(v => /^zh[-_]?(cn|hans)/i.test(v.lang))
+        || chineseVoices.find(v => /^zh/i.test(v.lang))
+        || chineseVoices[0];
+      if (voice) utterance.voice = voice;
+      utterance.onstart = () => {
+        if (statusElement) statusElement.textContent = voice
+          ? "▶ Воспроизводится китайский голос: " + voice.name
+          : "▶ Запущена системная озвучка zh-CN. Если звука нет, на устройстве не установлен китайский голос.";
+      };
+      utterance.onend = () => {
+        if (statusElement) statusElement.textContent = "Воспроизведение завершено.";
+      };
       utterance.onerror = event => {
-        if (statusElement) statusElement.textContent = "Не удалось воспроизвести звук (" + (event.error || "ошибка синтеза") + "). Проверь громкость и наличие китайского голоса в настройках Android.";
+        if (statusElement) statusElement.textContent = "Браузер не смог воспроизвести звук: " + (event.error || "ошибка синтеза") + ". Проверь системный движок TTS и установленный голос китайского языка.";
       };
       synth.resume();
       synth.speak(utterance);
-      if (statusElement && !chineseVoice) statusElement.textContent = "Запрашиваю китайский голос устройства… Если звука нет, установи китайский голос в настройках преобразования текста в речь Android.";
+      if (statusElement) statusElement.textContent = voice
+        ? "Подготавливаю китайскую озвучку…"
+        : "Китайский голос не найден в списке браузера. Пробую системный голос zh-CN…";
     } catch (error) {
-      if (statusElement) statusElement.textContent = "Ошибка запуска озвучивания. Проверь, включён ли синтез речи на устройстве.";
-      else alert("Не удалось запустить китайскую озвучку. Проверь настройки синтеза речи Android.");
+      if (statusElement) statusElement.textContent = "Не удалось запустить озвучку. Проверь настройки преобразования текста в речь на устройстве.";
     }
   }
-  function renderStats(words, state) {
-    const due = words.filter(w => !state[w.id] || state[w.id].due <= Date.now()).length;
-    $("studyToolsWordCount").textContent = words.length;
-    $("studyToolsDueCount").textContent = due;
-    $("studyToolsLearnedCount").textContent = words.filter(w => state[w.id]?.reps > 0).length;
-  }
-
   function renderReview() {
     const words = getWords();
     const state = getReviewState(words);
-    renderStats(words,state);
     const due = words.filter(w => (state[w.id]?.due || 0) <= Date.now()).sort((a,b) => (state[a.id]?.due||0)-(state[b.id]?.due||0));
     const card = $("studyReviewCard"), empty = $("studyReviewEmpty");
     $("studyReviewAnswer").hidden = true;
@@ -149,7 +159,6 @@
 
   function renderDictionary() {
     const words = getWords();
-    renderStats(words,getReviewState(words));
     const query = clean($("studyDictionarySearch").value).toLowerCase();
     const level = $("studyDictionaryLevel").value;
     const filtered = words.filter(w => {
@@ -174,7 +183,7 @@
       const actions = document.createElement("div"); actions.className = "study-tools-actions";
       const audio = document.createElement("button"); audio.type="button"; audio.className="study-tools-icon-btn"; audio.textContent="🔊"; audio.title="Прослушать"; audio.addEventListener("click",()=>speak(w.hanzi, status));
       const status = document.createElement("span"); status.className = "study-tools-word-status"; status.setAttribute("aria-live","polite");
-      actions.appendChild(audio); row.append(main,actions); list.appendChild(row); list.appendChild(status);
+      actions.appendChild(audio); row.append(main,actions,status); list.appendChild(row);
     });
   }
 
@@ -256,8 +265,13 @@
       $("studyWordForm").reset(); renderDictionary(); renderReview(); populateSpeakSelect();
     });
     $("studySpeakSelect").addEventListener("change",renderSpeakWord);
-    $("studySpeakAudio").addEventListener("click",()=>{const w=getWords().find(x=>x.id===currentSpeakId);if(w)speak(w.hanzi, $("studyReviewPrompt"));});
-    $("studyReviewAudio").addEventListener("click",()=>{const w=getWords().find(x=>x.id===currentReviewId);if(w)speak(w.hanzi, $("studySpeakMicStatus"));});
+    if (window.speechSynthesis) {
+      refreshChineseVoices();
+      window.speechSynthesis.addEventListener?.("voiceschanged", refreshChineseVoices);
+      window.speechSynthesis.onvoiceschanged = refreshChineseVoices;
+    }
+    $("studySpeakAudio").addEventListener("click",()=>{const w=getWords().find(x=>x.id===currentSpeakId);if(w)speak(w.hanzi, $("studySpeakAudioStatus"));});
+    $("studyReviewAudio").addEventListener("click",()=>{const w=getWords().find(x=>x.id===currentReviewId);if(w)speak(w.hanzi, $("studyReviewAudioStatus"));});
     $("studySpeakMic").addEventListener("click",startRecognition);
     setView("dictionary");
   }
