@@ -3018,7 +3018,11 @@ const progress = {
   )
 };
 
-// Сохранение прогресса
+let cloudProgressReady = false;
+let activeProgressUserId = null;
+let cloudProgressSaveQueue = Promise.resolve();
+
+// Сохраняем локальную копию и, если аккаунт уже загружен, отправляем данные в облако.
 function saveProgress() {
   localStorage.setItem(
     "learnedCharacters",
@@ -3034,6 +3038,90 @@ function saveProgress() {
     "achievements",
     JSON.stringify(progress.achievements)
   );
+
+  if (cloudProgressReady && activeProgressUserId) {
+    cloudProgressSaveQueue = cloudProgressSaveQueue
+      .then(() => saveCloudProgress())
+      .catch(error => {
+        console.error("Не удалось сохранить прогресс в облако:", error);
+      });
+  }
+}
+
+// Отправка текущего прогресса в Supabase
+async function saveCloudProgress() {
+  const client = window.photoChineseSupabase;
+  if (!client || !activeProgressUserId || !cloudProgressReady) return;
+
+  const { data: sessionData, error: sessionError } =
+    await client.auth.getSession();
+
+  if (sessionError) throw sessionError;
+
+  // Не позволяем отправить данные предыдущего аккаунта в новый аккаунт.
+  if (!sessionData.session ||
+      sessionData.session.user.id !== activeProgressUserId) {
+    return;
+  }
+
+  const { error } = await client
+    .from("learning_progress")
+    .upsert({
+      user_id: activeProgressUserId,
+      learned_characters: progress.learnedCharacters,
+      completed_lessons: progress.completedLessons,
+      achievements: progress.achievements,
+      updated_at: new Date().toISOString()
+    }, { onConflict: "user_id" });
+
+  if (error) throw error;
+}
+
+// Загружаем облачный прогресс и объединяем его с прежними локальными данными.
+async function loadCloudProgress(user) {
+  const client = window.photoChineseSupabase;
+  if (!client || !user) return;
+
+  cloudProgressReady = false;
+  activeProgressUserId = user.id;
+
+  const { data, error } = await client
+    .from("learning_progress")
+    .select("*")
+    .eq("user_id", user.id)
+    .maybeSingle();
+
+  if (error) throw error;
+
+  const mergeUnique = (localItems, cloudItems) => [
+    ...new Set([
+      ...(Array.isArray(localItems) ? localItems : []),
+      ...(Array.isArray(cloudItems) ? cloudItems : [])
+    ])
+  ];
+
+  progress.learnedCharacters = mergeUnique(
+    progress.learnedCharacters,
+    data?.learned_characters
+  );
+
+  progress.completedLessons = mergeUnique(
+    progress.completedLessons,
+    data?.completed_lessons
+  );
+
+  progress.achievements = mergeUnique(
+    progress.achievements,
+    data?.achievements
+  );
+
+  // Сначала включаем облачную синхронизацию, затем сохраняем объединённые данные.
+  cloudProgressReady = true;
+  saveProgress();
+  updateAchievements();
+  updateProfileProgress();
+
+  await cloudProgressSaveQueue;
 }
 
 // Добавление изученного иероглифа
@@ -3443,6 +3531,7 @@ document.getElementById("accountForm").addEventListener("submit", async function
 
       if (!result.error && result.data.session) {
         await loadCloudProfile(result.data.user);
+        await loadCloudProgress(result.data.user);
         message.textContent = "Аккаунт создан! Профиль готов ❤️";
       } else if (!result.error) {
         message.textContent = "Аккаунт создан! Проверь почту и подтверди регистрацию.";
@@ -3456,8 +3545,9 @@ document.getElementById("accountForm").addEventListener("submit", async function
 
       if (!result.error) {
         await loadCloudProfile(result.data.user);
+        await loadCloudProgress(result.data.user);
 
-        message.textContent = "Успешный вход! Профиль загружен ❤️";
+        message.textContent = "Успешный вход! Профиль и прогресс загружены ❤️";
 
         document.getElementById("accountButton").title =
           "Ты вошла в аккаунт";
@@ -3494,6 +3584,7 @@ document.getElementById("accountForm").addEventListener("submit", async function
   if (data.session) {
     try {
       await loadCloudProfile(data.session.user);
+      await loadCloudProgress(data.session.user);
 
       document.getElementById("accountButton").title =
         "Ты вошла в аккаунт";
