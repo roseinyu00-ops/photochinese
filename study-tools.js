@@ -94,16 +94,31 @@
       const voice = chineseVoices.find(v => /^zh[-_]?(cn|hans)/i.test(v.lang))
         || chineseVoices.find(v => /^zh/i.test(v.lang));
       if (voice) utterance.voice = voice;
-      utterance.onstart = () => { if (statusElement && requestId === speechRequestId) statusElement.textContent = "▶ Воспроизводится системная китайская озвучка."; };
-      utterance.onend = () => { if (statusElement && requestId === speechRequestId) statusElement.textContent = "Воспроизведение завершено."; };
+      let startTimer = null;
+      utterance.onstart = () => {
+        if (startTimer) clearTimeout(startTimer);
+        if (statusElement && requestId === speechRequestId) statusElement.textContent = "▶ Воспроизводится системная китайская озвучка.";
+      };
+      utterance.onend = () => {
+        if (startTimer) clearTimeout(startTimer);
+        if (statusElement && requestId === speechRequestId) statusElement.textContent = "Воспроизведение завершено.";
+      };
       utterance.onerror = event => {
+        if (startTimer) clearTimeout(startTimer);
         if (!statusElement || requestId !== speechRequestId) return;
         if (event.error === "interrupted" || event.error === "canceled") return;
         statusElement.textContent = "Системная озвучка не сработала (" + (event.error || "ошибка") + ").";
       };
       synth.resume();
       synth.speak(utterance);
-      if (statusElement && requestId === speechRequestId) statusElement.textContent = "Запускаю системную китайскую озвучку…";
+      if (statusElement && requestId === speechRequestId) {
+        statusElement.textContent = "Запускаю системную китайскую озвучку…";
+        startTimer = setTimeout(() => {
+          if (requestId === speechRequestId) {
+            statusElement.textContent = "Системная озвучка не запустилась. Возможно, на устройстве или в браузере нет доступного китайского голоса.";
+          }
+        }, 6000);
+      }
     } catch (_) {
       if (statusElement && requestId === speechRequestId) statusElement.textContent = "Не удалось запустить системную озвучку.";
     }
@@ -123,26 +138,57 @@
     const synth = window.speechSynthesis;
     if (synth && (synth.speaking || synth.pending)) synth.cancel();
 
-    // Сначала пробуем сетевую запись китайской речи, затем системный TTS.
-    const url = "https://translate.google.com/translate_tts?ie=UTF-8&client=tw-ob&tl=zh-CN&q=" + encodeURIComponent(phrase);
-    try {
-      const audio = new Audio(url);
+    // Сначала пробуем актуальный Google Translate TTS endpoint, затем резервный адрес.
+    const encoded = encodeURIComponent(phrase);
+    const urls = [
+      "https://translate.googleapis.com/translate_tts?ie=UTF-8&client=gtx&tl=zh-CN&q=" + encoded,
+      "https://translate.google.com/translate_tts?ie=UTF-8&client=gtx&tl=zh-CN&q=" + encoded
+    ];
+
+    const tryAudio = index => {
+      if (requestId !== speechRequestId) return;
+      if (index >= urls.length) {
+        if (statusElement) statusElement.textContent = "Онлайн-озвучка недоступна. Пробую системный китайский голос…";
+        speakWithBrowser(phrase, statusElement, requestId);
+        return;
+      }
+      let settled = false;
+      const audio = new Audio(urls[index]);
       activeAudio = audio;
       audio.preload = "auto";
-      audio.onplaying = () => { if (statusElement && requestId === speechRequestId) statusElement.textContent = "▶ Воспроизводится китайская аудиозапись."; };
-      audio.onended = () => { if (requestId === speechRequestId) { activeAudio = null; if (statusElement) statusElement.textContent = "Воспроизведение завершено."; } };
-      const fallback = () => {
-        if (requestId !== speechRequestId) return;
-        if (activeAudio === audio) activeAudio = null;
-        if (statusElement) statusElement.textContent = "Онлайн-аудио недоступно. Переключаюсь на системную озвучку…";
-        speakWithBrowser(phrase, statusElement, requestId);
+      const clearAttempt = () => {
+        if (audioAttemptTimer) clearTimeout(audioAttemptTimer);
       };
-      audio.onerror = fallback;
+      const fail = () => {
+        if (settled || requestId !== speechRequestId) return;
+        settled = true;
+        clearAttempt();
+        if (activeAudio === audio) activeAudio = null;
+        try { audio.pause(); } catch (_) {}
+        tryAudio(index + 1);
+      };
+      let audioAttemptTimer = setTimeout(fail, 7000);
+      audio.onplaying = () => {
+        if (requestId !== speechRequestId) return;
+        settled = true;
+        clearAttempt();
+        if (statusElement) statusElement.textContent = "▶ Воспроизводится китайская аудиозапись.";
+      };
+      audio.onended = () => {
+        clearAttempt();
+        if (requestId === speechRequestId) {
+          activeAudio = null;
+          if (statusElement) statusElement.textContent = "Воспроизведение завершено.";
+        }
+      };
+      audio.onerror = fail;
       const result = audio.play();
-      if (result && typeof result.catch === "function") result.catch(fallback);
-      if (statusElement) statusElement.textContent = "Загружаю китайское произношение…";
+      if (result && typeof result.catch === "function") result.catch(fail);
+      if (statusElement && requestId === speechRequestId) statusElement.textContent = "Загружаю китайское произношение…";
+    };
+    try {
+      tryAudio(0);
     } catch (_) {
-      if (statusElement) statusElement.textContent = "Онлайн-аудио недоступно. Переключаюсь на системную озвучку…";
       speakWithBrowser(phrase, statusElement, requestId);
     }
   }
@@ -176,7 +222,6 @@
     $("studyReviewPinyin").textContent = word.pinyin || "Пиньинь не указан";
     $("studyReviewMeaning").textContent = word.translation;
     $("studyReviewLevel").textContent = word.level ? "HSK " + word.level : (word.source || "Личный словарь");
-    updateReviewRatingLabels(word,state);
     $("studyReviewAnswer").hidden = true;
     $("studyReviewReveal").hidden = false;
   }
@@ -232,15 +277,6 @@
     const mod10 = count % 10, mod100 = count % 100;
     const noun = mod100 >= 11 && mod100 <= 14 ? "дней" : mod10 === 1 ? "день" : mod10 >= 2 && mod10 <= 4 ? "дня" : "дней";
     return "примерно через " + count + " " + noun;
-  }
-
-  function updateReviewRatingLabels(word, state) {
-    const previous = state[word.id] || {interval:0,ease:2.5,reps:0};
-    ["again","hard","good","easy"].forEach(rating => {
-      const button = document.querySelector('#studyReviewRatings [data-rating="' + rating + '"]');
-      const detail = button?.querySelector("strong");
-      if (detail) detail.textContent = formatReviewInterval(calculateNextReview(rating,previous).interval);
-    });
   }
 
   function rateReview(rating) {
