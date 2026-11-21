@@ -3340,15 +3340,15 @@ document.getElementById('translateBtn').onclick=async()=>{
   if(!t){result.textContent='Сначала загрузи мем или введи китайский текст.';return;}
   result.textContent='Подготавливаем словарь…';
   await dictionaryPromise;
-  const normalized=t.replace(/\\s/g,'');
+  const normalized=t.replace(/\s/g,'');
   const tokens=tokenizeChinese(t);
   const exact=sentenceTranslations[normalized]||sentenceTranslations[t];
-  const pinyin=tokens.map(token=>token.p||token.text).join(' ').replace(/\\s+([，。！？；：、,.!?;:])/g,'$1');
+  const pinyin=tokens.map(token=>token.p||token.text).join(' ').replace(/\s+([，。！？；：、,.!?;:])/g,'$1');
   const gloss=tokens.map(token=>{
     if(token.type==='punct') return token.text;
     return token.text+' — '+(token.m||'значение пока не найдено в словаре');
   });
-  const hasChinese=/\\p{Script=Han}/u.test(t);
+  const hasChinese=/\p{Script=Han}/u.test(t);
   if(!hasChinese){result.textContent='В тексте не нашлись китайские иероглифы. Проверь ввод или распознавание.';return;}
   result.innerHTML='<div class="meme-analysis-card"><h3>Пиньинь</h3><p>'+esc(pinyin)+'</p></div>'+
     '<div class="meme-analysis-card"><h3>'+(exact?'Перевод':'Значение по словам')+'</h3><p>'+esc(exact||gloss.join(' · '))+'</p>'+
