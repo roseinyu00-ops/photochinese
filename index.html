@@ -3751,7 +3751,7 @@ function renderCoachCourse(){
  const allDone=done.length===lessons.length;
  examButton.disabled=!allDone;
  examStatus.textContent=allDone?'Все уроки завершены. Можно пройти итоговую проверку по материалу этого курса.':'Завершено уроков: '+done.length+' из '+lessons.length+'. Итоговая проверка откроется после всех уроков.';
- const examHistory=JSON.parse(localStorage.getItem('photoChineseCoachExams')||'{}');
+ let examHistory={};try{examHistory=JSON.parse(localStorage.getItem('photoChineseCoachExams')||'{}')||{};}catch(e){examHistory={};}
  const previous=examHistory[level];
  document.getElementById('coachExamResult').hidden=!previous;
  if(previous)document.getElementById('coachExamResult').textContent='Последняя попытка: '+previous.correct+' из '+previous.total+' ('+previous.percent+'%). '+(previous.passed?'Уровень курса подтверждён.':'Можно повторить проверку после повторения материала.');
