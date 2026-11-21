@@ -2849,21 +2849,44 @@ async function getPaddleChineseOcr() {
     paddleOcrPromise = (async () => {
       setOcrStatus('Загружаем модуль PaddleOCR…');
       const { PaddleOCR } = await import('https://cdn.jsdelivr.net/npm/@paddleocr/paddleocr-js@0.4.2/+esm');
-      setOcrStatus('Загружаем китайские модели распознавания. При первом запуске это может занять некоторое время…');
+      setOcrStatus('Загружаем китайские модели распознавания…');
       return PaddleOCR.create({
         lang: 'ch',
         ocrVersion: 'PP-OCRv5',
-        ortOptions: { backend: 'auto' }
+        ortOptions: { backend: 'wasm', numThreads: 1, simd: true }
       });
     })();
   }
 
   try {
-    return await paddleOcrPromise;
+    return await Promise.race([
+      paddleOcrPromise,
+      new Promise((_, reject) => setTimeout(
+        () => reject(new Error('Загрузка моделей занимает слишком долго. Проверь подключение и повтори попытку.')),
+        90000
+      ))
+    ]);
   } catch (error) {
+    // Не держим интерфейс в бесконечной загрузке: разрешаем повторную попытку.
     paddleOcrPromise = null;
     throw error;
   }
+}
+
+async function recognizeChineseWithTesseract(file) {
+  if (!window.Tesseract) throw new Error('Резервный модуль OCR не загрузился.');
+  if (!ocrWorkerPromise) {
+    setOcrStatus('Запускаем резервное распознавание…');
+    ocrWorkerPromise = Tesseract.createWorker('chi_sim', 1, {
+      logger: m => {
+        if (m.status === 'loading language traineddata') setOcrStatus('Загружаем резервную китайскую модель… ' + Math.round((m.progress || 0) * 100) + '%');
+        else if (m.status === 'recognizing text') setOcrStatus('Резервный OCR распознаёт текст… ' + Math.round((m.progress || 0) * 100) + '%');
+      }
+    });
+  }
+  const worker = await ocrWorkerPromise;
+  const result = await worker.recognize(file);
+  return (result && result.data && result.data.text ? result.data.text : '').trim();
 }
 
 async function recognizeChinese(file) {
@@ -2878,7 +2901,22 @@ async function recognizeChinese(file) {
   setOcrStatus('Подготавливаем распознавание…');
 
   try {
-    const ocr = await getPaddleChineseOcr();
+    let ocr;
+    let usedFallback = false;
+    try {
+      ocr = await getPaddleChineseOcr();
+    } catch (loadError) {
+      console.warn('PaddleOCR initialization failed; using Tesseract fallback:', loadError);
+      usedFallback = true;
+      setOcrStatus('PaddleOCR не загрузился. Временно используем резервное распознавание…');
+      const fallbackText = await recognizeChineseWithTesseract(file);
+      recognizedText.value = fallbackText;
+      ocrOutput.hidden = false;
+      setOcrStatus(fallbackText
+        ? 'Резервное распознавание завершено. Точность может быть ниже; проверь и поправь текст.'
+        : 'Оба способа не смогли распознать текст. Попробуй другое фото.');
+      return;
+    }
     setOcrStatus('PaddleOCR ищет текст на изображении и распознаёт иероглифы…');
     const results = await ocr.predict(file);
     const result = results && results[0];
