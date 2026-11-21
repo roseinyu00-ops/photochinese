@@ -1547,6 +1547,604 @@ body.dark-theme .analysis-result-summary .small {
   color: #e8c9d0 !important;
 }
 
+
+/* ===== ЗАКРЫТЫЙ ПРОФИЛЬ ДЛЯ ГОСТЕЙ ===== */
+#profile { position: relative; }
+#profile.profile-locked .profile-page {
+  filter: blur(5px);
+  opacity: .72;
+  pointer-events: none;
+  user-select: none;
+}
+.profile-lock-screen {
+  position: absolute;
+  inset: 0;
+  z-index: 20;
+  display: grid;
+  place-items: center;
+  padding: 24px;
+  border-radius: 24px;
+  background: rgba(255,250,248,.34);
+}
+.profile-lock-screen[hidden] { display: none; }
+.profile-lock-content {
+  width: min(100%, 390px);
+  padding: 30px 26px;
+  text-align: center;
+  border: 1px solid #f0dce2;
+  border-radius: 24px;
+  background: rgba(255,250,248,.96);
+  box-shadow: 0 18px 55px rgba(73,53,61,.13);
+  color: #60464d;
+}
+.profile-lock-icon {
+  width: 66px;
+  height: 66px;
+  margin: 0 auto 16px;
+  display: grid;
+  place-items: center;
+  border-radius: 22px;
+  background: #f7e8eb;
+}
+.profile-lock-icon svg {
+  width: 38px;
+  height: 38px;
+  stroke: #a66f7d;
+  stroke-width: 2;
+  stroke-linecap: round;
+  stroke-linejoin: round;
+}
+.profile-lock-content h2 { margin: 0 0 9px; font-size: 22px; }
+.profile-lock-content p { margin: 0 auto 21px; max-width: 300px; line-height: 1.55; color: #8a7078; }
+.profile-lock-button {
+  width: 100%;
+  border: 0;
+  border-radius: 14px;
+  padding: 14px 18px;
+  background: #a66f7d;
+  color: #fffaf8;
+  font: inherit;
+  font-weight: 700;
+  cursor: pointer;
+}
+.profile-lock-button:hover { background: #925d6b; }
+body.dark-theme .profile-lock-screen { background: rgba(35,26,31,.42); }
+body.dark-theme .profile-lock-content {
+  background: rgba(53,41,46,.97);
+  border-color: #59434b;
+  color: #f6e9eb;
+}
+body.dark-theme .profile-lock-icon { background: #59414a; }
+body.dark-theme .profile-lock-icon svg { stroke: #e6aeba; }
+body.dark-theme .profile-lock-content p { color: #d8bec5; }
+body.dark-theme .profile-lock-button { background: #c18494; color: #35292e; }
+@media (max-width: 480px) {
+  .profile-lock-content { padding: 25px 20px; }
+  .profile-lock-content h2 { font-size: 20px; }
+}
+
+/* ===== ОБНОВЛЁННЫЙ ПРОФИЛЬ PHOTOCHINESE ===== */
+.profile-page {
+  background: #fffaf8;
+  border: 1px solid #f0dce2;
+  border-radius: 24px;
+  overflow: hidden;
+  color: #60464d;
+}
+.profile-banner {
+  height: 170px;
+  background: linear-gradient(125deg,#f0c5ce 0%,#e8d4d8 52%,#d8c6c2 100%);
+  border-radius: 0;
+  overflow: visible;
+}
+#bannerPlaceholder {
+  font-size: clamp(22px,4vw,34px);
+  font-weight: 750;
+  letter-spacing: .02em;
+  text-shadow: 0 2px 14px #60464d20;
+}
+.profile-main { padding: 0 24px 28px; }
+.profile-top {
+  display: flex;
+  align-items: center;
+  justify-content: flex-start;
+  gap: 18px;
+  min-height: 116px;
+  margin-top: -56px;
+  position: relative;
+  z-index: 3;
+  flex-wrap: wrap;
+}
+.profile-avatar {
+  width: 116px;
+  height: 116px;
+  flex: 0 0 116px;
+  border-radius: 50%;
+  border: 5px solid #fffaf8;
+  background: #f4e8e8;
+  box-shadow: 0 5px 18px #60464d20;
+}
+.profile-identity {
+  min-width: 130px;
+  flex: 1 1 150px;
+  align-self: flex-end;
+  padding-bottom: 12px;
+}
+.profile-name-line { margin: 0; gap: 7px; }
+.profile-name-line h2 { color: #49353d; font-size: 27px; }
+.profile-subtitle { margin: 5px 0 0; color: #8b6872; font-size: 14px; }
+.profile-hsk-badge {
+  align-self: flex-end;
+  margin: 0 0 18px auto;
+  padding: 9px 15px;
+  border-radius: 999px;
+  background: #f1e3e5;
+  color: #76515c;
+  font-weight: 700;
+  white-space: nowrap;
+}
+#editProfileBtn {
+  position: absolute;
+  right: 0;
+  top: -108px;
+  margin: 0;
+  padding: 10px 16px;
+  border: 1px solid #e7cbd1;
+  border-radius: 999px;
+  background: #fff4f3;
+  color: #76515c;
+  font-weight: 700;
+}
+#editProfileBtn:hover { background: #f7e5e5; transform: translateY(-1px); }
+.profile-bio {
+  margin-top: 20px;
+  padding: 0;
+  background: transparent;
+  border-radius: 0;
+  color: #705962;
+  font-size: 16px;
+  line-height: 1.65;
+}
+.profile-bio p { margin: 0; color: inherit; }
+.profile-facts {
+  margin-top: 12px;
+  padding: 0;
+  background: transparent;
+  color: #8b6872;
+}
+.profile-divider { margin: 22px 0; background: #ead8dc; }
+.profile-section { margin-top: 24px; }
+.profile-section h2, .profile-hsk-progress h2 {
+  margin: 0 0 14px;
+  color: #49353d;
+  font-size: 21px;
+}
+.profile-stats { grid-template-columns: repeat(3,minmax(0,1fr)); gap: 12px; }
+.profile-stat {
+  min-width: 0;
+  min-height: 116px;
+  justify-content: space-between;
+  padding: 18px 10px;
+  border-radius: 20px;
+  background: #f7eff0;
+  color: #60464d;
+}
+.profile-stat strong { font-size: 29px; color: #76515c; }
+.profile-stat span { font-size: 13px; line-height: 1.35; color: #806a71; }
+.profile-hsk-progress {
+  margin-top: 18px;
+  padding: 20px;
+  border: 1px solid #f0e1e3;
+  border-radius: 20px;
+  background: #fff3f3;
+}
+.profile-hsk-progress-label {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  margin: 12px 0 10px;
+  color: #806a71;
+}
+.profile-hsk-progress-label strong { color: #76515c; }
+.profile-hsk-track {
+  height: 12px;
+  overflow: hidden;
+  border-radius: 999px;
+  background: #eadde1;
+}
+.profile-hsk-track span {
+  display: block;
+  width: 0;
+  height: 100%;
+  border-radius: inherit;
+  background: linear-gradient(90deg,#c88f9d,#9f6c7b);
+  transition: width .35s ease;
+}
+#profileHskHint { margin: 10px 0 0; color: #9a858b; font-size: 12px; }
+.profile-edit { background: #fff7f6; border-color: #eedde0; }
+.profile-edit input, .profile-edit textarea { box-sizing: border-box; }
+@media (max-width: 560px) {
+  .profile-main { padding-left: 15px; padding-right: 15px; }
+  .profile-banner { height: 145px; }
+  .profile-top { gap: 11px; margin-top: -48px; min-height: 104px; }
+  .profile-avatar { width: 96px; height: 96px; flex-basis: 96px; }
+  .profile-identity { flex-basis: calc(100% - 112px); padding-bottom: 8px; }
+  .profile-name-line h2 { font-size: 23px; }
+  .profile-hsk-badge { margin: 0 0 10px auto; padding: 7px 11px; }
+  #editProfileBtn { top: -92px; right: 0; padding: 8px 12px; font-size: 13px; }
+  .profile-stats { gap: 8px; }
+  .profile-stat { min-height: 100px; padding: 14px 6px; }
+  .profile-stat strong { font-size: 25px; }
+  .profile-stat span { font-size: 11px; }
+  .profile-hsk-progress { padding: 16px; }
+}
+body.dark-theme .profile-page {
+  background: #35292e;
+  border-color: #59434b;
+  color: #f6e9eb;
+}
+body.dark-theme .profile-banner {
+  background: linear-gradient(125deg,#674650 0%,#57434d 55%,#49414a 100%);
+}
+body.dark-theme .profile-avatar {
+  background: #57414a;
+  border-color: #35292e;
+}
+body.dark-theme .profile-name-line h2,
+body.dark-theme .profile-section h2,
+body.dark-theme .profile-hsk-progress h2 { color: #fff0f2; }
+body.dark-theme .profile-subtitle,
+body.dark-theme .profile-bio,
+body.dark-theme .profile-facts { color: #d8bec5; }
+body.dark-theme .profile-hsk-badge,
+body.dark-theme #editProfileBtn {
+  background: #59414a;
+  color: #ffe9ed;
+  border-color: #795965;
+}
+body.dark-theme .profile-stat {
+  background: #49363e;
+  color: #f7e9ec;
+}
+body.dark-theme .profile-stat strong { color: #f4cbd5; }
+body.dark-theme .profile-stat span,
+body.dark-theme #profileHskHint,
+body.dark-theme .profile-hsk-progress-label { color: #d2b9c0; }
+body.dark-theme .profile-hsk-progress {
+  background: #403039;
+  border-color: #604751;
+}
+body.dark-theme .profile-hsk-progress-label strong { color: #f4cbd5; }
+body.dark-theme .profile-hsk-track { background: #5b4650; }
+body.dark-theme .profile-hsk-track span { background: linear-gradient(90deg,#d49aa8,#a97585); }
+body.dark-theme .profile-divider { background: #604751; }
+body.dark-theme .profile-edit { background: #403039; border-color: #604751; }
+
+
+/* Тонкая настройка профиля: меньше визуального шума */
+#bannerPlaceholder {
+  font-size: clamp(22px, 3vw, 30px);
+  font-weight: 700;
+  letter-spacing: .015em;
+  text-transform: lowercase;
+  color: #fffaf8;
+  text-shadow: 0 2px 12px rgba(73,53,61,.16);
+  transition: opacity .18s ease;
+}
+.profile-top {
+  margin-top: -56px;
+  padding-top: 56px;
+  min-height: 116px;
+  align-items: end;
+  flex-wrap: nowrap;
+  gap: 14px;
+}
+.profile-avatar {
+  transform: translateY(-56px);
+  margin-bottom: -56px;
+}
+.profile-identity {
+  align-self: flex-end;
+  min-width: 0;
+  padding-bottom: 8px;
+}
+.profile-name-line h2 { font-size: 24px; line-height: 1.2; }
+.profile-subtitle { font-size: 13px; margin-top: 4px; }
+.profile-hsk-badge {
+  flex: 0 0 auto;
+  align-self: flex-end;
+  margin: 0 0 12px auto;
+  padding: 6px 10px;
+  font-size: 11px;
+  line-height: 1.2;
+  letter-spacing: .02em;
+}
+#editProfileBtn {
+  top: -108px;
+  right: 0;
+  padding: 8px 13px;
+  font-size: 13px;
+  line-height: 1.2;
+  z-index: 4;
+}
+#chooseBannerBtn {
+  left: 50%;
+  top: 50%;
+  right: auto;
+  bottom: auto;
+  transform: translate(-50%,-50%);
+  padding: 9px 15px;
+  border-radius: 999px;
+  font-size: 13px;
+  background: rgba(255,250,248,.88);
+  color: #76515c;
+  box-shadow: 0 3px 14px rgba(73,53,61,.12);
+  backdrop-filter: blur(8px);
+}
+#chooseBannerBtn:hover { transform: translate(-50%,-50%) scale(1.03); }
+body.profile-editing #bannerPlaceholder { opacity: 0; }
+#profileAvatar::after {
+  content: "изменить";
+  inset: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 0;
+  background: rgba(53,41,46,.16);
+  color: #fff;
+  font-size: 10px;
+  font-weight: 600;
+  letter-spacing: .03em;
+  backdrop-filter: blur(3px);
+  opacity: 0;
+}
+body.profile-editing #profileAvatar::after { opacity: 1; }
+body.profile-editing #profileAvatar {
+  outline: 2px solid #e5c5cd;
+  outline-offset: 2px;
+}
+.profile-collection .collection-item {
+  min-height: 76px;
+  padding: 10px 8px;
+  gap: 5px;
+  font-size: 16px;
+}
+.profile-collection .collection-item span:not(.achievement-mark) {
+  font-size: 12px;
+  line-height: 1.3;
+  font-weight: 600;
+}
+.profile-collection .collection-item small {
+  font-size: 10px;
+  line-height: 1.3;
+}
+.achievement-mark {
+  display: block;
+  color: #b47d8b;
+  font-size: 18px;
+  line-height: 1;
+  font-weight: 400;
+}
+.profile-section h2, .profile-hsk-progress h2 {
+  font-size: 18px;
+  margin-bottom: 12px;
+}
+.profile-section { margin-top: 21px; }
+.profile-stat { min-height: 104px; padding: 15px 8px; }
+.profile-stat strong { font-size: 26px; }
+.profile-stat span { font-size: 12px; }
+.profile-hsk-progress { padding: 17px; }
+.companion-card { padding: 14px; gap: 13px; }
+.companion-picture { width: 68px; height: 68px; font-size: 40px; }
+body.dark-theme #chooseBannerBtn {
+  background: rgba(61,48,52,.9);
+  color: #fff1ed;
+}
+body.dark-theme .achievement-mark { color: #d6a2af; }
+@media (max-width: 560px) {
+  .profile-top { gap: 9px; padding-top: 50px; margin-top: -50px; min-height: 104px; }
+  .profile-avatar { transform: translateY(-50px); margin-bottom: -50px; width: 96px; height: 96px; flex-basis: 96px; }
+  .profile-identity { flex: 1 1 90px; padding-bottom: 7px; }
+  .profile-name-line h2 { font-size: 21px; }
+  .profile-subtitle { font-size: 12px; }
+  .profile-hsk-badge { padding: 5px 8px; font-size: 10px; margin-bottom: 10px; }
+  #editProfileBtn { top: -92px; padding: 7px 10px; font-size: 11px; }
+  #chooseBannerBtn { font-size: 12px; padding: 8px 13px; }
+  .profile-collection .collection-item { min-height: 72px; padding: 8px 5px; }
+  .profile-collection .collection-item span:not(.achievement-mark) { font-size: 11px; }
+  .profile-collection .collection-item small { font-size: 9px; }
+}
+
+
+/* Последние штрихи: позиция имени, обрезка blur и тонкие иконки */
+.profile-identity {
+  transform: translateY(8px);
+}
+.profile-banner {
+  overflow: hidden !important;
+  clip-path: inset(0);
+  isolation: isolate;
+}
+#chooseBannerBtn {
+  overflow: hidden;
+  clip-path: inset(0 round 999px);
+  contain: paint;
+  backdrop-filter: blur(5px);
+  -webkit-backdrop-filter: blur(5px);
+  box-shadow: 0 2px 8px rgba(73,53,61,.10);
+}
+.achievement-mark {
+  width: 23px;
+  height: 23px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: #b77f8d;
+}
+.achievement-mark svg,
+.collection-icon svg,
+#equippedDecoration svg {
+  width: 100%;
+  height: 100%;
+  display: block;
+  fill: none;
+  stroke: currentColor;
+  stroke-width: 1.45;
+  stroke-linecap: round;
+  stroke-linejoin: round;
+}
+.profile-collection .collection-item .achievement-mark {
+  font-size: 0;
+}
+.collection-icon {
+  width: 26px;
+  height: 26px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  color: #b77f8d;
+}
+#equippedDecoration {
+  display: inline-flex;
+  width: 21px;
+  height: 21px;
+  color: #b77f8d;
+  vertical-align: middle;
+}
+body.dark-theme .achievement-mark,
+body.dark-theme .collection-icon,
+body.dark-theme #equippedDecoration {
+  color: #d6a2af;
+}
+@media (max-width: 560px) {
+  .profile-identity { transform: translateY(6px); }
+}
+
+
+.profile-collection-title {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+.collection-title-icon {
+  width: 22px;
+  height: 18px;
+  display: inline-flex;
+  color: #b77f8d;
+}
+.collection-title-icon svg {
+  width: 100%;
+  height: 100%;
+  fill: none;
+  stroke: currentColor;
+  stroke-width: 1.45;
+  stroke-linecap: round;
+  stroke-linejoin: round;
+}
+body.dark-theme .collection-title-icon { color: #d6a2af; }
+
+
+/* Финальная коррекция слоя редактирования аватарки */
+#profileAvatar {
+  position: relative !important;
+  overflow: hidden !important;
+  border-radius: 50% !important;
+  clip-path: circle(50% at 50% 50%);
+  isolation: isolate;
+  contain: paint;
+}
+#profileAvatar::after {
+  position: absolute !important;
+  inset: 0 !important;
+  width: 100% !important;
+  height: 100% !important;
+  box-sizing: border-box !important;
+  margin: 0 !important;
+  padding: 0 !important;
+  display: grid !important;
+  place-items: center !important;
+  text-align: center !important;
+  line-height: 1 !important;
+  border-radius: 50% !important;
+  clip-path: circle(50% at 50% 50%);
+  overflow: hidden !important;
+  transform: none !important;
+  pointer-events: none;
+  background: rgba(53,41,46,.32) !important;
+  -webkit-backdrop-filter: blur(2px);
+  backdrop-filter: blur(2px);
+}
+body.profile-editing #profileAvatar::after {
+  opacity: 1 !important;
+}
+#chooseBannerBtn {
+  -webkit-backdrop-filter: none !important;
+  backdrop-filter: none !important;
+  background: rgba(255,250,248,.94) !important;
+  box-shadow: 0 2px 8px rgba(73,53,61,.10);
+}
+body.dark-theme #chooseBannerBtn {
+  background: rgba(61,48,52,.96) !important;
+}
+
+
+/* Жёстко ограничиваем эффект редактирования кругом аватарки.
+   Размываем само изображение внутри контейнера, а не backdrop —
+   так blur не может рисоваться за пределами аватара. */
+#profileAvatar {
+  position: relative !important;
+  overflow: hidden !important;
+  border-radius: 50% !important;
+  clip-path: circle(50% at 50% 50%) !important;
+  -webkit-clip-path: circle(50% at 50% 50%) !important;
+  isolation: isolate !important;
+}
+#profileAvatarImage {
+  transition: filter .18s ease, transform .18s ease;
+}
+body.profile-editing #profileAvatarImage {
+  filter: blur(3px);
+  transform: scale(1.08);
+}
+#profileAvatar::after {
+  content: "изменить";
+  position: absolute !important;
+  inset: 0 !important;
+  display: flex !important;
+  align-items: center !important;
+  justify-content: center !important;
+  width: 100% !important;
+  height: 100% !important;
+  box-sizing: border-box !important;
+  margin: 0 !important;
+  padding: 0 !important;
+  border-radius: 50% !important;
+  clip-path: circle(50% at 50% 50%) !important;
+  -webkit-clip-path: circle(50% at 50% 50%) !important;
+  overflow: hidden !important;
+  transform: none !important;
+  background: rgba(53,41,46,.24) !important;
+  color: #fff !important;
+  font-size: 10px !important;
+  line-height: 1 !important;
+  text-align: center !important;
+  -webkit-backdrop-filter: none !important;
+  backdrop-filter: none !important;
+  pointer-events: none;
+  opacity: 0;
+}
+body.profile-editing #profileAvatar::after {
+  opacity: 1 !important;
+}
+/* На кнопке смены баннера вообще нет blur — только аккуратная плашка. */
+#chooseBannerBtn {
+  -webkit-backdrop-filter: none !important;
+  backdrop-filter: none !important;
+  filter: none !important;
+  box-shadow: 0 2px 8px rgba(73,53,61,.10) !important;
+}
+
 </style>
 </head>
 <body>
@@ -1567,16 +2165,6 @@ body.dark-theme .analysis-result-summary .small {
 
   <div class="header-actions">
   <button class="theme-toggle" id="themeToggle" type="button" aria-label="Сменить тему">🌙</button>
-
-  <button
-    class="account-button"
-    id="accountButton"
-    type="button"
-    aria-label="Аккаунт"
-    onclick="openAccountModal()"
-  >
-    ♙
-  </button>
 </div>
 </header>
   
@@ -1697,7 +2285,7 @@ body.dark-theme .analysis-result-summary .small {
     <!-- БАННЕР -->
     
 <div class="profile-banner" id="profileBanner">
-  <span id="bannerPlaceholder">Твой баннер</span>
+  <span id="bannerPlaceholder">your little world ✦</span>
   
  <button type="button" id="chooseBannerBtn" hidden>
   ✎ Изменить баннер
@@ -1716,59 +2304,52 @@ body.dark-theme .analysis-result-summary .small {
     <div class="profile-main">
 
       <div class="profile-top">
-       
-<div class="profile-editor" id="profileEditor" hidden>
-  <h3>✏️ Настройка профиля</h3>
-
-<input
-  type="file"
-  id="avatarUpload"
-  accept="image/*"
-  hidden
->
-
-</div>
+        <div class="profile-editor" id="profileEditor" hidden>
+          <input type="file" id="avatarUpload" accept="image/*" hidden>
+        </div>
 
         <div class="profile-avatar" id="profileAvatar">
-  <span id="profileAvatarPlaceholder">🦊</span>
-  <img id="profileAvatarImage" hidden>
+          <span id="profileAvatarPlaceholder">🦊</span>
+          <img id="profileAvatarImage" hidden>
         </div>
-        
+
+        <div class="profile-identity">
+          <div class="profile-name-line">
+            <h2 id="profileNickname">dollrot</h2>
+            <span class="profile-decoration" id="equippedDecoration"></span>
+          </div>
+          <p class="profile-subtitle" id="profileSubtitle">学习中文 ♡</p>
+        </div>
+
+        <span class="profile-hsk-badge" id="profileHskBadge">HSK 1</span>
+
         <button class="secondary" id="editProfileBtn" type="button">
-  ✎ Редактировать профиль
+          ✎ Редактировать
         </button>
-
-      </div>
-      
-        <div class="profile-name-line">
-  <h2 id="profileNickname">dollrot</h2>
-  <span class="profile-decoration" id="equippedDecoration"></span>
       </div>
 
-      <p class="profile-subtitle">Начинающий исследователь китайского языка</p>
+      <div class="profile-bio">
+        <p id="profileBioText">Изучаю китайский, собираю иероглифы и создаю свой маленький мир.</p>
+      </div>
 
-      
-<div class="profile-bio">
-  <h3>Обо мне</h3>
-  <p id="profileBioText">Расскажи немного о себе ♡</p>
-</div>
+      <div class="profile-facts">
+        <span>Любимый иероглиф: <strong id="favoriteCharacter">愛</strong></span>
+      </div>
 
-<div class="profile-facts">
-  <span>♡ Любимый иероглиф: <strong id="favoriteCharacter">愛</strong></span>
-  <span>📚 Изучаю китайский</span>
-</div>
+      <div class="profile-edit" id="profileEditPanel" hidden>
+        <label for="subtitleInput">Подпись под ником</label>
+        <input id="subtitleInput" type="text" maxlength="60" placeholder="Например: 学习中文 ♡">
 
-<div class="profile-edit" id="profileEditPanel" hidden>
-  <label for="bioInput">Обо мне</label>
-  <textarea id="bioInput" maxlength="300" placeholder="Расскажи о себе..."></textarea>
+        <label for="bioInput">Обо мне</label>
+        <textarea id="bioInput" maxlength="300" placeholder="Расскажи о себе..."></textarea>
 
-  <label for="favoriteCharacterInput">Любимый иероглиф</label>
-  <input id="favoriteCharacterInput" type="text" maxlength="5" placeholder="Например, 愛">
+        <label for="favoriteCharacterInput">Любимый иероглиф</label>
+        <input id="favoriteCharacterInput" type="text" maxlength="5" placeholder="Например, 愛">
 
-  <button class="primary" id="saveProfileInfo" type="button">
-    Сохранить информацию
-  </button>
-</div>
+        <button class="primary" id="saveProfileInfo" type="button">
+          Сохранить информацию
+        </button>
+      </div>
 
 
       <!-- РЕДАКТИРОВАНИЕ НИКНЕЙМА -->
@@ -1789,7 +2370,7 @@ body.dark-theme .analysis-result-summary .small {
 
       <!-- КОМПАНЬОН -->
       <section class="profile-section">
-        <h2>🦊 Мой компаньон</h2>
+        <h2>Мой компаньон</h2>
         <div class="companion-card">
           <div class="companion-picture">🦊</div>
           <div>
@@ -1803,24 +2384,24 @@ body.dark-theme .analysis-result-summary .small {
       
 <!-- ДОСТИЖЕНИЯ -->
 <section class="profile-section">
-  <h2>🏆 Достижения</h2>
+  <h2>Достижения</h2>
 
   <div class="profile-collection" id="achievementsList">
 
     <div class="collection-item" data-achievement="first_steps">
-      🌱
+      <span class="achievement-mark" aria-hidden="true"><svg viewBox="0 0 24 24"><path d="M12 20C8 16 4 12 7 7c2-3 4-3 5-1 1-2 3-2 5 1 3 5-1 9-5 13Z"/><path d="M12 7c-1 4-1 8 0 13"/></svg></span>
       <span>Первые шаги</span>
       <small>Изучи первый иероглиф</small>
     </div>
 
     <div class="collection-item" data-achievement="curious">
-      📖
+      <span class="achievement-mark" aria-hidden="true"><svg viewBox="0 0 24 24"><path d="M4 5.5c3-1.5 6-1 8 1v13c-2-2-5-2.5-8-1z"/><path d="M20 5.5c-3-1.5-6-1-8 1v13c2-2 5-2.5 8-1z"/></svg></span>
       <span>Любознательный</span>
       <small>Изучи 10 иероглифов</small>
     </div>
 
     <div class="collection-item" data-achievement="beginner">
-      ⭐
+      <span class="achievement-mark" aria-hidden="true"><svg viewBox="0 0 24 24"><path d="m12 3 2.6 5.7 6.2.7-4.6 4.2 1.2 6.1-5.4-3.1-5.4 3.1 1.2-6.1-4.6-4.2 6.2-.7z"/></svg></span>
       <span>Новичок</span>
       <small>Заверши первый урок</small>
     </div>
@@ -1832,7 +2413,7 @@ body.dark-theme .analysis-result-summary .small {
       
 <!-- КОЛЛЕКЦИЯ -->
 <section class="profile-section">
-  <h2>🎀 Моя коллекция</h2>
+  <h2 class="profile-collection-title"><span class="collection-title-icon" aria-hidden="true"><svg viewBox="0 0 32 24"><path d="M15 11C10 4 4 3 3 6c-1 4 3 9 11 7l2-2-2-2Zm2 0c5-7 11-8 12-5 1 4-3 9-11 7l-2-2 2-2Z"/><path d="m14 12-3 10 5-5 5 5-3-10"/></svg></span>Моя коллекция</h2>
 
   <div class="profile-collection" id="collectionList">
     <p>Пока коллекция пуста...</p>
@@ -1845,23 +2426,39 @@ body.dark-theme .analysis-result-summary .small {
   Снять украшение
         </button>
 
-      <!-- ПРОГРЕСС -->
-      <section class="profile-section">
-        <h2>📊 Твой прогресс</h2>
+      <!-- СТАТИСТИКА И HSK -->
+      <section class="profile-section profile-overview">
+        <h2>Мои достижения</h2>
         <div class="profile-stats">
           <div class="profile-stat">
-            <strong>0</strong>
-            <span>Иероглифов</span>
+            <strong id="profileLearnedCount">0</strong>
+            <span>иероглифов изучено</span>
           </div>
           <div class="profile-stat">
-            <strong>0</strong>
-            <span>Дней подряд</span>
+            <strong id="profileLessonsCount">0</strong>
+            <span>уроков завершено</span>
           </div>
           <div class="profile-stat">
-            <strong>1</strong>
-            <span>Уровень HSK</span>
+            <strong id="profileAchievementsCount">0</strong>
+            <span>достижений</span>
           </div>
         </div>
+      </section>
+
+      <section class="profile-hsk-progress" aria-labelledby="profileHskTitle">
+        <h2 id="profileHskTitle">Мой прогресс HSK</h2>
+        <div class="profile-hsk-progress-label">
+          <span id="profileHskNextLabel">Подготовка к HSK 2</span>
+          <strong id="profileHskPercent">—</strong>
+        </div>
+        <div class="profile-hsk-track" role="progressbar" aria-label="Прогресс подготовки к следующему уровню HSK" aria-valuemin="0" aria-valuemax="100" aria-valuenow="0">
+          <span id="profileHskFill"></span>
+        </div>
+        <p id="profileHskHint">Прогресс будет рассчитываться по изученным словам выбранного уровня.</p>
+      </section>
+
+      <section class="profile-section profile-account-actions" id="profileAccountActions" hidden>
+        <button class="secondary" type="button" id="signOutButton">Выйти из аккаунта</button>
       </section>
 
       <!-- СЛОВО ДНЯ -->
@@ -1871,6 +2468,21 @@ body.dark-theme .analysis-result-summary .small {
         <div class="pinyin">xué</div>
         <p>учиться; изучать</p>
       </section>
+    </div>
+  </div>
+  <div class="profile-lock-screen" id="profileLockScreen" hidden>
+    <div class="profile-lock-content">
+      <div class="profile-lock-icon" aria-hidden="true">
+        <svg viewBox="0 0 48 48" fill="none">
+          <rect x="9" y="21" width="30" height="22" rx="6"/>
+          <path d="M16 21v-7a8 8 0 0 1 16 0v7"/>
+          <circle cx="24" cy="31" r="2.5"/>
+          <path d="M24 34v3"/>
+        </svg>
+      </div>
+      <h2>Твой профиль ждёт тебя</h2>
+      <p>Войди или создай аккаунт, чтобы открыть свой личный мир PhotoChinese.</p>
+      <button class="profile-lock-button" type="button" onclick="openAccountModal()">Зарегистрироваться / войти</button>
     </div>
   </div>
 </section>
@@ -1899,15 +2511,25 @@ body.dark-theme .analysis-result-summary .small {
   console.log("PhotoChinese: Supabase подключён");
 </script>
 <script>
+let photoChineseUser = null;
+
+function updateProfileAccess() {
+  const profileTab = document.getElementById("profile");
+  const lockScreen = document.getElementById("profileLockScreen");
+  const locked = !photoChineseUser;
+  profileTab.classList.toggle("profile-locked", locked);
+  lockScreen.hidden = !locked;
+  const accountActions = document.getElementById("profileAccountActions");
+  if (accountActions) accountActions.hidden = locked;
+}
+
 const tabs = document.querySelectorAll('nav button');
 tabs.forEach(btn => btn.addEventListener('click', () => {
   tabs.forEach(b => b.classList.toggle('active', b === btn));
   document.querySelectorAll('.tab').forEach(s => s.hidden = s.id !== btn.dataset.tab);
 
-document.body.classList.toggle(
-  "profile-open",
-  btn.dataset.tab === "profile"
-);
+  document.body.classList.toggle("profile-open", btn.dataset.tab === "profile");
+  if (btn.dataset.tab === "profile") updateProfileAccess();
 }));
 const photo = document.getElementById('photo');
 const cameraPhoto = document.getElementById('cameraPhoto');
@@ -2824,6 +3446,8 @@ bannerUpload.addEventListener("change", async () => {
   try {
     await saveBannerFile(file);
     showBanner(file);
+    window.photoChineseBannerDirty = true;
+    window.photoChineseSync?.();
   } catch (error) {
     console.error(error);
     alert("Не удалось сохранить баннер. Попробуй файл поменьше.");
@@ -2869,6 +3493,7 @@ saveNickname.addEventListener("click", () => {
   }
 
   localStorage.setItem("profileNickname", newNickname);
+  window.photoChineseSync?.();
   profileNickname.textContent = newNickname;
 
   alert("Никнейм успешно сохранён! ♡");
@@ -2915,6 +3540,7 @@ avatarUpload.addEventListener("change", () => {
   reader.onload = () => {
     try {
       localStorage.setItem("profileAvatar", reader.result);
+      window.photoChineseSync?.();
 
       profileAvatarImage.src = reader.result;
       profileAvatarImage.hidden = false;
@@ -2932,38 +3558,46 @@ avatarUpload.addEventListener("change", () => {
 // ===== ПРОФИЛЬ: ИНФОРМАЦИЯ =====
 
 const bioInput = document.getElementById("bioInput");
+const subtitleInput = document.getElementById("subtitleInput");
 const favoriteCharacterInput = document.getElementById("favoriteCharacterInput");
 
 const profileBioText = document.getElementById("profileBioText");
+const profileSubtitle = document.getElementById("profileSubtitle");
 const favoriteCharacter = document.getElementById("favoriteCharacter");
 const saveProfileInfo = document.getElementById("saveProfileInfo");
 
-// Загружаем сохранённую информацию
 const savedBio = localStorage.getItem("profileBio");
+const savedSubtitle = localStorage.getItem("profileSubtitle");
 const savedCharacter = localStorage.getItem("favoriteCharacter");
 
 if (savedBio !== null) {
-  profileBioText.textContent = savedBio;
+  profileBioText.textContent = savedBio || "Расскажи немного о себе ♡";
   bioInput.value = savedBio;
 }
-
+if (savedSubtitle !== null) {
+  profileSubtitle.textContent = savedSubtitle || "学习中文 ♡";
+  subtitleInput.value = savedSubtitle;
+} else {
+  subtitleInput.value = profileSubtitle.textContent;
+}
 if (savedCharacter !== null) {
   favoriteCharacter.textContent = savedCharacter;
   favoriteCharacterInput.value = savedCharacter;
 }
 
-// Сохраняем изменения
 saveProfileInfo.addEventListener("click", () => {
   const bio = bioInput.value.trim();
+  const subtitle = subtitleInput.value.trim();
   const character = favoriteCharacterInput.value.trim();
 
   localStorage.setItem("profileBio", bio);
+  localStorage.setItem("profileSubtitle", subtitle);
   localStorage.setItem("favoriteCharacter", character || "—");
+  window.photoChineseSync?.();
 
   profileBioText.textContent = bio || "Расскажи немного о себе ♡";
+  profileSubtitle.textContent = subtitle || "学习中文 ♡";
   favoriteCharacter.textContent = character || "—";
-
-  alert("Информация профиля сохранена! ♡");
 });
 </script>
 
@@ -3018,110 +3652,12 @@ const progress = {
   )
 };
 
-let cloudProgressReady = false;
-let activeProgressUserId = null;
-let cloudProgressSaveQueue = Promise.resolve();
-
-// Сохраняем локальную копию и, если аккаунт уже загружен, отправляем данные в облако.
+// Сохранение прогресса
 function saveProgress() {
-  localStorage.setItem(
-    "learnedCharacters",
-    JSON.stringify(progress.learnedCharacters)
-  );
-
-  localStorage.setItem(
-    "completedLessons",
-    JSON.stringify(progress.completedLessons)
-  );
-
-  localStorage.setItem(
-    "achievements",
-    JSON.stringify(progress.achievements)
-  );
-
-  if (cloudProgressReady && activeProgressUserId) {
-    cloudProgressSaveQueue = cloudProgressSaveQueue
-      .then(() => saveCloudProgress())
-      .catch(error => {
-        console.error("Не удалось сохранить прогресс в облако:", error);
-      });
-  }
-}
-
-// Отправка текущего прогресса в Supabase
-async function saveCloudProgress() {
-  const client = window.photoChineseSupabase;
-  if (!client || !activeProgressUserId || !cloudProgressReady) return;
-
-  const { data: sessionData, error: sessionError } =
-    await client.auth.getSession();
-
-  if (sessionError) throw sessionError;
-
-  // Не позволяем отправить данные предыдущего аккаунта в новый аккаунт.
-  if (!sessionData.session ||
-      sessionData.session.user.id !== activeProgressUserId) {
-    return;
-  }
-
-  const { error } = await client
-    .from("learning_progress")
-    .upsert({
-      user_id: activeProgressUserId,
-      learned_characters: progress.learnedCharacters,
-      completed_lessons: progress.completedLessons,
-      achievements: progress.achievements,
-      updated_at: new Date().toISOString()
-    }, { onConflict: "user_id" });
-
-  if (error) throw error;
-}
-
-// Загружаем облачный прогресс и объединяем его с прежними локальными данными.
-async function loadCloudProgress(user) {
-  const client = window.photoChineseSupabase;
-  if (!client || !user) return;
-
-  cloudProgressReady = false;
-  activeProgressUserId = user.id;
-
-  const { data, error } = await client
-    .from("learning_progress")
-    .select("*")
-    .eq("user_id", user.id)
-    .maybeSingle();
-
-  if (error) throw error;
-
-  const mergeUnique = (localItems, cloudItems) => [
-    ...new Set([
-      ...(Array.isArray(localItems) ? localItems : []),
-      ...(Array.isArray(cloudItems) ? cloudItems : [])
-    ])
-  ];
-
-  progress.learnedCharacters = mergeUnique(
-    progress.learnedCharacters,
-    data?.learned_characters
-  );
-
-  progress.completedLessons = mergeUnique(
-    progress.completedLessons,
-    data?.completed_lessons
-  );
-
-  progress.achievements = mergeUnique(
-    progress.achievements,
-    data?.achievements
-  );
-
-  // Сначала включаем облачную синхронизацию, затем сохраняем объединённые данные.
-  cloudProgressReady = true;
-  saveProgress();
-  updateAchievements();
-  updateProfileProgress();
-
-  await cloudProgressSaveQueue;
+  localStorage.setItem("learnedCharacters", JSON.stringify(progress.learnedCharacters));
+  localStorage.setItem("completedLessons", JSON.stringify(progress.completedLessons));
+  localStorage.setItem("achievements", JSON.stringify(progress.achievements));
+  window.photoChineseSync?.();
 }
 
 // Добавление изученного иероглифа
@@ -3147,6 +3683,7 @@ function completeLesson(lessonId) {
 
   saveProgress();
   updateAchievements();
+  updateProfileProgress();
 }
 
 // Проверка достижений
@@ -3177,15 +3714,19 @@ function updateAchievements() {
       console.log("Получено достижение:", rule.id);
     }
   });
+
+  updateProfileProgress();
 }
 
 // Обновление цифр в профиле
 function updateProfileProgress() {
-  const stats = document.querySelectorAll(".profile-stat strong");
+  const learned = document.getElementById("profileLearnedCount");
+  const lessons = document.getElementById("profileLessonsCount");
+  const achievements = document.getElementById("profileAchievementsCount");
 
-  if (stats.length >= 1) {
-    stats[0].textContent = progress.learnedCharacters.length;
-  }
+  if (learned) learned.textContent = progress.learnedCharacters.length;
+  if (lessons) lessons.textContent = progress.completedLessons.length;
+  if (achievements) achievements.textContent = progress.achievements.length;
 }
 
 // Загружаем данные при открытии сайта
@@ -3217,7 +3758,8 @@ function renderCollection() {
     card.className = "collection-item";
 
     const emoji = document.createElement("span");
-    emoji.textContent = item;
+    emoji.className = "collection-icon";
+    emoji.innerHTML = profileIconMarkup(item);
 
     const name = document.createElement("span");
     name.textContent = "Награда " + (index + 1);
@@ -3238,10 +3780,22 @@ renderCollection();
 // ===== PHOTOCHINESE: ДОСТИЖЕНИЯ И КОЛЛЕКЦИЯ =====
 
 const achievementRewards = {
-  first_steps: "🌱",
-  curious: "📖",
-  beginner: "⭐"
+  first_steps: "petal",
+  curious: "book",
+  beginner: "star"
 };
+
+const profileIconSvgs = {
+  petal: '<svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 20C8 16 4 12 7 7c2-3 4-3 5-1 1-2 3-2 5 1 3 5-1 9-5 13Z"/><path d="M12 7c-1 4-1 8 0 13"/></svg>',
+  book: '<svg viewBox="0 0 24 24" aria-hidden="true"><path d="M4 5.5c3-1.5 6-1 8 1v13c-2-2-5-2.5-8-1z"/><path d="M20 5.5c-3-1.5-6-1-8 1v13c2-2 5-2.5 8-1z"/></svg>',
+  star: '<svg viewBox="0 0 24 24" aria-hidden="true"><path d="m12 3 2.6 5.7 6.2.7-4.6 4.2 1.2 6.1-5.4-3.1-5.4 3.1 1.2-6.1-4.6-4.2 6.2-.7z"/></svg>',
+  bow: '<svg viewBox="0 0 32 24" aria-hidden="true"><path d="M15 11C10 4 4 3 3 6c-1 4 3 9 11 7l2-2-2-2Zm2 0c5-7 11-8 12-5 1 4-3 9-11 7l-2-2 2-2Z"/><path d="m14 12-3 10 5-5 5 5-3-10"/></svg>'
+};
+
+function profileIconMarkup(key) {
+  const legacy = {"🌱":"petal","📖":"book","⭐":"star"};
+  return profileIconSvgs[legacy[key] || key] || profileIconSvgs.star;
+}
 
 // Обновление сохранённых наград
 function updateCollection() {
@@ -3249,10 +3803,8 @@ function updateCollection() {
     .filter(id => progress.achievements.includes(id))
     .map(id => achievementRewards[id]);
 
-  localStorage.setItem(
-    "profileCollection",
-    JSON.stringify(unlockedItems)
-  );
+  localStorage.setItem("profileCollection", JSON.stringify(unlockedItems));
+  window.photoChineseSync?.();
 }
 
 // Отображение достижений
@@ -3304,7 +3856,8 @@ function renderCollection() {
     card.className = "collection-item";
 
     const emoji = document.createElement("span");
-    emoji.textContent = item;
+    emoji.className = "collection-icon";
+    emoji.innerHTML = profileIconMarkup(item);
 
     const name = document.createElement("span");
 
@@ -3336,17 +3889,19 @@ function renderEquippedDecoration() {
   if (!equippedDecoration) return;
 
   const saved = localStorage.getItem("equippedDecoration");
-  equippedDecoration.textContent = saved || "";
+  equippedDecoration.innerHTML = saved ? profileIconMarkup(saved) : "";
 }
 
 function equipDecoration(emoji) {
   localStorage.setItem("equippedDecoration", emoji);
+  window.photoChineseSync?.();
   renderEquippedDecoration();
   renderCollection();
 }
 
 function removeDecoration() {
   localStorage.removeItem("equippedDecoration");
+  window.photoChineseSync?.();
   renderEquippedDecoration();
   renderCollection();
 }
@@ -3433,7 +3988,113 @@ function switchAccountMode(mode) {
 }
 
 // Загрузка профиля из облака
+const PHOTOCHINESE_SYNC_KEYS = [
+  "profileNickname", "photoChineseNickname", "profileBio",
+  "profileSubtitle", "favoriteCharacter", "learnedCharacters",
+  "completedLessons", "achievements", "profileCollection",
+  "equippedDecoration", "profileAvatar"
+];
+
+let photoChineseSyncTimer = null;
+let photoChineseSyncQueue = Promise.resolve();
+
+function collectPhotoChineseData() {
+  const storage = {};
+  PHOTOCHINESE_SYNC_KEYS.forEach(key => {
+    const value = localStorage.getItem(key);
+    if (value !== null) storage[key] = value;
+  });
+  return { storage, updatedAt: new Date().toISOString() };
+}
+
+function applyPhotoChineseData(appData) {
+  if (!appData || !appData.storage) return;
+  PHOTOCHINESE_SYNC_KEYS.forEach(key => {
+    if (Object.prototype.hasOwnProperty.call(appData.storage, key)) {
+      localStorage.setItem(key, appData.storage[key]);
+    }
+  });
+
+  progress.learnedCharacters = JSON.parse(localStorage.getItem("learnedCharacters") || "[]");
+  progress.completedLessons = JSON.parse(localStorage.getItem("completedLessons") || "[]");
+  progress.achievements = JSON.parse(localStorage.getItem("achievements") || "[]");
+
+  const nickname = localStorage.getItem("profileNickname") || localStorage.getItem("photoChineseNickname");
+  if (nickname) {
+    document.getElementById("profileNickname").textContent = nickname;
+    document.getElementById("nicknameInput").value = nickname;
+  }
+
+  const bio = localStorage.getItem("profileBio") || "";
+  document.getElementById("profileBioText").textContent = bio || "Расскажи немного о себе ♡";
+  document.getElementById("bioInput").value = bio;
+
+  const subtitle = localStorage.getItem("profileSubtitle") || "学习中文 ♡";
+  document.getElementById("profileSubtitle").textContent = subtitle;
+  document.getElementById("subtitleInput").value = subtitle;
+
+  const favorite = localStorage.getItem("favoriteCharacter") || "愛";
+  document.getElementById("favoriteCharacter").textContent = favorite;
+  document.getElementById("favoriteCharacterInput").value = favorite;
+
+  const avatar = localStorage.getItem("profileAvatar");
+  if (avatar) {
+    profileAvatarImage.src = avatar;
+    profileAvatarImage.hidden = false;
+    profileAvatarPlaceholder.hidden = true;
+  }
+
+  updateAchievements();
+  updateProfileProgress();
+  updateCollection();
+  renderAchievements();
+  renderCollection();
+  renderEquippedDecoration();
+}
+
+function savePhotoChineseDataNow() {
+  if (!photoChineseUser || !window.photoChineseSupabase) return Promise.resolve();
+  const userId = photoChineseUser.id;
+  const payload = collectPhotoChineseData();
+  photoChineseSyncQueue = photoChineseSyncQueue.catch(() => {}).then(async () => {
+    if (window.photoChineseBannerDirty) {
+      const bannerFile = await getSavedBanner();
+      if (bannerFile) {
+        const extension = (bannerFile.name || "").split(".").pop().toLowerCase();
+        const safeExtension = /^[a-z0-9]{2,5}$/.test(extension) ? extension : (bannerFile.type === "video/webm" ? "webm" : bannerFile.type === "video/mp4" ? "mp4" : "jpg");
+        const path = userId + "/banner." + safeExtension;
+        const { error: uploadError } = await window.photoChineseSupabase.storage
+          .from("profile-media")
+          .upload(path, bannerFile, { upsert: true, contentType: bannerFile.type || "application/octet-stream" });
+        if (uploadError) throw uploadError;
+        payload.bannerPath = path;
+        window.photoChineseBannerDirty = false;
+      }
+    }
+
+    const { error } = await window.photoChineseSupabase
+      .from("profiles")
+      .update({ app_data: payload })
+      .eq("id", userId);
+    if (error) {
+      console.error("Не удалось сохранить данные PhotoChinese в облако:", error);
+      throw error;
+    }
+  });
+  return photoChineseSyncQueue;
+}
+
+window.photoChineseSync = function() {
+  if (!photoChineseUser) return;
+  clearTimeout(photoChineseSyncTimer);
+  photoChineseSyncTimer = setTimeout(() => {
+    savePhotoChineseDataNow().catch(() => {});
+  }, 500);
+};
+
 async function loadCloudProfile(user) {
+  photoChineseUser = user;
+  updateProfileAccess();
   const client = window.photoChineseSupabase;
 
   const { data, error } = await client
@@ -3445,59 +4106,69 @@ async function loadCloudProfile(user) {
   if (error) throw error;
 
   let profile = data;
-
-  // Если профиля ещё нет — создаём его
   if (!profile) {
-    const username =
-      localStorage.getItem("profileNickname") ||
-      localStorage.getItem("photoChineseNickname") ||
-      null;
-
+    const username = localStorage.getItem("profileNickname") || localStorage.getItem("photoChineseNickname") || null;
     const bio = localStorage.getItem("profileBio") || "";
-
-    let result = await client
-      .from("profiles")
-      .insert({
-        id: user.id,
-        username: username,
-        bio: bio
-      })
-      .select()
-      .single();
-
-    // Если ник занят другим пользователем
-    if (result.error && result.error.code === "23505") {
-      result = await client
-        .from("profiles")
-        .insert({
-          id: user.id,
-          bio: bio
-        })
-        .select()
-        .single();
-    }
-
+    const result = await client.from("profiles")
+      .insert({ id: user.id, username, bio, app_data: collectPhotoChineseData() })
+      .select().single();
     if (result.error) throw result.error;
-
     profile = result.data;
   }
 
-  // Отображаем никнейм
-  if (profile.username) {
-    document.getElementById("profileNickname").textContent =
-      profile.username;
-
-    document.getElementById("nicknameInput").value =
-      profile.username;
+  if (profile.app_data && profile.app_data.storage && Object.keys(profile.app_data.storage).length) {
+    applyPhotoChineseData(profile.app_data);
+    if (profile.app_data.bannerPath) {
+      const { data: mediaUrl } = client.storage.from("profile-media").getPublicUrl(profile.app_data.bannerPath);
+      if (mediaUrl && mediaUrl.publicUrl) {
+        try {
+          const mediaResponse = await fetch(mediaUrl.publicUrl);
+          if (mediaResponse.ok) {
+            const mediaBlob = await mediaResponse.blob();
+            await saveBannerFile(mediaBlob);
+            showBanner(mediaBlob);
+          }
+        } catch (mediaError) {
+          console.warn("Не удалось загрузить баннер из облака:", mediaError);
+        }
+      }
+    }
+  } else {
+    // Первый вход: переносим локальные данные в новый аккаунт.
+    if (profile.username) localStorage.setItem("profileNickname", profile.username);
+    if (profile.bio) localStorage.setItem("profileBio", profile.bio);
+    await savePhotoChineseDataNow();
   }
 
-  // Отображаем описание
-  document.getElementById("profileBioText").textContent =
-    profile.bio || "Расскажи немного о себе ♡";
-
-  document.getElementById("bioInput").value =
-    profile.bio || "";
+  const finalNickname = localStorage.getItem("profileNickname") || profile.username;
+  if (finalNickname) {
+    document.getElementById("profileNickname").textContent = finalNickname;
+    document.getElementById("nicknameInput").value = finalNickname;
+  }
+  const finalBio = localStorage.getItem("profileBio") ?? profile.bio ?? "";
+  document.getElementById("profileBioText").textContent = finalBio || "Расскажи немного о себе ♡";
+  document.getElementById("bioInput").value = finalBio;
 }
+
+// Выход из аккаунта
+const signOutButton = document.getElementById("signOutButton");
+const profileAccountActions = document.getElementById("profileAccountActions");
+
+signOutButton.addEventListener("click", async () => {
+  const client = window.photoChineseSupabase;
+  if (!client) return;
+  signOutButton.disabled = true;
+  const { error } = await client.auth.signOut();
+  signOutButton.disabled = false;
+  if (error) {
+    console.error("Не удалось выйти из аккаунта:", error);
+    return;
+  }
+  photoChineseUser = null;
+  updateProfileAccess();
+  openAccountModal();
+  switchAccountMode("login");
+});
 
 // Вход и регистрация
 document.getElementById("accountForm").addEventListener("submit", async function(event) {
@@ -3531,7 +4202,6 @@ document.getElementById("accountForm").addEventListener("submit", async function
 
       if (!result.error && result.data.session) {
         await loadCloudProfile(result.data.user);
-        await loadCloudProgress(result.data.user);
         message.textContent = "Аккаунт создан! Профиль готов ❤️";
       } else if (!result.error) {
         message.textContent = "Аккаунт создан! Проверь почту и подтверди регистрацию.";
@@ -3545,12 +4215,10 @@ document.getElementById("accountForm").addEventListener("submit", async function
 
       if (!result.error) {
         await loadCloudProfile(result.data.user);
-        await loadCloudProgress(result.data.user);
 
-        message.textContent = "Успешный вход! Профиль и прогресс загружены ❤️";
+        message.textContent = "Успешный вход! Профиль загружен ❤️";
 
-        document.getElementById("accountButton").title =
-          "Ты вошла в аккаунт";
+        updateProfileAccess();
 
         setTimeout(closeAccountModal, 1200);
       }
@@ -3584,15 +4252,20 @@ document.getElementById("accountForm").addEventListener("submit", async function
   if (data.session) {
     try {
       await loadCloudProfile(data.session.user);
-      await loadCloudProgress(data.session.user);
-
-      document.getElementById("accountButton").title =
-        "Ты вошла в аккаунт";
-
     } catch (error) {
+      photoChineseUser = null;
+      updateProfileAccess();
       console.error("Не удалось восстановить профиль:", error);
     }
+  } else {
+    photoChineseUser = null;
+    updateProfileAccess();
   }
+
+  client.auth.onAuthStateChange((_event, session) => {
+    photoChineseUser = session ? session.user : null;
+    updateProfileAccess();
+  });
 })();
 
 window.addEventListener("keydown", function(event) {
