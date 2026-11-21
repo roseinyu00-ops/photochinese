@@ -79,29 +79,33 @@
   }
 
   let activeAudio = null;
-  function speakWithBrowser(text, statusElement) {
+  let speechRequestId = 0;
+  function speakWithBrowser(text, statusElement, requestId) {
     const synth = window.speechSynthesis;
     if (!synth || typeof window.SpeechSynthesisUtterance !== "function") {
-      if (statusElement) statusElement.textContent = "Браузерная озвучка недоступна. Не удалось загрузить аудио.";
+      if (statusElement && requestId === speechRequestId) statusElement.textContent = "Системная озвучка недоступна в этом браузере.";
       return;
     }
     try {
       refreshChineseVoices();
-      synth.cancel();
       const utterance = new SpeechSynthesisUtterance(text);
       utterance.lang = "zh-CN";
       utterance.rate = 0.82;
       const voice = chineseVoices.find(v => /^zh[-_]?(cn|hans)/i.test(v.lang))
-        || chineseVoices.find(v => /^zh/i.test(v.lang)) || chineseVoices[0];
+        || chineseVoices.find(v => /^zh/i.test(v.lang));
       if (voice) utterance.voice = voice;
-      utterance.onstart = () => { if (statusElement) statusElement.textContent = "▶ Воспроизводится системная китайская озвучка."; };
-      utterance.onend = () => { if (statusElement) statusElement.textContent = "Воспроизведение завершено."; };
-      utterance.onerror = event => { if (statusElement) statusElement.textContent = "Системная озвучка не сработала (" + (event.error || "ошибка") + "). Проверь звук и TTS на устройстве."; };
+      utterance.onstart = () => { if (statusElement && requestId === speechRequestId) statusElement.textContent = "▶ Воспроизводится системная китайская озвучка."; };
+      utterance.onend = () => { if (statusElement && requestId === speechRequestId) statusElement.textContent = "Воспроизведение завершено."; };
+      utterance.onerror = event => {
+        if (!statusElement || requestId !== speechRequestId) return;
+        if (event.error === "interrupted" || event.error === "canceled") return;
+        statusElement.textContent = "Системная озвучка не сработала (" + (event.error || "ошибка") + ").";
+      };
       synth.resume();
       synth.speak(utterance);
-      if (statusElement) statusElement.textContent = "Пробую системную китайскую озвучку…";
+      if (statusElement && requestId === speechRequestId) statusElement.textContent = "Запускаю системную китайскую озвучку…";
     } catch (_) {
-      if (statusElement) statusElement.textContent = "Не удалось запустить системную озвучку.";
+      if (statusElement && requestId === speechRequestId) statusElement.textContent = "Не удалось запустить системную озвучку.";
     }
   }
 
@@ -111,39 +115,17 @@
       if (statusElement) statusElement.textContent = "Нет текста для озвучивания.";
       return;
     }
-
-    // Сначала используем аудиофайл с китайской речью: это не зависит
-    // от наличия установленного китайского голоса в Android/Yandex Browser.
+    const requestId = ++speechRequestId;
     if (activeAudio) {
       try { activeAudio.pause(); activeAudio.currentTime = 0; } catch (_) {}
       activeAudio = null;
     }
-    if (window.speechSynthesis) window.speechSynthesis.cancel();
-    const url = "https://translate.google.com/translate_tts?ie=UTF-8&client=tw-ob&tl=zh-CN&q=" + encodeURIComponent(phrase);
-    try {
-      const audio = new Audio(url);
-      activeAudio = audio;
-      audio.preload = "auto";
-      audio.onplaying = () => { if (statusElement) statusElement.textContent = "▶ Воспроизводится китайская аудиозапись."; };
-      audio.onended = () => { if (statusElement) statusElement.textContent = "Воспроизведение завершено."; };
-      audio.onerror = () => {
-        if (activeAudio === audio) activeAudio = null;
-        if (statusElement) statusElement.textContent = "Онлайн-аудио недоступно. Пробую системную озвучку…";
-        speakWithBrowser(phrase, statusElement);
-      };
-      const result = audio.play();
-      if (result && typeof result.catch === "function") {
-        result.catch(() => {
-          if (activeAudio === audio) activeAudio = null;
-          if (statusElement) statusElement.textContent = "Браузер заблокировал онлайн-аудио. Пробую системную озвучку…";
-          speakWithBrowser(phrase, statusElement);
-        });
-      }
-      if (statusElement) statusElement.textContent = "Загружаю китайское произношение…";
-    } catch (_) {
-      if (statusElement) statusElement.textContent = "Онлайн-аудио недоступно. Пробую системную озвучку…";
-      speakWithBrowser(phrase, statusElement);
-    }
+    const synth = window.speechSynthesis;
+    if (synth && (synth.speaking || synth.pending)) synth.cancel();
+
+    // Используем один механизм воспроизведения за раз. Ошибка interrupted
+    // от предыдущего запроса не должна перезаписывать статус нового.
+    speakWithBrowser(phrase, statusElement, requestId);
   }
   function renderReview() {
     const words = getWords();
@@ -151,7 +133,12 @@
     const due = words.filter(w => (state[w.id]?.due || 0) <= Date.now()).sort((a,b) => (state[a.id]?.due||0)-(state[b.id]?.due||0));
     const card = $("studyReviewCard"), empty = $("studyReviewEmpty");
     $("studyReviewAnswer").hidden = true;
-    $("studyReviewReveal").hidden = true;
+    $("studyReviewInputArea").hidden = false;
+    $("studyReviewPinyinInput").value = "";
+    $("studyReviewMeaningInput").value = "";
+    $("studyReviewCheckResult").textContent = "";
+    $("studyReviewReveal").disabled = false;
+    $("studyReviewReveal").hidden = false;
     $("studyReviewRatings").hidden = true;
     if (!due.length) {
       card.hidden = true; empty.hidden = false;
@@ -174,10 +161,35 @@
     $("studyReviewReveal").hidden = false;
   }
 
+  function normalizeAnswer(value) {
+    return clean(value).toLocaleLowerCase().normalize("NFC").replace(/[\\s\\p{P}\\p{S}]+/gu, "");
+  }
+
   function revealReview() {
     if (!currentReviewId) return;
+    const word = getWords().find(item => item.id === currentReviewId);
+    if (!word) return;
+    const typedPinyin = normalizeAnswer($("studyReviewPinyinInput").value);
+    const typedMeaning = normalizeAnswer($("studyReviewMeaningInput").value);
+    if (!typedPinyin || !typedMeaning) {
+      $("studyReviewCheckResult").textContent = "Заполни оба поля, чтобы проверить ответ.";
+      return;
+    }
+    const correctPinyin = normalizeAnswer(word.pinyin || "");
+    const correctMeaning = normalizeAnswer(word.translation || "");
+    const pinyinCorrect = !!correctPinyin && typedPinyin === correctPinyin;
+    const meaningCorrect = !!correctMeaning && typedMeaning === correctMeaning;
+    const score = (pinyinCorrect ? 1 : 0) + (meaningCorrect ? 1 : 0);
+    $("studyReviewCheckResult").textContent = score === 2
+      ? "✓ Всё верно! И произношение, и значение совпали."
+      : score === 1
+        ? "Частично верно. " + (pinyinCorrect ? "Пиньинь правильный." : "Проверь пиньинь.") + " " + (meaningCorrect ? "Перевод правильный." : "Проверь значение.")
+        : "Пока есть ошибки. Сверь оба ответа с правильным вариантом ниже.";
+    $("studyReviewPinyin").textContent = "Пиньинь: " + (word.pinyin || "не указан");
+    $("studyReviewMeaning").textContent = "Значение: " + (word.translation || "не указано");
+    $("studyReviewLevel").textContent = word.level ? "HSK " + word.level : (word.source || "Личный словарь");
+    $("studyReviewInputArea").hidden = true;
     $("studyReviewAnswer").hidden = false;
-    $("studyReviewReveal").hidden = true;
     $("studyReviewRatings").hidden = false;
   }
 
