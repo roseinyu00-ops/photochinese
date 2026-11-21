@@ -99,7 +99,7 @@ label{font-weight:700;font-size:13px;display:block;margin:12px 0 6px}
 .coach-lesson-card:disabled{opacity:.55;cursor:not-allowed}.coach-lesson-number{width:34px;height:34px;border-radius:11px;background:#fff0f4;display:grid;place-items:center;flex-shrink:0;font-weight:800;color:#a85c72}
 .coach-lesson-meta{display:block;font-size:12px;color:var(--muted);margin-top:3px}.coach-lesson-status{margin-left:auto;color:#9b6b7a;font-size:18px}
 .coach-lesson-top{display:flex;justify-content:space-between;align-items:center;gap:10px}.coach-word-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(125px,1fr));gap:9px;margin:16px 0}
-.coach-word{border:1px solid var(--line);border-radius:12px;padding:12px;background:rgba(255,245,248,.65);text-align:center}.coach-word strong{display:block;font-size:25px;line-height:1.35}.coach-word-pinyin{display:block;color:var(--muted);font-size:13px;font-weight:600;margin-top:3px}.coach-word-translation{display:block;color:var(--ink);font-size:13px;margin-top:5px}.coach-example-hanzi{font-size:20px;font-weight:800;line-height:1.5}.coach-example-pinyin{font-size:14px;font-weight:600;color:var(--muted);margin-top:3px}.coach-example-translation{font-size:14px;font-weight:400;margin-top:5px}.coach-objectives{border:1px solid var(--line);border-radius:12px;padding:12px;margin:12px 0;background:rgba(255,245,248,.4)}.coach-objectives ul{margin:8px 0 0;padding-left:20px}.coach-dialogue-line{padding:10px 0;border-bottom:1px solid var(--line)}.coach-dialogue-line:last-child{border-bottom:0}.coach-dialogue-line strong{font-size:18px}.coach-practice-actions{display:flex;gap:8px;flex-wrap:wrap;margin-top:12px}
+.coach-word{border:1px solid var(--line);border-radius:12px;padding:12px;background:rgba(255,245,248,.65);text-align:center}.coach-word strong{display:block;font-size:25px;line-height:1.35}.coach-word-pinyin{display:block;color:var(--muted);font-size:13px;font-weight:600;margin-top:3px}.coach-word-translation{display:block;color:var(--ink);font-size:13px;margin-top:5px}.coach-example-hanzi{font-size:20px;font-weight:800;line-height:1.5}.coach-example-pinyin{font-size:14px;font-weight:600;color:var(--muted);margin-top:3px}.coach-example-translation{font-size:14px;font-weight:400;margin-top:5px}.coach-final-exam{border-top:1px solid var(--line);margin-top:18px;padding-top:16px}.coach-final-exam h3{margin:0 0 6px}.coach-objectives{border:1px solid var(--line);border-radius:12px;padding:12px;margin:12px 0;background:rgba(255,245,248,.4)}.coach-objectives ul{margin:8px 0 0;padding-left:20px}.coach-dialogue-line{padding:10px 0;border-bottom:1px solid var(--line)}.coach-dialogue-line:last-child{border-bottom:0}.coach-dialogue-line strong{font-size:18px}.coach-practice-actions{display:flex;gap:8px;flex-wrap:wrap;margin-top:12px}
 .coach-grammar-box{padding:15px;border-radius:14px;background:#fff5f7;border:1px solid var(--line);margin:14px 0}.coach-example{font-size:18px;font-weight:700}
 .coach-practice{border-top:1px solid var(--line);padding-top:14px;margin-top:16px}.coach-practice-option{display:block;width:100%;text-align:left;border:1px solid var(--line);border-radius:11px;padding:11px;margin:7px 0;background:white;color:var(--ink)}
 .coach-practice-option.correct{border-color:#70ad88;background:#eff9f1}.coach-practice-option.wrong{border-color:#d98798;background:#fff1f3}
@@ -2343,6 +2343,23 @@ body.profile-editing #profileAvatar::after {
     </div>
     <div class="coach-progress-track"><div id="coachProgressFill"></div></div>
     <div id="coachLessonList" class="coach-lesson-list"></div>
+    <div class="coach-final-exam">
+      <h3>Итоговая проверка PhotoChinese</h3>
+      <p id="coachExamStatus" class="small">Сначала заверши все уроки этого уровня. Затем откроется проверка по изученному материалу.</p>
+      <button id="startCoachExam" class="primary" type="button" disabled>Начать итоговую проверку</button>
+      <div id="coachExamResult" class="result" hidden></div>
+    </div>
+  </div>
+  <div class="panel section" id="coachExamPanel" hidden>
+    <div class="coach-lesson-top"><button class="secondary" id="backFromCoachExam" type="button">← К урокам</button><span id="coachExamTag" class="small"></span></div>
+    <h2 id="coachExamTitle">Итоговая проверка</h2>
+    <p id="coachExamIntro" class="small">Проверь, насколько хорошо усвоен материал курса.</p>
+    <p id="coachExamCounter" class="small"></p>
+    <h3 id="coachExamQuestion"></h3>
+    <div id="coachExamOptions"></div>
+    <div id="coachExamFeedback" class="small" aria-live="polite"></div>
+    <button id="nextCoachExamQuestion" class="primary" type="button" hidden disabled>Следующее задание</button>
+    <div id="coachExamSummary" class="result" hidden></div>
   </div>
   <div class="panel section" id="coachLessonPanel" hidden>
     <div class="coach-lesson-top"><button class="secondary" id="backToLessons" type="button">← Все уроки</button><span id="coachLessonTag" class="small"></span></div>
@@ -3720,6 +3737,7 @@ const coachOriginalExamplePinyin={"Приветствие и знакомств�
 const coachStorageKey='photoChineseCoachProgress';
 let activeCoachLesson=null, coachPracticePassed=false;
 let activeCoachQuestions=[], coachPracticeIndex=0, coachPracticeCorrect=0, coachPracticeAnswered=false;
+let activeCoachExamQuestions=[],coachExamIndex=0,coachExamCorrect=0,coachExamAnswered=false;
 function readCoachProgress(){try{return JSON.parse(localStorage.getItem(coachStorageKey)||'{}')}catch(e){return {}}}
 function saveCoachProgress(data){localStorage.setItem(coachStorageKey,JSON.stringify(data))}
 function currentCoachLevel(){return Number(document.getElementById('coachLevel').value)||1}
@@ -3729,6 +3747,14 @@ function renderCoachCourse(){
  document.getElementById('coachCourseSubtitle').textContent=lessons.length+' последовательных уроков · '+done.length+' из '+lessons.length+' завершено';
  const pct=Math.round(done.length/lessons.length*100);
  document.getElementById('coachProgress').textContent=pct+'%';
+ const examButton=document.getElementById('startCoachExam'),examStatus=document.getElementById('coachExamStatus');
+ const allDone=done.length===lessons.length;
+ examButton.disabled=!allDone;
+ examStatus.textContent=allDone?'Все уроки завершены. Можно пройти итоговую проверку по материалу этого курса.':'Завершено уроков: '+done.length+' из '+lessons.length+'. Итоговая проверка откроется после всех уроков.';
+ const examHistory=JSON.parse(localStorage.getItem('photoChineseCoachExams')||'{}');
+ const previous=examHistory[level];
+ document.getElementById('coachExamResult').hidden=!previous;
+ if(previous)document.getElementById('coachExamResult').textContent='Последняя попытка: '+previous.correct+' из '+previous.total+' ('+previous.percent+'%). '+(previous.passed?'Уровень курса подтверждён.':'Можно повторить проверку после повторения материала.');
  document.getElementById('coachProgressFill').style.width=pct+'%';
  const list=document.getElementById('coachLessonList');list.innerHTML='';
  lessons.forEach((lesson,index)=>{
@@ -3830,6 +3856,62 @@ document.getElementById('nextCoachQuestion').addEventListener('click',()=>{
 });
 document.getElementById('retryCoachPractice').addEventListener('click',()=>{
  coachPracticeIndex=0;coachPracticeCorrect=0;coachPracticePassed=false;renderCoachPracticeQuestion();
+});
+function startCoachExam(){
+ const level=currentCoachLevel(),lessons=coachCourses[level],pool=[];
+ lessons.forEach(lesson=>pool.push(...buildCoachPractice(lesson)));
+ activeCoachExamQuestions=shuffleCoachItems(pool).slice(0,Math.min(25,pool.length));
+ coachExamIndex=0;coachExamCorrect=0;coachExamAnswered=false;
+ document.getElementById('coachLessonPanel').hidden=true;
+ document.getElementById('coachExamPanel').hidden=false;
+ document.getElementById('coachExamSummary').hidden=true;
+ document.getElementById('coachExamTag').textContent='HSK '+level+' · PhotoChinese';
+ document.getElementById('coachExamTitle').textContent='Итоговая проверка HSK '+level;
+ document.getElementById('coachExamIntro').textContent='Вопросы случайно выбраны из слов и грамматики пройденных уроков. Это внутренняя проверка PhotoChinese, не официальный экзамен HSK.';
+ renderCoachExamQuestion();
+}
+function renderCoachExamQuestion(){
+ const q=activeCoachExamQuestions[coachExamIndex];coachExamAnswered=false;
+ document.getElementById('coachExamCounter').textContent='Задание '+(coachExamIndex+1)+' из '+activeCoachExamQuestions.length+' · правильных ответов: '+coachExamCorrect;
+ document.getElementById('coachExamQuestion').textContent=q.question;
+ document.getElementById('coachExamFeedback').textContent='Выбери один ответ.';
+ const next=document.getElementById('nextCoachExamQuestion');next.hidden=true;next.disabled=true;
+ const options=document.getElementById('coachExamOptions');options.innerHTML='';
+ q.options.forEach((option,i)=>{
+  const b=document.createElement('button');b.type='button';b.className='coach-practice-option';b.textContent=option;
+  b.addEventListener('click',()=>{
+   if(coachExamAnswered)return;coachExamAnswered=true;
+   const correct=i===q.answer;if(correct)coachExamCorrect++;
+   [...options.children].forEach((item,j)=>{item.disabled=true;if(j===q.answer)item.classList.add('correct');else if(j===i)item.classList.add('wrong');});
+   document.getElementById('coachExamCounter').textContent='Задание '+(coachExamIndex+1)+' из '+activeCoachExamQuestions.length+' · правильных ответов: '+coachExamCorrect;
+   document.getElementById('coachExamFeedback').textContent=(correct?'Верно! ':'Ответ неверный. ')+(q.explanation||'');
+   next.hidden=false;next.disabled=false;next.textContent=coachExamIndex===activeCoachExamQuestions.length-1?'Завершить проверку':'Следующее задание';
+  });options.appendChild(b);
+ });
+}
+document.getElementById('startCoachExam').addEventListener('click',()=>{
+ const progress=readCoachProgress(),done=progress[String(currentCoachLevel())]||[];
+ if(done.length!==coachCourses[currentCoachLevel()].length)return;
+ startCoachExam();
+});
+document.getElementById('nextCoachExamQuestion').addEventListener('click',()=>{
+ if(!coachExamAnswered)return;
+ if(coachExamIndex<activeCoachExamQuestions.length-1){coachExamIndex++;renderCoachExamQuestion();return;}
+ const total=activeCoachExamQuestions.length,percent=Math.round(coachExamCorrect/total*100),passed=percent>=80;
+ const history=JSON.parse(localStorage.getItem('photoChineseCoachExams')||'{}');
+ history[String(currentCoachLevel())]={correct:coachExamCorrect,total,percent,passed,date:new Date().toISOString()};
+ localStorage.setItem('photoChineseCoachExams',JSON.stringify(history));
+ document.getElementById('coachExamOptions').innerHTML='';
+ document.getElementById('coachExamQuestion').textContent='Проверка завершена.';
+ document.getElementById('coachExamCounter').textContent='Результат: '+coachExamCorrect+' из '+total+' · '+percent+'%';
+ document.getElementById('coachExamFeedback').textContent=passed?'Отличный результат! Ты успешно прошёл(ла) внутреннюю проверку курса.':'Пока не достигнут порог 80%. Повтори уроки и попробуй ещё раз.';
+ const summary=document.getElementById('coachExamSummary');summary.hidden=false;
+ summary.textContent=passed?'PhotoChinese: уровень HSK '+currentCoachLevel()+' по материалам пройденного курса подтверждён. Это учебный результат, не официальный сертификат HSK.':'Рекомендация: вернись к урокам, в которых были ошибки, и повтори итоговую проверку.';
+ document.getElementById('nextCoachExamQuestion').hidden=true;
+ renderCoachCourse();
+});
+document.getElementById('backFromCoachExam').addEventListener('click',()=>{
+ document.getElementById('coachExamPanel').hidden=true;renderCoachCourse();
 });
 document.getElementById('coachLevel').addEventListener('change',()=>{document.getElementById('coachLessonPanel').hidden=true;renderCoachCourse();document.getElementById('coachLevelNotice').textContent='Выбран HSK '+currentCoachLevel()+'. Прогресс каждого уровня сохраняется отдельно.'});
 document.getElementById('backToLessons').addEventListener('click',()=>{document.getElementById('coachLessonPanel').hidden=true;renderCoachCourse()});
