@@ -2842,8 +2842,7 @@ function setOcrStatus(message, show=true) {
   ocrStatus.hidden = !show;
 }
 
-// PaddleOCR.js загружается только при первом распознавании.
-// Модели работают в браузере; само изображение на сервер не отправляется.
+// PaddleOCR.js работает локально в браузере: изображение не отправляется на сервер.
 async function getPaddleChineseOcr() {
   if (!paddleOcrPromise) {
     paddleOcrPromise = (async () => {
@@ -2867,9 +2866,41 @@ async function getPaddleChineseOcr() {
       ))
     ]);
   } catch (error) {
-    // Не держим интерфейс в бесконечной загрузке: разрешаем повторную попытку.
     paddleOcrPromise = null;
     throw error;
+  }
+}
+
+// Готовим дополнительную версию фото: увеличиваем небольшой знак,
+// добавляем свободное поле и мягко усиливаем контраст, не обрезая черты.
+async function prepareChineseOcrCanvas(file) {
+  const bitmap = await createImageBitmap(file);
+  try {
+    const longestSide = Math.max(bitmap.width, bitmap.height);
+    const scale = Math.min(3, 1600 / Math.max(1, longestSide));
+    const contentWidth = Math.max(1, Math.round(bitmap.width * scale));
+    const contentHeight = Math.max(1, Math.round(bitmap.height * scale));
+    const padding = Math.round(Math.max(contentWidth, contentHeight) * 0.18);
+    const canvas = document.createElement('canvas');
+    canvas.width = contentWidth + padding * 2;
+    canvas.height = contentHeight + padding * 2;
+    const context = canvas.getContext('2d', { willReadFrequently: true });
+    if (!context) throw new Error('Не удалось подготовить изображение.');
+    context.fillStyle = '#ffffff';
+    context.fillRect(0, 0, canvas.width, canvas.height);
+    context.drawImage(bitmap, padding, padding, contentWidth, contentHeight);
+
+    const imageData = context.getImageData(0, 0, canvas.width, canvas.height);
+    const pixels = imageData.data;
+    for (let i = 0; i < pixels.length; i += 4) {
+      const gray = pixels[i] * 0.299 + pixels[i + 1] * 0.587 + pixels[i + 2] * 0.114;
+      const enhanced = Math.max(0, Math.min(255, (gray - 128) * 1.22 + 128));
+      pixels[i] = pixels[i + 1] = pixels[i + 2] = enhanced;
+    }
+    context.putImageData(imageData, 0, 0);
+    return canvas;
+  } finally {
+    bitmap.close?.();
   }
 }
 
@@ -2889,6 +2920,19 @@ async function recognizeChineseWithTesseract(file) {
   return (result && result.data && result.data.text ? result.data.text : '').trim();
 }
 
+function collectPaddleOcrCandidate(result, variant) {
+  const items = result && Array.isArray(result.items)
+    ? result.items.filter(item => item && typeof item.text === 'string' && item.text.trim())
+    : [];
+  if (!items.length) return null;
+  const text = items.map(item => item.text.trim()).join('\n').trim();
+  const scores = items.map(item => Number(item.score)).filter(Number.isFinite);
+  const confidence = scores.length
+    ? scores.reduce((sum, score) => sum + score, 0) / scores.length
+    : 0;
+  return { text, key: text.replace(/\s+/g, ''), confidence, variant, items: items.length };
+}
+
 async function recognizeChinese(file) {
   if (!file || !file.type.startsWith('image/')) return;
   fileName.textContent = 'Выбрано: ' + file.name;
@@ -2898,51 +2942,67 @@ async function recognizeChinese(file) {
   currentImageUrl = URL.createObjectURL(file);
   photoPreview.src = currentImageUrl;
   photoPreview.hidden = false;
-  setOcrStatus('Подготавливаем распознавание…');
+  setOcrStatus('Подготавливаем фотографию…');
 
   try {
-    let ocr;
-    let usedFallback = false;
-    try {
-      ocr = await getPaddleChineseOcr();
-    } catch (loadError) {
-      console.warn('PaddleOCR initialization failed; using Tesseract fallback:', loadError);
-      usedFallback = true;
-      setOcrStatus('PaddleOCR не загрузился. Временно используем резервное распознавание…');
-      const fallbackText = await recognizeChineseWithTesseract(file);
-      recognizedText.value = fallbackText;
+    const ocr = await getPaddleChineseOcr();
+    const candidates = [];
+    const predictionParams = {
+      textDetLimitSideLen: 1280,
+      textDetLimitType: 'max',
+      textDetThresh: 0.2,
+      textDetBoxThresh: 0.35,
+      textDetUnclipRatio: 2.0,
+      textRecScoreThresh: 0.0
+    };
+
+    setOcrStatus('Распознаём исходное фото…');
+    const originalResults = await ocr.predict(file, predictionParams);
+    const originalCandidate = collectPaddleOcrCandidate(originalResults && originalResults[0], 'исходное фото');
+    if (originalCandidate) candidates.push(originalCandidate);
+
+    setOcrStatus('Увеличиваем и подготавливаем изображение для повторной проверки…');
+    const preparedCanvas = await prepareChineseOcrCanvas(file);
+    const preparedResults = await ocr.predict(preparedCanvas, predictionParams);
+    const preparedCandidate = collectPaddleOcrCandidate(preparedResults && preparedResults[0], 'увеличенное фото');
+    if (preparedCandidate) candidates.push(preparedCandidate);
+
+    if (!candidates.length) {
+      setOcrStatus('PaddleOCR не обнаружил текст. Попробуй снять знак крупнее, ровно и на контрастном фоне.');
       ocrOutput.hidden = false;
-      setOcrStatus(fallbackText
-        ? 'Резервное распознавание завершено. Точность может быть ниже; проверь и поправь текст.'
-        : 'Оба способа не смогли распознать текст. Попробуй другое фото.');
       return;
     }
-    setOcrStatus('PaddleOCR ищет текст на изображении и распознаёт иероглифы…');
-    const results = await ocr.predict(file);
-    const result = results && results[0];
-    const items = (result && Array.isArray(result.items) ? result.items : [])
-      .filter(item => item && typeof item.text === 'string' && item.text.trim());
 
-    // SDK уже возвращает распознанные фрагменты в порядке чтения.
-    const text = items.map(item => item.text.trim()).join('\n');
-    recognizedText.value = text;
+    // Согласие двух вариантов повышает приоритет результата; одиночный ответ
+    // не объявляется достоверным только потому, что модель вернула символ.
+    const grouped = new Map();
+    candidates.forEach(candidate => {
+      const current = grouped.get(candidate.key);
+      if (!current || candidate.confidence > current.confidence) {
+        grouped.set(candidate.key, { ...candidate, votes: current ? current.votes + 1 : 1 });
+      } else {
+        current.votes += 1;
+      }
+    });
+    const ranked = [...grouped.values()].map(candidate => ({
+      ...candidate,
+      rank: candidate.confidence + (candidate.votes > 1 ? 0.12 : 0)
+    })).sort((a, b) => b.rank - a.rank);
+
+    const best = ranked[0];
+    recognizedText.value = best.text;
     ocrOutput.hidden = false;
 
-    if (text) {
-      const scores = items
-        .map(item => Number(item.score))
-        .filter(score => Number.isFinite(score));
-      const confidence = scores.length
-        ? Math.round(scores.reduce((sum, score) => sum + score, 0) / scores.length * 100)
-        : null;
-      const confidenceNote = confidence === null ? '' : ' Средняя уверенность модели: ' + confidence + '%.';
-      setOcrStatus('Готово! Найдено фрагментов текста: ' + items.length + '.' + confidenceNote + ' Проверь результат перед разбором — особенно если это каллиграфия или рукописный текст.');
-    } else {
-      setOcrStatus('PaddleOCR не обнаружил текст. Попробуй загрузить фото крупнее, ровнее и при хорошем освещении.');
-    }
+    const confidence = Math.round(best.confidence * 100);
+    const disagreement = ranked.length > 1
+      ? ' Варианты не совпали: альтернативный результат — «' + ranked[1].text.replace(/\s+/g, ' ') + '». Проверь знак вручную.'
+      : best.votes > 1
+        ? ' Оба варианта обработки дали одинаковый результат.'
+        : ' Получен только один вариант распознавания; обязательно проверь его.';
+    setOcrStatus('Распознавание завершено. Уверенность выбранного варианта: ' + confidence + '%.' + disagreement);
   } catch (error) {
     console.error('PaddleOCR error:', error);
-    setOcrStatus('Не удалось запустить распознавание: ' + (error && error.message ? error.message : 'ошибка загрузки модуля или модели') + '. Проверь подключение к интернету и попробуй ещё раз.');
+    setOcrStatus('Не удалось выполнить распознавание: ' + (error && error.message ? error.message : 'ошибка модели или обработки изображения') + '. Проверь подключение и попробуй ещё раз.');
   }
 }
 photo.addEventListener('change', () => { if (photo.files[0]) recognizeChinese(photo.files[0]); });
