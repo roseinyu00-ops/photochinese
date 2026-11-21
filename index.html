@@ -3354,7 +3354,41 @@ document.getElementById('translateBtn').onclick=async()=>{
     '<div class="meme-analysis-card"><h3>'+(exact?'Перевод':'Значение по словам')+'</h3><p>'+esc(exact||gloss.join(' · '))+'</p>'+
     (exact?'':'<p class="small">Это словарная подсказка, а не точный перевод всей фразы: смысл зависит от контекста.</p>')+'</div>'+
     '<div class="meme-analysis-card"><h3>Разбор</h3>'+tokens.map(token=>token.type==='punct'?'<span>'+esc(token.text)+'</span>':'<div class="meme-token"><b>'+esc(token.text)+'</b><span>'+esc(token.p||'')+'</span><span>'+esc(token.m||'Значение не найдено')+'</span></div>').join('')+'</div>'+
-    '<div class="meme-analysis-note">Пока это словарный разбор. Ирония, мемный сленг, игра слов и культурные отсылки требуют отдельного ИИ-сервиса — мы не будем выдавать догадки за точное объяснение.</div>';
+    '<div class="meme-analysis-note">Словарная часть готова. Ниже можно получить контекстный разбор от ИИ.</div>';
+  const aiBox=document.createElement('div');
+  aiBox.className='meme-analysis-card';
+  aiBox.innerHTML='<h3>Объяснение от ИИ ✨</h3><p class="small" id="memeAiStatus">Подключаем преподавателя…</p><div id="memeAiAnswer"></div>';
+  result.appendChild(aiBox);
+  const status=aiBox.querySelector('#memeAiStatus');
+  const answer=aiBox.querySelector('#memeAiAnswer');
+  const client=window.photoChineseSupabase;
+  if(!client){
+    status.textContent='Сервис аккаунтов не подключён. Пока доступен словарный разбор.';
+    return;
+  }
+  try{
+    const {data:sessionData,error:sessionError}=await client.auth.getSession();
+    if(sessionError) throw sessionError;
+    if(!sessionData.session){
+      status.textContent='Чтобы пользоваться ИИ-разбором, войди в аккаунт PhotoChinese. Словарный разбор доступен без входа.';
+      return;
+    }
+    status.textContent='ИИ анализирует фразу…';
+    const {data,error}=await client.functions.invoke('explain-meme',{body:{text:t}});
+    if(error) throw error;
+    if(!data || !data.answer) throw new Error(data?.error||'Пустой ответ сервиса.');
+    status.textContent='Готово! Разбор учитывает естественный смысл и разговорный контекст.';
+    answer.textContent=data.answer;
+    answer.style.whiteSpace='pre-wrap';
+    answer.style.lineHeight='1.65';
+  }catch(error){
+    console.error('Meme AI error:',error);
+    status.textContent='ИИ-разбор пока не подключён: '+(error.message||'проверь настройки Supabase').replace(/<[^>]*>/g,'');
+    const hint=document.createElement('p');
+    hint.className='small';
+    hint.textContent='Словарный разбор выше продолжает работать. Для запуска ИИ нужно развернуть Edge Function и добавить серверный ключ.';
+    answer.appendChild(hint);
+  }
 };
 let teacher='balanced';
 document.querySelectorAll('#teacherChoices button').forEach(b=>b.onclick=()=>{
