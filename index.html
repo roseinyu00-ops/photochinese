@@ -3836,7 +3836,7 @@ for(let n=0;n<=100;n++){
 }
 coachSupplementalVocabulary[1][1].words=[
  ...coachSupplementalVocabulary[1][1].words.filter(w=>!/^([零一二三四五六七八九十百]+)$/.test(w[0])),
- ...hsk1NumberWords.filter(w=>!['一','二','三'].includes(w[0])),
+ ...hsk1NumberWords,
  ['两','liǎng','два (перед счётным словом и некоторыми единицами)'],
  ['个','gè','универсальное счётное слово'],
  ['多少','duōshao','сколько (о количестве)']
