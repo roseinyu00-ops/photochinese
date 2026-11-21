@@ -1,5 +1,5 @@
 
-const CACHE_NAME = "photochinese-v12";
+const CACHE_NAME = "photochinese-v13";
 
 const FILES_TO_CACHE = [
   "./",
