@@ -123,9 +123,28 @@
     const synth = window.speechSynthesis;
     if (synth && (synth.speaking || synth.pending)) synth.cancel();
 
-    // Используем один механизм воспроизведения за раз. Ошибка interrupted
-    // от предыдущего запроса не должна перезаписывать статус нового.
-    speakWithBrowser(phrase, statusElement, requestId);
+    // Сначала пробуем сетевую запись китайской речи, затем системный TTS.
+    const url = "https://translate.google.com/translate_tts?ie=UTF-8&client=tw-ob&tl=zh-CN&q=" + encodeURIComponent(phrase);
+    try {
+      const audio = new Audio(url);
+      activeAudio = audio;
+      audio.preload = "auto";
+      audio.onplaying = () => { if (statusElement && requestId === speechRequestId) statusElement.textContent = "▶ Воспроизводится китайская аудиозапись."; };
+      audio.onended = () => { if (requestId === speechRequestId) { activeAudio = null; if (statusElement) statusElement.textContent = "Воспроизведение завершено."; } };
+      const fallback = () => {
+        if (requestId !== speechRequestId) return;
+        if (activeAudio === audio) activeAudio = null;
+        if (statusElement) statusElement.textContent = "Онлайн-аудио недоступно. Переключаюсь на системную озвучку…";
+        speakWithBrowser(phrase, statusElement, requestId);
+      };
+      audio.onerror = fallback;
+      const result = audio.play();
+      if (result && typeof result.catch === "function") result.catch(fallback);
+      if (statusElement) statusElement.textContent = "Загружаю китайское произношение…";
+    } catch (_) {
+      if (statusElement) statusElement.textContent = "Онлайн-аудио недоступно. Переключаюсь на системную озвучку…";
+      speakWithBrowser(phrase, statusElement, requestId);
+    }
   }
   function renderReview() {
     const words = getWords();
@@ -162,7 +181,7 @@
   }
 
   function normalizeAnswer(value) {
-    return clean(value).toLocaleLowerCase().normalize("NFC").replace(/[\\s\\p{P}\\p{S}]+/gu, "");
+    return clean(value).toLocaleLowerCase().normalize("NFC").replace(/[\s\p{P}\p{S}]+/gu, "");
   }
 
   function revealReview() {
