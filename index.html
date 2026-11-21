@@ -2519,6 +2519,8 @@ function updateProfileAccess() {
   const locked = !photoChineseUser;
   profileTab.classList.toggle("profile-locked", locked);
   lockScreen.hidden = !locked;
+  const accountActions = document.getElementById("profileAccountActions");
+  if (accountActions) accountActions.hidden = locked;
 }
 
 const tabs = document.querySelectorAll('nav button');
