@@ -175,29 +175,35 @@
     const synth = window.speechSynthesis;
     if (synth && (synth.speaking || synth.pending)) synth.cancel();
 
+    // Важно: если китайский голос уже установлен, запускаем его прямо
+    // в обработчике нажатия. После ожидания сетевых запросов браузер
+    // может потерять разрешение на запуск речи по действию пользователя.
+    const voices = refreshChineseVoices();
+    if (voices.length && synth && typeof window.SpeechSynthesisUtterance === "function") {
+      speakWithBrowser(phrase, statusElement, requestId, []);
+      return;
+    }
+
+    // Если системного китайского голоса нет, пробуем онлайн-источники.
     const encoded = encodeURIComponent(phrase);
     const sources = [
       {label:"Google audio 1 (translate.googleapis.com)", url:"https://translate.googleapis.com/translate_tts?ie=UTF-8&client=gtx&tl=zh-CN&q=" + encoded},
       {label:"Google audio 2 (translate.google.com)", url:"https://translate.google.com/translate_tts?ie=UTF-8&client=gtx&tl=zh-CN&q=" + encoded}
     ];
     const failures = [];
-
     const tryAudio = index => {
       if (requestId !== speechRequestId) return;
       if (index >= sources.length) {
-        if (statusElement) statusElement.textContent = failures.join("\n") + "\nПроверяю системный китайский голос…";
+        if (statusElement) statusElement.textContent = failures.join("\\n") + "\\nСистемный голос не найден. Проверяю резервную системную озвучку…";
         speakWithBrowser(phrase, statusElement, requestId, failures);
         return;
       }
       const source = sources[index];
       let settled = false;
-      let reachedCanPlay = false;
       const audio = new Audio();
       activeAudio = audio;
       audio.preload = "auto";
-      const clearAttempt = () => {
-        if (audioAttemptTimer) clearTimeout(audioAttemptTimer);
-      };
+      const clearAttempt = () => { if (audioAttemptTimer) clearTimeout(audioAttemptTimer); };
       const fail = reason => {
         if (settled || requestId !== speechRequestId) return;
         settled = true;
@@ -207,19 +213,7 @@
         try { audio.pause(); } catch (_) {}
         tryAudio(index + 1);
       };
-      let audioAttemptTimer = setTimeout(() => {
-        const phase = reachedCanPlay ? "тайм-аут запуска после загрузки" : "тайм-аут ожидания аудио";
-        fail(phase + " (readyState=" + audio.readyState + ", networkState=" + audio.networkState + ")");
-      }, 8000);
-      audio.onloadedmetadata = () => {
-        if (requestId === speechRequestId && statusElement) {
-          statusElement.textContent = "Проверка " + (index + 1) + "/2: метаданные получены, пробую воспроизвести…";
-        }
-      };
-      audio.oncanplay = () => { reachedCanPlay = true; };
-      audio.onstalled = () => {
-        if (requestId === speechRequestId && statusElement) statusElement.textContent = "Источник " + (index + 1) + "/2: загрузка приостановилась, жду…";
-      };
+      let audioAttemptTimer = setTimeout(() => fail("тайм-аут ожидания (readyState=" + audio.readyState + ", networkState=" + audio.networkState + ")"), 8000);
       audio.onplaying = () => {
         if (requestId !== speechRequestId) return;
         settled = true;
@@ -237,13 +231,10 @@
       audio.src = source.url;
       const result = audio.play();
       if (result && typeof result.catch === "function") result.catch(error => fail(playErrorDescription(error)));
-      if (statusElement && requestId === speechRequestId) {
-        statusElement.textContent = "Проверка источника " + (index + 1) + "/2: " + source.label + "…";
-      }
+      if (statusElement && requestId === speechRequestId) statusElement.textContent = "Проверяю онлайн-источник " + (index + 1) + "/2…";
     };
-    try {
-      tryAudio(0);
-    } catch (error) {
+    try { tryAudio(0); }
+    catch (error) {
       failures.push("Онлайн-аудио: " + playErrorDescription(error));
       speakWithBrowser(phrase, statusElement, requestId, failures);
     }
