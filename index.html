@@ -2266,6 +2266,25 @@ body.profile-editing #profileAvatar::after {
 .hsk-level-status{font-size:12px;color:var(--muted);min-width:66px;text-align:right}
 @media(max-width:480px){.hsk-intro-stats{gap:6px}.hsk-intro-stats>div{padding:12px 5px}.hsk-intro-stats strong{font-size:20px}.hsk-test-actions button{flex:1}.hsk-level-row{grid-template-columns:55px 1fr auto;gap:7px}}
 </style>
+<style>
+.learning-progress-heading{display:flex;align-items:center;justify-content:space-between;gap:10px}
+.learning-progress-heading h2{margin:0}
+.learning-progress-mark{color:var(--pink);font-size:22px}
+.learning-progress-level{display:grid;gap:5px;margin:17px 0;padding:14px;border-radius:14px;background:var(--surface-soft,rgba(230,170,190,.12))}
+.learning-progress-level strong{font-size:23px;color:var(--accent)}
+.learning-progress-stats{display:grid;grid-template-columns:1fr 1fr;gap:10px}
+.learning-progress-stat{display:grid;gap:4px;padding:13px;border:1px solid var(--line);border-radius:13px;min-width:0}
+.learning-progress-stat strong{font-size:25px;line-height:1.1}
+.learning-progress-stat span{font-size:12px;color:var(--muted)}
+.learning-progress-course{margin-top:18px}
+.learning-progress-course-label{display:flex;justify-content:space-between;gap:10px;font-size:13px;margin-bottom:8px}
+.learning-progress-course-track{height:9px;border-radius:20px;background:var(--line);overflow:hidden}
+#learningProgressCourseFill{height:100%;width:0;background:var(--pink);border-radius:20px;transition:width .25s}
+.learning-progress-actions{display:grid;gap:8px;margin-top:16px}
+.learning-progress-actions button{width:100%}
+.learning-progress-sync-note{margin:13px 0 0}
+@media(max-width:760px){.learning-progress-stats{gap:8px}.learning-progress-stat{padding:11px}}
+</style>
 </head>
 <body>
 <div class="app">
@@ -2497,12 +2516,32 @@ body.profile-editing #profileAvatar::after {
 </section>
 
 <aside class="side section">
-  <div class="panel">
-    <h2>Твой прогресс</h2>
-    <div class="stat"><span>Изучено иероглифов</span><b>0</b></div>
-    <div class="stat"><span>Дней подряд</span><b>0</b></div>
-    <div class="stat"><span>Текущий уровень</span><b>Не определён</b></div>
-    <p class="small">Прогресс будет сохраняться после подключения аккаунта или локального хранилища.</p>
+  <div class="panel learning-progress-panel">
+    <div class="learning-progress-heading">
+      <h2>Твой прогресс</h2>
+      <span class="learning-progress-mark" aria-hidden="true">✦</span>
+    </div>
+    <div class="learning-progress-level">
+      <span class="small">Текущий уровень</span>
+      <strong id="learningProgressLevel">Пока не определён</strong>
+      <span class="small" id="learningProgressLevelNote">Пройди диагностику HSK, чтобы определить стартовый уровень</span>
+    </div>
+    <div class="learning-progress-stats">
+      <div class="learning-progress-stat"><strong id="learningProgressCharacters">0</strong><span>иероглифов изучено</span></div>
+      <div class="learning-progress-stat"><strong id="learningProgressStreak">0</strong><span>дней подряд</span></div>
+      <div class="learning-progress-stat"><strong id="learningProgressLessons">0</strong><span>уроков завершено</span></div>
+      <div class="learning-progress-stat"><strong id="learningProgressVocabulary">0</strong><span>слов в словаре</span></div>
+    </div>
+    <div class="learning-progress-course">
+      <div class="learning-progress-course-label"><span>Уроки ИИ-учителя</span><strong id="learningProgressCoursePercent">0%</strong></div>
+      <div class="learning-progress-course-track"><div id="learningProgressCourseFill"></div></div>
+      <p class="small" id="learningProgressCourseNote">Начни первый урок, и здесь появится твоя статистика</p>
+    </div>
+    <div class="learning-progress-actions">
+      <button class="primary" id="learningProgressOpenCoach" type="button">Продолжить обучение</button>
+      <button class="secondary" id="learningProgressOpenHsk" type="button">Диагностика HSK</button>
+    </div>
+    <p class="small learning-progress-sync-note" id="learningProgressSyncNote">Данные сохраняются на этом устройстве. После входа в аккаунт они синхронизируются.</p>
   </div>
   <div class="panel">
     <h2>Слово дня</h2>
@@ -4065,7 +4104,7 @@ let activeCoachLesson=null, coachPracticePassed=false;
 let activeCoachQuestions=[], coachPracticeIndex=0, coachPracticeCorrect=0, coachPracticeAnswered=false;
 let activeCoachExamQuestions=[],coachExamIndex=0,coachExamCorrect=0,coachExamAnswered=false,coachExamSelected=null,coachExamAnswers=[],coachExamTimer=null,coachExamDeadline=0;
 function readCoachProgress(){try{return JSON.parse(localStorage.getItem(coachStorageKey)||'{}')}catch(e){return {}}}
-function saveCoachProgress(data){localStorage.setItem(coachStorageKey,JSON.stringify(data))}
+function saveCoachProgress(data){localStorage.setItem(coachStorageKey,JSON.stringify(data));recordLearningActivity();updateLearningDashboard();window.photoChineseSync?.();}
 function currentCoachLevel(){return Number(document.getElementById('coachLevel').value)||1}
 function renderCoachCourse(){
  const level=currentCoachLevel(), lessons=coachCourses[level], progress=readCoachProgress(), done=progress[level]||[];
@@ -4959,6 +4998,63 @@ function saveProgress() {
   window.photoChineseSync?.();
 }
 
+// Фиксируем учебную активность только после реального учебного действия.
+function recordLearningActivity() {
+  const key = "photoChineseActivityDays";
+  let days = [];
+  try { days = JSON.parse(localStorage.getItem(key) || "[]"); } catch (e) { days = []; }
+  const today = new Date();
+  const dayKey = [today.getFullYear(), String(today.getMonth()+1).padStart(2,"0"), String(today.getDate()).padStart(2,"0")].join("-");
+  if (!days.includes(dayKey)) days.push(dayKey);
+  days = days.sort().slice(-365);
+  localStorage.setItem(key, JSON.stringify(days));
+  window.photoChineseSync?.();
+}
+
+function updateLearningDashboard() {
+  const byId = id => document.getElementById(id);
+  const put = (id, value) => { const el = byId(id); if (el) el.textContent = value; };
+  let days = [];
+  try { days = JSON.parse(localStorage.getItem("photoChineseActivityDays") || "[]"); } catch (e) { days = []; }
+  const now = new Date();
+  const dateKey = d => [d.getFullYear(), String(d.getMonth()+1).padStart(2,"0"), String(d.getDate()).padStart(2,"0")].join("-");
+  const todayKey = dateKey(now);
+  const yesterday = new Date(now); yesterday.setDate(yesterday.getDate()-1);
+  const yesterdayKey = dateKey(yesterday);
+  const activeSet = new Set(days);
+  let streak = 0;
+  const cursor = new Date(now);
+  if (!activeSet.has(todayKey)) cursor.setDate(cursor.getDate()-1);
+  if (activeSet.has(dateKey(cursor))) {
+    while (activeSet.has(dateKey(cursor))) { streak++; cursor.setDate(cursor.getDate()-1); }
+  }
+  const coachProgress = (() => { try { return JSON.parse(localStorage.getItem("photoChineseCoachProgress") || "{}") || {}; } catch(e) { return {}; } })();
+  const courseLevels = typeof coachCourses !== "undefined" ? Object.keys(coachCourses) : [];
+  const courseTotal = courseLevels.reduce((sum, level) => sum + (Array.isArray(coachCourses[level]) ? coachCourses[level].length : 0), 0);
+  const courseDone = courseLevels.reduce((sum, level) => sum + (Array.isArray(coachProgress[level]) ? coachProgress[level].length : 0), 0);
+  const legacyDone = Array.isArray(progress.completedLessons) ? progress.completedLessons.length : 0;
+  const lessonsDone = courseDone + legacyDone;
+  let vocab = {};
+  try { vocab = JSON.parse(localStorage.getItem("photoChineseCoachVocabulary") || "{}") || {}; } catch(e) { vocab = {}; }
+  const vocabularyCount = Object.values(vocab).reduce((sum, items) => sum + (Array.isArray(items) ? items.length : 0), 0);
+  let diagnostic = null;
+  try { diagnostic = JSON.parse(localStorage.getItem("photoChineseHskDiagnostic") || "null"); } catch(e) { diagnostic = null; }
+  const level = diagnostic && Number(diagnostic.level);
+  put("learningProgressCharacters", progress.learnedCharacters.length);
+  put("learningProgressStreak", streak);
+  put("learningProgressLessons", lessonsDone);
+  put("learningProgressVocabulary", vocabularyCount);
+  put("learningProgressLevel", level >= 1 && level <= 6 ? "HSK " + level : "Пока не определён");
+  put("learningProgressLevelNote", level >= 1 && level <= 6 ? "По результатам последней диагностики" : "Пройди диагностику HSK, чтобы определить стартовый уровень");
+  const percent = courseTotal ? Math.min(100, Math.round(courseDone / courseTotal * 100)) : 0;
+  put("learningProgressCoursePercent", percent + "%");
+  put("learningProgressCourseNote", courseTotal ? courseDone + " из " + courseTotal + " уроков ИИ-учителя завершено" : "Курсы пока не загружены");
+  const fill = byId("learningProgressCourseFill");
+  if (fill) fill.style.width = percent + "%";
+  const syncNote = byId("learningProgressSyncNote");
+  if (syncNote) syncNote.textContent = window.photoChineseUser ? "Прогресс синхронизируется с твоим аккаунтом." : "Данные сохраняются на этом устройстве. После входа в аккаунт они синхронизируются.";
+}
+
 // Добавление изученного иероглифа
 function learnCharacter(character) {
   if (!character || progress.learnedCharacters.includes(character)) {
@@ -4967,6 +5063,7 @@ function learnCharacter(character) {
 
   progress.learnedCharacters.push(character);
 
+  recordLearningActivity();
   saveProgress();
   updateAchievements();
   updateProfileProgress();
@@ -4980,6 +5077,7 @@ function completeLesson(lessonId) {
 
   progress.completedLessons.push(lessonId);
 
+  recordLearningActivity();
   saveProgress();
   updateAchievements();
   updateProfileProgress();
@@ -5026,11 +5124,20 @@ function updateProfileProgress() {
   if (learned) learned.textContent = progress.learnedCharacters.length;
   if (lessons) lessons.textContent = progress.completedLessons.length;
   if (achievements) achievements.textContent = progress.achievements.length;
+  updateLearningDashboard();
 }
 
 // Загружаем данные при открытии сайта
 updateAchievements();
 updateProfileProgress();
+updateLearningDashboard();
+
+document.getElementById("learningProgressOpenCoach")?.addEventListener("click", () => {
+  document.querySelector('nav button[data-tab="coach"]')?.click();
+});
+document.getElementById("learningProgressOpenHsk")?.addEventListener("click", () => {
+  document.querySelector('nav button[data-tab="hsk"]')?.click();
+});
 
 </script>
 
@@ -5322,7 +5429,9 @@ const PHOTOCHINESE_SYNC_KEYS = [
   "profileNickname", "photoChineseNickname", "profileBio",
   "profileSubtitle", "favoriteCharacter", "learnedCharacters", "savedCharacters",
   "completedLessons", "achievements", "profileCollection",
-  "equippedDecoration", "profileAvatar"
+  "equippedDecoration", "profileAvatar", "photoChineseCoachProgress",
+  "photoChineseCoachVocabulary", "photoChineseCoachExams",
+  "photoChineseHskDiagnostic", "photoChineseActivityDays"
 ];
 
 let photoChineseSyncTimer = null;
@@ -5376,6 +5485,7 @@ function applyPhotoChineseData(appData) {
 
   updateAchievements();
   updateProfileProgress();
+  updateLearningDashboard();
   updateCollection();
   renderAchievements();
   renderCollection();
