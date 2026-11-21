@@ -105,6 +105,9 @@ label{font-weight:700;font-size:13px;display:block;margin:12px 0 6px}
 .coach-practice{border-top:1px solid var(--line);padding-top:14px;margin-top:16px}.coach-practice-option{display:block;width:100%;text-align:left;border:1px solid var(--line);border-radius:11px;padding:11px;margin:7px 0;background:white;color:var(--ink)}
 .coach-practice-option.correct{border-color:#70ad88;background:#eff9f1}.coach-practice-option.wrong{border-color:#d98798;background:#fff1f3}
 .coach-teacher-help{border-top:1px solid var(--line);padding-top:14px;margin-top:18px}
+.coach-exam-timer{font-weight:800;font-variant-numeric:tabular-nums;color:#76515c;background:#fff3f5;border:1px solid #efd8de;border-radius:12px;padding:10px 13px;display:inline-block}
+.coach-exam-timer.warning{color:#a23f52;background:#fff0f1;border-color:#e7a9b4}
+body.dark-theme .coach-exam-timer{color:#ffe1e8;background:#49383d;border-color:#76545d}
 body.dark-theme .coach-grammar-box,body.dark-theme .coach-word{background:#49383d;color:#fff1ed;border-color:#76545d}
 body.dark-theme .coach-lesson-card,body.dark-theme .coach-practice-option{background:#49383d;color:#fff1ed;border-color:#76545d}
 @media(max-width:480px){.coach-level-row{display:block}.coach-test-link{margin-top:8px;width:100%}.coach-course-head{align-items:flex-start}}
@@ -2356,6 +2359,7 @@ body.profile-editing #profileAvatar::after {
     <h2 id="coachExamTitle">Итоговая проверка</h2>
     <p id="coachExamIntro" class="small">Проверь, насколько хорошо усвоен материал курса.</p>
     <p id="coachExamCounter" class="small"></p>
+    <p id="coachExamTimer" class="coach-exam-timer" role="timer">Осталось времени: 75:00</p>
     <h3 id="coachExamQuestion"></h3>
     <div id="coachExamOptions"></div>
     <div id="coachExamFeedback" class="small" aria-live="polite"></div>
@@ -3934,7 +3938,7 @@ const coachOriginalExamplePinyin={"Приветствие и знакомств�
 const coachStorageKey='photoChineseCoachProgress';
 let activeCoachLesson=null, coachPracticePassed=false;
 let activeCoachQuestions=[], coachPracticeIndex=0, coachPracticeCorrect=0, coachPracticeAnswered=false;
-let activeCoachExamQuestions=[],coachExamIndex=0,coachExamCorrect=0,coachExamAnswered=false;
+let activeCoachExamQuestions=[],coachExamIndex=0,coachExamCorrect=0,coachExamAnswered=false,coachExamSelected=null,coachExamAnswers=[],coachExamTimer=null,coachExamDeadline=0;
 function readCoachProgress(){try{return JSON.parse(localStorage.getItem(coachStorageKey)||'{}')}catch(e){return {}}}
 function saveCoachProgress(data){localStorage.setItem(coachStorageKey,JSON.stringify(data))}
 function currentCoachLevel(){return Number(document.getElementById('coachLevel').value)||1}
@@ -4088,40 +4092,68 @@ document.getElementById('nextCoachQuestion').addEventListener('click',()=>{
 document.getElementById('retryCoachPractice').addEventListener('click',()=>{
  coachPracticeIndex=0;coachPracticeCorrect=0;coachPracticePassed=false;renderCoachPracticeQuestion();
 });
-function startCoachExam(){
- const level=currentCoachLevel(),lessons=coachCourses[level],core=[],extra=[];
- lessons.forEach(lesson=>{
-  const lessonQuestions=buildCoachPractice(lesson);
-  if(lessonQuestions.length)core.push(lessonQuestions[0]);
-  extra.push(...lessonQuestions.slice(1));
+function buildCoachExamQuestions(level){
+ const lessons=coachCourses[level],allWords=[],allPhrases=[],grammar=[];
+ lessons.forEach((lesson,index)=>{
+  grammar.push({section:'Грамматика',question:lesson.question,options:lesson.options.slice(),answer:lesson.answer,explanation:(lesson.help&&lesson.help.grammar)||lesson.grammar||'Повтори грамматическое правило урока «'+lesson.title+'».'});
+  const supplement=(coachSupplementalVocabulary[level]||{})[index]||{};
+  [...(lesson.words||[]),...(supplement.words||[])].forEach(w=>{if(w&&w[0]&&!allWords.some(x=>x[0]===w[0]))allWords.push(w);});
+  (supplement.phrases||[]).forEach(p=>{if(p&&p[0])allPhrases.push(p);});
  });
- activeCoachExamQuestions=core.concat(shuffleCoachItems(extra).slice(0,Math.max(0,25-core.length)));
- activeCoachExamQuestions=shuffleCoachItems(activeCoachExamQuestions);
- coachExamIndex=0;coachExamCorrect=0;coachExamAnswered=false;
+ const vocab=[];
+ allWords.forEach(word=>{
+  const meaningDistractors=shuffleCoachItems([...new Set(allWords.map(w=>w[2]).filter(v=>v&&v!==word[2]))]).slice(0,3);
+  if(meaningDistractors.length>=3){const options=shuffleCoachItems([word[2],...meaningDistractors]);vocab.push({section:'Лексика',question:'Выбери точное значение слова '+word[0]+'.',options,answer:options.indexOf(word[2]),explanation:word[0]+' — '+word[1]+' — '+word[2]+'.'});}
+  const pinyinDistractors=shuffleCoachItems([...new Set(allWords.map(w=>w[1]).filter(v=>v&&v!==word[1]))]).slice(0,3);
+  if(pinyinDistractors.length>=3){const options=shuffleCoachItems([word[1],...pinyinDistractors]);vocab.push({section:'Лексика и чтение',question:'Выбери правильный пиньинь для '+word[0]+'.',options,answer:options.indexOf(word[1]),explanation:word[0]+' читается '+word[1]+'.'});}
+ });
+ const phraseQuestions=[];
+ allPhrases.forEach(phrase=>{
+  const distractors=shuffleCoachItems([...new Set(allPhrases.map(p=>p[2]).filter(v=>v&&v!==phrase[2]))]).slice(0,3);
+  if(distractors.length>=3){const options=shuffleCoachItems([phrase[2],...distractors]);phraseQuestions.push({section:'Понимание фраз',question:'Как правильно перевести выражение «'+phrase[0]+'»?',options,answer:options.indexOf(phrase[2]),explanation:phrase[0]+' — '+phrase[1]+' — '+phrase[2]+'.'});}
+ });
+ const grammarCount=grammar.length;
+ const vocabTarget=42,phraseTarget=10;
+ return shuffleCoachItems(grammar).concat(shuffleCoachItems(vocab).slice(0,vocabTarget),shuffleCoachItems(phraseQuestions).slice(0,phraseTarget));
+}
+function startCoachExam(){
+ const level=currentCoachLevel();
+ activeCoachExamQuestions=buildCoachExamQuestions(level);
+ coachExamIndex=0;coachExamCorrect=0;coachExamAnswered=false;coachExamSelected=null;coachExamAnswers=[];
+ if(coachExamTimer)clearInterval(coachExamTimer);
+ coachExamDeadline=Date.now()+75*60*1000;
  document.getElementById('coachLessonPanel').hidden=true;
  document.getElementById('coachExamPanel').hidden=false;
  document.getElementById('coachExamSummary').hidden=true;
- document.getElementById('coachExamTag').textContent='HSK '+level+' · PhotoChinese';
- document.getElementById('coachExamTitle').textContent='Итоговая проверка HSK '+level;
- document.getElementById('coachExamIntro').textContent='Вопросы случайно выбраны из слов и грамматики пройденных уроков. Это внутренняя проверка PhotoChinese, не официальный экзамен HSK.';
+ document.getElementById('coachExamTag').textContent='HSK '+level+' · Итоговая аттестация';
+ document.getElementById('coachExamTitle').textContent='Итоговый экзамен HSK '+level;
+ document.getElementById('coachExamIntro').textContent='Письменная внутренняя аттестация PhotoChinese: грамматика каждого урока, выборка лексики и понимание выражений. 75 минут. Ответы и правильные варианты не показываются до завершения. Это не официальный сертификат HSK.';
+ document.getElementById('coachExamFeedback').textContent='Выбери ответ. Можно изменить его до перехода к следующему заданию.';
+ const timer=document.getElementById('coachExamTimer');timer.classList.remove('warning');
+ const updateTimer=()=>{
+  const remaining=Math.max(0,coachExamDeadline-Date.now()),minutes=Math.floor(remaining/60000),seconds=Math.floor((remaining%60000)/1000);
+  timer.textContent='Осталось времени: '+String(minutes).padStart(2,'0')+':'+String(seconds).padStart(2,'0');
+  timer.classList.toggle('warning',remaining<=5*60*1000);
+  if(remaining<=0){clearInterval(coachExamTimer);coachExamTimer=null;finishCoachExam(true);}
+ };
+ updateTimer();coachExamTimer=setInterval(updateTimer,1000);
  renderCoachExamQuestion();
 }
 function renderCoachExamQuestion(){
- const q=activeCoachExamQuestions[coachExamIndex];coachExamAnswered=false;
- document.getElementById('coachExamCounter').textContent='Задание '+(coachExamIndex+1)+' из '+activeCoachExamQuestions.length+' · правильных ответов: '+coachExamCorrect;
+ const q=activeCoachExamQuestions[coachExamIndex];coachExamAnswered=false;coachExamSelected=coachExamAnswers[coachExamIndex]??null;
+ document.getElementById('coachExamCounter').textContent='Задание '+(coachExamIndex+1)+' из '+activeCoachExamQuestions.length+' · раздел: '+q.section;
  document.getElementById('coachExamQuestion').textContent=q.question;
- document.getElementById('coachExamFeedback').textContent='Выбери один ответ.';
- const next=document.getElementById('nextCoachExamQuestion');next.hidden=true;next.disabled=true;
+ document.getElementById('coachExamFeedback').textContent='Ответы будут проверены после завершения экзамена.';
+ const next=document.getElementById('nextCoachExamQuestion');next.hidden=false;next.disabled=coachExamSelected===null;
+ next.textContent=coachExamIndex===activeCoachExamQuestions.length-1?'Завершить экзамен':'Следующее задание';
  const options=document.getElementById('coachExamOptions');options.innerHTML='';
  q.options.forEach((option,i)=>{
   const b=document.createElement('button');b.type='button';b.className='coach-practice-option';b.textContent=option;
+  if(coachExamSelected===i)b.classList.add('selected');
   b.addEventListener('click',()=>{
-   if(coachExamAnswered)return;coachExamAnswered=true;
-   const correct=i===q.answer;if(correct)coachExamCorrect++;
-   [...options.children].forEach((item,j)=>{item.disabled=true;if(j===q.answer)item.classList.add('correct');else if(j===i)item.classList.add('wrong');});
-   document.getElementById('coachExamCounter').textContent='Задание '+(coachExamIndex+1)+' из '+activeCoachExamQuestions.length+' · правильных ответов: '+coachExamCorrect;
-   document.getElementById('coachExamFeedback').textContent=(correct?'Верно! ':'Ответ неверный. ')+(q.explanation||'');
-   next.hidden=false;next.disabled=false;next.textContent=coachExamIndex===activeCoachExamQuestions.length-1?'Завершить проверку':'Следующее задание';
+   if(coachExamAnswered)return;coachExamSelected=i;coachExamAnswers[coachExamIndex]=i;
+   [...options.children].forEach((item,j)=>{item.classList.toggle('selected',j===i);});
+   next.disabled=false;
   });options.appendChild(b);
  });
 }
@@ -4130,23 +4162,38 @@ document.getElementById('startCoachExam').addEventListener('click',()=>{
  if(done.length!==coachCourses[currentCoachLevel()].length)return;
  startCoachExam();
 });
-document.getElementById('nextCoachExamQuestion').addEventListener('click',()=>{
- if(!coachExamAnswered)return;
- if(coachExamIndex<activeCoachExamQuestions.length-1){coachExamIndex++;renderCoachExamQuestion();return;}
+function finishCoachExam(timeExpired=false){
+ if(!activeCoachExamQuestions.length||document.getElementById('coachExamSummary').hidden===false)return;
+ if(coachExamTimer){clearInterval(coachExamTimer);coachExamTimer=null;}
+ coachExamCorrect=0;const sectionResults={};
+ activeCoachExamQuestions.forEach((q,index)=>{
+  const correct=coachExamAnswers[index]===q.answer;if(correct)coachExamCorrect++;
+  sectionResults[q.section]=sectionResults[q.section]||{correct:0,total:0};
+  sectionResults[q.section].total++;if(correct)sectionResults[q.section].correct++;
+ });
  const total=activeCoachExamQuestions.length,percent=Math.round(coachExamCorrect/total*100),passed=percent>=80;
  const history=JSON.parse(localStorage.getItem('photoChineseCoachExams')||'{}');
- history[String(currentCoachLevel())]={correct:coachExamCorrect,total,percent,passed,date:new Date().toISOString()};
+ history[String(currentCoachLevel())]={correct:coachExamCorrect,total,percent,passed,date:new Date().toISOString(),sections:sectionResults,timeExpired};
  localStorage.setItem('photoChineseCoachExams',JSON.stringify(history));
  document.getElementById('coachExamOptions').innerHTML='';
- document.getElementById('coachExamQuestion').textContent='Проверка завершена.';
- document.getElementById('coachExamCounter').textContent='Результат: '+coachExamCorrect+' из '+total+' · '+percent+'%';
- document.getElementById('coachExamFeedback').textContent=passed?'Отличный результат! Ты успешно прошёл(ла) внутреннюю проверку курса.':'Пока не достигнут порог 80%. Повтори уроки и попробуй ещё раз.';
+ document.getElementById('coachExamQuestion').textContent='Экзамен завершён.';
+ document.getElementById('coachExamCounter').textContent='Результат: '+coachExamCorrect+' из '+total+' · '+percent+'%'+(timeExpired?' · время истекло':'');
+ document.getElementById('coachExamFeedback').textContent=passed?'Достигнут проходной порог 80%.':'Проходной порог — 80%. Результат пока недостаточен для подтверждения уровня.';
  const summary=document.getElementById('coachExamSummary');summary.hidden=false;
- summary.textContent=passed?'PhotoChinese: уровень HSK '+currentCoachLevel()+' по материалам пройденного курса подтверждён. Это учебный результат, не официальный сертификат HSK.':'Рекомендация: вернись к урокам, в которых были ошибки, и повтори итоговую проверку.';
+ const details=Object.entries(sectionResults).map(([name,data])=>name+': '+data.correct+'/'+data.total).join(' · ');
+ summary.textContent=(passed?'PhotoChinese: внутренняя аттестация HSK '+currentCoachLevel()+' пройдена. ':'HSK '+currentCoachLevel()+' пока не подтверждён. ')+details+'. Это учебный результат, не официальный сертификат HSK.';
  document.getElementById('nextCoachExamQuestion').hidden=true;
+ document.getElementById('coachExamTimer').textContent='Экзамен завершён';
  renderCoachCourse();
+}
+document.getElementById('nextCoachExamQuestion').addEventListener('click',()=>{
+ if(document.getElementById('coachExamSummary').hidden===false)return;
+ if(coachExamIndex<activeCoachExamQuestions.length-1){coachExamIndex++;renderCoachExamQuestion();return;}
+ finishCoachExam(false);
 });
 document.getElementById('backFromCoachExam').addEventListener('click',()=>{
+ if(document.getElementById('coachExamSummary').hidden===true&&!confirm('Выйти из экзамена? Текущая попытка не будет засчитана.'))return;
+ if(coachExamTimer){clearInterval(coachExamTimer);coachExamTimer=null;}
  document.getElementById('coachExamPanel').hidden=true;renderCoachCourse();
 });
 document.getElementById('coachLevel').addEventListener('change',()=>{document.getElementById('coachLessonPanel').hidden=true;renderCoachCourse();document.getElementById('coachLevelNotice').textContent='Выбран HSK '+currentCoachLevel()+'. Прогресс каждого уровня сохраняется отдельно.'});
