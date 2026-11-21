@@ -1547,6 +1547,205 @@ body.dark-theme .analysis-result-summary .small {
   color: #e8c9d0 !important;
 }
 
+
+/* ===== ОБНОВЛЁННЫЙ ПРОФИЛЬ PHOTOCHINESE ===== */
+.profile-page {
+  background: #fffaf8;
+  border: 1px solid #f0dce2;
+  border-radius: 24px;
+  overflow: hidden;
+  color: #60464d;
+}
+.profile-banner {
+  height: 170px;
+  background: linear-gradient(125deg,#f0c5ce 0%,#e8d4d8 52%,#d8c6c2 100%);
+  border-radius: 0;
+  overflow: visible;
+}
+#bannerPlaceholder {
+  font-size: clamp(22px,4vw,34px);
+  font-weight: 750;
+  letter-spacing: .02em;
+  text-shadow: 0 2px 14px #60464d20;
+}
+.profile-main { padding: 0 24px 28px; }
+.profile-top {
+  display: flex;
+  align-items: center;
+  justify-content: flex-start;
+  gap: 18px;
+  min-height: 116px;
+  margin-top: -56px;
+  position: relative;
+  z-index: 3;
+  flex-wrap: wrap;
+}
+.profile-avatar {
+  width: 116px;
+  height: 116px;
+  flex: 0 0 116px;
+  border-radius: 50%;
+  border: 5px solid #fffaf8;
+  background: #f4e8e8;
+  box-shadow: 0 5px 18px #60464d20;
+}
+.profile-identity {
+  min-width: 130px;
+  flex: 1 1 150px;
+  align-self: flex-end;
+  padding-bottom: 12px;
+}
+.profile-name-line { margin: 0; gap: 7px; }
+.profile-name-line h2 { color: #49353d; font-size: 27px; }
+.profile-subtitle { margin: 5px 0 0; color: #8b6872; font-size: 14px; }
+.profile-hsk-badge {
+  align-self: flex-end;
+  margin: 0 0 18px auto;
+  padding: 9px 15px;
+  border-radius: 999px;
+  background: #f1e3e5;
+  color: #76515c;
+  font-weight: 700;
+  white-space: nowrap;
+}
+#editProfileBtn {
+  position: absolute;
+  right: 0;
+  top: -108px;
+  margin: 0;
+  padding: 10px 16px;
+  border: 1px solid #e7cbd1;
+  border-radius: 999px;
+  background: #fff4f3;
+  color: #76515c;
+  font-weight: 700;
+}
+#editProfileBtn:hover { background: #f7e5e5; transform: translateY(-1px); }
+.profile-bio {
+  margin-top: 20px;
+  padding: 0;
+  background: transparent;
+  border-radius: 0;
+  color: #705962;
+  font-size: 16px;
+  line-height: 1.65;
+}
+.profile-bio p { margin: 0; color: inherit; }
+.profile-facts {
+  margin-top: 12px;
+  padding: 0;
+  background: transparent;
+  color: #8b6872;
+}
+.profile-divider { margin: 22px 0; background: #ead8dc; }
+.profile-section { margin-top: 24px; }
+.profile-section h2, .profile-hsk-progress h2 {
+  margin: 0 0 14px;
+  color: #49353d;
+  font-size: 21px;
+}
+.profile-stats { grid-template-columns: repeat(3,minmax(0,1fr)); gap: 12px; }
+.profile-stat {
+  min-width: 0;
+  min-height: 116px;
+  justify-content: space-between;
+  padding: 18px 10px;
+  border-radius: 20px;
+  background: #f7eff0;
+  color: #60464d;
+}
+.profile-stat strong { font-size: 29px; color: #76515c; }
+.profile-stat span { font-size: 13px; line-height: 1.35; color: #806a71; }
+.profile-hsk-progress {
+  margin-top: 18px;
+  padding: 20px;
+  border: 1px solid #f0e1e3;
+  border-radius: 20px;
+  background: #fff3f3;
+}
+.profile-hsk-progress-label {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  margin: 12px 0 10px;
+  color: #806a71;
+}
+.profile-hsk-progress-label strong { color: #76515c; }
+.profile-hsk-track {
+  height: 12px;
+  overflow: hidden;
+  border-radius: 999px;
+  background: #eadde1;
+}
+.profile-hsk-track span {
+  display: block;
+  width: 0;
+  height: 100%;
+  border-radius: inherit;
+  background: linear-gradient(90deg,#c88f9d,#9f6c7b);
+  transition: width .35s ease;
+}
+#profileHskHint { margin: 10px 0 0; color: #9a858b; font-size: 12px; }
+.profile-edit { background: #fff7f6; border-color: #eedde0; }
+.profile-edit input, .profile-edit textarea { box-sizing: border-box; }
+@media (max-width: 560px) {
+  .profile-main { padding-left: 15px; padding-right: 15px; }
+  .profile-banner { height: 145px; }
+  .profile-top { gap: 11px; margin-top: -48px; min-height: 104px; }
+  .profile-avatar { width: 96px; height: 96px; flex-basis: 96px; }
+  .profile-identity { flex-basis: calc(100% - 112px); padding-bottom: 8px; }
+  .profile-name-line h2 { font-size: 23px; }
+  .profile-hsk-badge { margin: 0 0 10px auto; padding: 7px 11px; }
+  #editProfileBtn { top: -92px; right: 0; padding: 8px 12px; font-size: 13px; }
+  .profile-stats { gap: 8px; }
+  .profile-stat { min-height: 100px; padding: 14px 6px; }
+  .profile-stat strong { font-size: 25px; }
+  .profile-stat span { font-size: 11px; }
+  .profile-hsk-progress { padding: 16px; }
+}
+body.dark-theme .profile-page {
+  background: #35292e;
+  border-color: #59434b;
+  color: #f6e9eb;
+}
+body.dark-theme .profile-banner {
+  background: linear-gradient(125deg,#674650 0%,#57434d 55%,#49414a 100%);
+}
+body.dark-theme .profile-avatar {
+  background: #57414a;
+  border-color: #35292e;
+}
+body.dark-theme .profile-name-line h2,
+body.dark-theme .profile-section h2,
+body.dark-theme .profile-hsk-progress h2 { color: #fff0f2; }
+body.dark-theme .profile-subtitle,
+body.dark-theme .profile-bio,
+body.dark-theme .profile-facts { color: #d8bec5; }
+body.dark-theme .profile-hsk-badge,
+body.dark-theme #editProfileBtn {
+  background: #59414a;
+  color: #ffe9ed;
+  border-color: #795965;
+}
+body.dark-theme .profile-stat {
+  background: #49363e;
+  color: #f7e9ec;
+}
+body.dark-theme .profile-stat strong { color: #f4cbd5; }
+body.dark-theme .profile-stat span,
+body.dark-theme #profileHskHint,
+body.dark-theme .profile-hsk-progress-label { color: #d2b9c0; }
+body.dark-theme .profile-hsk-progress {
+  background: #403039;
+  border-color: #604751;
+}
+body.dark-theme .profile-hsk-progress-label strong { color: #f4cbd5; }
+body.dark-theme .profile-hsk-track { background: #5b4650; }
+body.dark-theme .profile-hsk-track span { background: linear-gradient(90deg,#d49aa8,#a97585); }
+body.dark-theme .profile-divider { background: #604751; }
+body.dark-theme .profile-edit { background: #403039; border-color: #604751; }
+
 </style>
 </head>
 <body>
@@ -1716,59 +1915,52 @@ body.dark-theme .analysis-result-summary .small {
     <div class="profile-main">
 
       <div class="profile-top">
-       
-<div class="profile-editor" id="profileEditor" hidden>
-  <h3>✏️ Настройка профиля</h3>
-
-<input
-  type="file"
-  id="avatarUpload"
-  accept="image/*"
-  hidden
->
-
-</div>
+        <div class="profile-editor" id="profileEditor" hidden>
+          <input type="file" id="avatarUpload" accept="image/*" hidden>
+        </div>
 
         <div class="profile-avatar" id="profileAvatar">
-  <span id="profileAvatarPlaceholder">🦊</span>
-  <img id="profileAvatarImage" hidden>
+          <span id="profileAvatarPlaceholder">🦊</span>
+          <img id="profileAvatarImage" hidden>
         </div>
-        
+
+        <div class="profile-identity">
+          <div class="profile-name-line">
+            <h2 id="profileNickname">dollrot</h2>
+            <span class="profile-decoration" id="equippedDecoration"></span>
+          </div>
+          <p class="profile-subtitle" id="profileSubtitle">学习中文 ♡</p>
+        </div>
+
+        <span class="profile-hsk-badge" id="profileHskBadge">HSK 1</span>
+
         <button class="secondary" id="editProfileBtn" type="button">
-  ✎ Редактировать профиль
+          ✎ Редактировать
         </button>
-
-      </div>
-      
-        <div class="profile-name-line">
-  <h2 id="profileNickname">dollrot</h2>
-  <span class="profile-decoration" id="equippedDecoration"></span>
       </div>
 
-      <p class="profile-subtitle">Начинающий исследователь китайского языка</p>
+      <div class="profile-bio">
+        <p id="profileBioText">Изучаю китайский, собираю иероглифы и создаю свой маленький мир.</p>
+      </div>
 
-      
-<div class="profile-bio">
-  <h3>Обо мне</h3>
-  <p id="profileBioText">Расскажи немного о себе ♡</p>
-</div>
+      <div class="profile-facts">
+        <span>♡ Любимый иероглиф: <strong id="favoriteCharacter">愛</strong></span>
+      </div>
 
-<div class="profile-facts">
-  <span>♡ Любимый иероглиф: <strong id="favoriteCharacter">愛</strong></span>
-  <span>📚 Изучаю китайский</span>
-</div>
+      <div class="profile-edit" id="profileEditPanel" hidden>
+        <label for="subtitleInput">Подпись под ником</label>
+        <input id="subtitleInput" type="text" maxlength="60" placeholder="Например: 学习中文 ♡">
 
-<div class="profile-edit" id="profileEditPanel" hidden>
-  <label for="bioInput">Обо мне</label>
-  <textarea id="bioInput" maxlength="300" placeholder="Расскажи о себе..."></textarea>
+        <label for="bioInput">Обо мне</label>
+        <textarea id="bioInput" maxlength="300" placeholder="Расскажи о себе..."></textarea>
 
-  <label for="favoriteCharacterInput">Любимый иероглиф</label>
-  <input id="favoriteCharacterInput" type="text" maxlength="5" placeholder="Например, 愛">
+        <label for="favoriteCharacterInput">Любимый иероглиф</label>
+        <input id="favoriteCharacterInput" type="text" maxlength="5" placeholder="Например, 愛">
 
-  <button class="primary" id="saveProfileInfo" type="button">
-    Сохранить информацию
-  </button>
-</div>
+        <button class="primary" id="saveProfileInfo" type="button">
+          Сохранить информацию
+        </button>
+      </div>
 
 
       <!-- РЕДАКТИРОВАНИЕ НИКНЕЙМА -->
@@ -1845,23 +2037,35 @@ body.dark-theme .analysis-result-summary .small {
   Снять украшение
         </button>
 
-      <!-- ПРОГРЕСС -->
-      <section class="profile-section">
-        <h2>📊 Твой прогресс</h2>
+      <!-- СТАТИСТИКА И HSK -->
+      <section class="profile-section profile-overview">
+        <h2>Мои достижения</h2>
         <div class="profile-stats">
           <div class="profile-stat">
-            <strong>0</strong>
-            <span>Иероглифов</span>
+            <strong id="profileLearnedCount">0</strong>
+            <span>иероглифов изучено</span>
           </div>
           <div class="profile-stat">
-            <strong>0</strong>
-            <span>Дней подряд</span>
+            <strong id="profileLessonsCount">0</strong>
+            <span>уроков завершено</span>
           </div>
           <div class="profile-stat">
-            <strong>1</strong>
-            <span>Уровень HSK</span>
+            <strong id="profileAchievementsCount">0</strong>
+            <span>достижений</span>
           </div>
         </div>
+      </section>
+
+      <section class="profile-hsk-progress" aria-labelledby="profileHskTitle">
+        <h2 id="profileHskTitle">Мой прогресс HSK</h2>
+        <div class="profile-hsk-progress-label">
+          <span id="profileHskNextLabel">Подготовка к HSK 2</span>
+          <strong id="profileHskPercent">—</strong>
+        </div>
+        <div class="profile-hsk-track" role="progressbar" aria-label="Прогресс подготовки к следующему уровню HSK" aria-valuemin="0" aria-valuemax="100" aria-valuenow="0">
+          <span id="profileHskFill"></span>
+        </div>
+        <p id="profileHskHint">Прогресс будет рассчитываться по изученным словам выбранного уровня.</p>
       </section>
 
       <!-- СЛОВО ДНЯ -->
@@ -2932,37 +3136,45 @@ avatarUpload.addEventListener("change", () => {
 // ===== ПРОФИЛЬ: ИНФОРМАЦИЯ =====
 
 const bioInput = document.getElementById("bioInput");
+const subtitleInput = document.getElementById("subtitleInput");
 const favoriteCharacterInput = document.getElementById("favoriteCharacterInput");
 
 const profileBioText = document.getElementById("profileBioText");
+const profileSubtitle = document.getElementById("profileSubtitle");
 const favoriteCharacter = document.getElementById("favoriteCharacter");
 const saveProfileInfo = document.getElementById("saveProfileInfo");
 
-// Загружаем сохранённую информацию
 const savedBio = localStorage.getItem("profileBio");
+const savedSubtitle = localStorage.getItem("profileSubtitle");
 const savedCharacter = localStorage.getItem("favoriteCharacter");
 
 if (savedBio !== null) {
-  profileBioText.textContent = savedBio;
+  profileBioText.textContent = savedBio || "Расскажи немного о себе ♡";
   bioInput.value = savedBio;
 }
-
+if (savedSubtitle !== null) {
+  profileSubtitle.textContent = savedSubtitle || "学习中文 ♡";
+  subtitleInput.value = savedSubtitle;
+} else {
+  subtitleInput.value = profileSubtitle.textContent;
+}
 if (savedCharacter !== null) {
   favoriteCharacter.textContent = savedCharacter;
   favoriteCharacterInput.value = savedCharacter;
 }
 
-// Сохраняем изменения
 saveProfileInfo.addEventListener("click", () => {
   const bio = bioInput.value.trim();
+  const subtitle = subtitleInput.value.trim();
   const character = favoriteCharacterInput.value.trim();
 
   localStorage.setItem("profileBio", bio);
+  localStorage.setItem("profileSubtitle", subtitle);
   localStorage.setItem("favoriteCharacter", character || "—");
 
   profileBioText.textContent = bio || "Расскажи немного о себе ♡";
+  profileSubtitle.textContent = subtitle || "学习中文 ♡";
   favoriteCharacter.textContent = character || "—";
-
   alert("Информация профиля сохранена! ♡");
 });
 </script>
@@ -3093,11 +3305,13 @@ function updateAchievements() {
 
 // Обновление цифр в профиле
 function updateProfileProgress() {
-  const stats = document.querySelectorAll(".profile-stat strong");
+  const learned = document.getElementById("profileLearnedCount");
+  const lessons = document.getElementById("profileLessonsCount");
+  const achievements = document.getElementById("profileAchievementsCount");
 
-  if (stats.length >= 1) {
-    stats[0].textContent = progress.learnedCharacters.length;
-  }
+  if (learned) learned.textContent = progress.learnedCharacters.length;
+  if (lessons) lessons.textContent = progress.completedLessons.length;
+  if (achievements) achievements.textContent = progress.achievements.length;
 }
 
 // Загружаем данные при открытии сайта
