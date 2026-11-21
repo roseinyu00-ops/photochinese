@@ -1,5 +1,5 @@
 
-const CACHE_NAME = "photochinese-v1";
+const CACHE_NAME = "photochinese-v2";
 
 const FILES_TO_CACHE = [
   "./",
@@ -35,7 +35,7 @@ self.addEventListener("fetch", event => {
   if (event.request.method !== "GET") return;
 
   event.respondWith(
-    fetch(event.request).catch(() =>
+    fetch(event.request, { cache: "no-cache" }).catch(() =>
       caches.match(event.request)
     )
   );
