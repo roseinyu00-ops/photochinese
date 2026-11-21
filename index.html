@@ -1969,6 +1969,50 @@ body.dark-theme #equippedDecoration {
 }
 body.dark-theme .collection-title-icon { color: #d6a2af; }
 
+
+/* Финальная коррекция слоя редактирования аватарки */
+#profileAvatar {
+  position: relative !important;
+  overflow: hidden !important;
+  border-radius: 50% !important;
+  clip-path: circle(50% at 50% 50%);
+  isolation: isolate;
+  contain: paint;
+}
+#profileAvatar::after {
+  position: absolute !important;
+  inset: 0 !important;
+  width: 100% !important;
+  height: 100% !important;
+  box-sizing: border-box !important;
+  margin: 0 !important;
+  padding: 0 !important;
+  display: grid !important;
+  place-items: center !important;
+  text-align: center !important;
+  line-height: 1 !important;
+  border-radius: 50% !important;
+  clip-path: circle(50% at 50% 50%);
+  overflow: hidden !important;
+  transform: none !important;
+  pointer-events: none;
+  background: rgba(53,41,46,.32) !important;
+  -webkit-backdrop-filter: blur(2px);
+  backdrop-filter: blur(2px);
+}
+body.profile-editing #profileAvatar::after {
+  opacity: 1 !important;
+}
+#chooseBannerBtn {
+  -webkit-backdrop-filter: none !important;
+  backdrop-filter: none !important;
+  background: rgba(255,250,248,.94) !important;
+  box-shadow: 0 2px 8px rgba(73,53,61,.10);
+}
+body.dark-theme #chooseBannerBtn {
+  background: rgba(61,48,52,.96) !important;
+}
+
 </style>
 </head>
 <body>
