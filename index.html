@@ -1548,6 +1548,81 @@ body.dark-theme .analysis-result-summary .small {
 }
 
 
+/* ===== ЗАКРЫТЫЙ ПРОФИЛЬ ДЛЯ ГОСТЕЙ ===== */
+#profile { position: relative; }
+#profile.profile-locked .profile-page {
+  filter: blur(5px);
+  opacity: .72;
+  pointer-events: none;
+  user-select: none;
+}
+.profile-lock-screen {
+  position: absolute;
+  inset: 0;
+  z-index: 20;
+  display: grid;
+  place-items: center;
+  padding: 24px;
+  border-radius: 24px;
+  background: rgba(255,250,248,.34);
+}
+.profile-lock-screen[hidden] { display: none; }
+.profile-lock-content {
+  width: min(100%, 390px);
+  padding: 30px 26px;
+  text-align: center;
+  border: 1px solid #f0dce2;
+  border-radius: 24px;
+  background: rgba(255,250,248,.96);
+  box-shadow: 0 18px 55px rgba(73,53,61,.13);
+  color: #60464d;
+}
+.profile-lock-icon {
+  width: 66px;
+  height: 66px;
+  margin: 0 auto 16px;
+  display: grid;
+  place-items: center;
+  border-radius: 22px;
+  background: #f7e8eb;
+}
+.profile-lock-icon svg {
+  width: 38px;
+  height: 38px;
+  stroke: #a66f7d;
+  stroke-width: 2;
+  stroke-linecap: round;
+  stroke-linejoin: round;
+}
+.profile-lock-content h2 { margin: 0 0 9px; font-size: 22px; }
+.profile-lock-content p { margin: 0 auto 21px; max-width: 300px; line-height: 1.55; color: #8a7078; }
+.profile-lock-button {
+  width: 100%;
+  border: 0;
+  border-radius: 14px;
+  padding: 14px 18px;
+  background: #a66f7d;
+  color: #fffaf8;
+  font: inherit;
+  font-weight: 700;
+  cursor: pointer;
+}
+.profile-lock-button:hover { background: #925d6b; }
+body.dark-theme .profile-lock-screen { background: rgba(35,26,31,.42); }
+body.dark-theme .profile-lock-content {
+  background: rgba(53,41,46,.97);
+  border-color: #59434b;
+  color: #f6e9eb;
+}
+body.dark-theme .profile-lock-icon { background: #59414a; }
+body.dark-theme .profile-lock-icon svg { stroke: #e6aeba; }
+body.dark-theme .profile-lock-content p { color: #d8bec5; }
+body.dark-theme .profile-lock-button { background: #c18494; color: #35292e; }
+@media (max-width: 480px) {
+  .profile-lock-content { padding: 25px 20px; }
+  .profile-lock-content h2 { font-size: 20px; }
+}
+
 /* ===== ОБНОВЛЁННЫЙ ПРОФИЛЬ PHOTOCHINESE ===== */
 .profile-page {
   background: #fffaf8;
@@ -2090,16 +2165,6 @@ body.profile-editing #profileAvatar::after {
 
   <div class="header-actions">
   <button class="theme-toggle" id="themeToggle" type="button" aria-label="Сменить тему">🌙</button>
-
-  <button
-    class="account-button"
-    id="accountButton"
-    type="button"
-    aria-label="Аккаунт"
-    onclick="openAccountModal()"
-  >
-    ♙
-  </button>
 </div>
 </header>
   
@@ -2401,6 +2466,21 @@ body.profile-editing #profileAvatar::after {
       </section>
     </div>
   </div>
+  <div class="profile-lock-screen" id="profileLockScreen" hidden>
+    <div class="profile-lock-content">
+      <div class="profile-lock-icon" aria-hidden="true">
+        <svg viewBox="0 0 48 48" fill="none">
+          <rect x="9" y="21" width="30" height="22" rx="6"/>
+          <path d="M16 21v-7a8 8 0 0 1 16 0v7"/>
+          <circle cx="24" cy="31" r="2.5"/>
+          <path d="M24 34v3"/>
+        </svg>
+      </div>
+      <h2>Твой профиль ждёт тебя</h2>
+      <p>Войди или создай аккаунт, чтобы открыть свой личный мир PhotoChinese.</p>
+      <button class="profile-lock-button" type="button" onclick="openAccountModal()">Зарегистрироваться / войти</button>
+    </div>
+  </div>
 </section>
 </main>
 <footer>PhotoChinese · Учись видеть смысл в каждом иероглифе<br><span class="small">Словарные данные: Maqsudjonpolatov, HSK Chinese–Uzbek–Russian · <a href="https://huggingface.co/datasets/Maqsudjonpolatov/hsk-chinese-uzbek-russian" target="_blank" rel="noopener">источник</a> · <a href="https://creativecommons.org/licenses/by/4.0/" target="_blank" rel="noopener">CC BY 4.0</a><br>Данные о структуре иероглифов: Make Me a Hanzi · LGPL-3.0-or-later; данные черт: Arphic Public License · <a href="https://wangwave.github.io/makeme_word/" target="_blank" rel="noopener">источник и лицензии</a></span></footer>
@@ -2427,15 +2507,23 @@ body.profile-editing #profileAvatar::after {
   console.log("PhotoChinese: Supabase подключён");
 </script>
 <script>
+let photoChineseUser = null;
+
+function updateProfileAccess() {
+  const profileTab = document.getElementById("profile");
+  const lockScreen = document.getElementById("profileLockScreen");
+  const locked = !photoChineseUser;
+  profileTab.classList.toggle("profile-locked", locked);
+  lockScreen.hidden = !locked;
+}
+
 const tabs = document.querySelectorAll('nav button');
 tabs.forEach(btn => btn.addEventListener('click', () => {
   tabs.forEach(b => b.classList.toggle('active', b === btn));
   document.querySelectorAll('.tab').forEach(s => s.hidden = s.id !== btn.dataset.tab);
 
-document.body.classList.toggle(
-  "profile-open",
-  btn.dataset.tab === "profile"
-);
+  document.body.classList.toggle("profile-open", btn.dataset.tab === "profile");
+  if (btn.dataset.tab === "profile") updateProfileAccess();
 }));
 const photo = document.getElementById('photo');
 const cameraPhoto = document.getElementById('cameraPhoto');
@@ -3901,6 +3989,8 @@ function switchAccountMode(mode) {
 
 // Загрузка профиля из облака
 async function loadCloudProfile(user) {
+  photoChineseUser = user;
+  updateProfileAccess();
   const client = window.photoChineseSupabase;
 
   const { data, error } = await client
@@ -4014,8 +4104,7 @@ document.getElementById("accountForm").addEventListener("submit", async function
 
         message.textContent = "Успешный вход! Профиль загружен ❤️";
 
-        document.getElementById("accountButton").title =
-          "Ты вошла в аккаунт";
+        updateProfileAccess();
 
         setTimeout(closeAccountModal, 1200);
       }
@@ -4049,14 +4138,20 @@ document.getElementById("accountForm").addEventListener("submit", async function
   if (data.session) {
     try {
       await loadCloudProfile(data.session.user);
-
-      document.getElementById("accountButton").title =
-        "Ты вошла в аккаунт";
-
     } catch (error) {
+      photoChineseUser = null;
+      updateProfileAccess();
       console.error("Не удалось восстановить профиль:", error);
     }
+  } else {
+    photoChineseUser = null;
+    updateProfileAccess();
   }
+
+  client.auth.onAuthStateChange((_event, session) => {
+    photoChineseUser = session ? session.user : null;
+    updateProfileAccess();
+  });
 })();
 
 window.addEventListener("keydown", function(event) {
