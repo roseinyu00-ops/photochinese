@@ -3370,9 +3370,11 @@ document.getElementById('translateBtn').onclick=async()=>{
     {term:'栓Q',title:'栓Q (shuān Q)',meaning:'Ироничное «спасибо» или «ну спасибо».',detail:'Мемная игра со звучанием английского thank you.'},
     {term:'真香',title:'真香 (zhēn xiāng)',meaning:'А ведь мне это нравится!',detail:'Мем о том, кто сначала отказывался от чего-то, а потом сам это полюбил.'},
     {term:'好家伙',title:'好家伙 (hǎo jiāhuo)',meaning:'Ничего себе! Вот это да!',detail:'Выражает удивление, восхищение или иронию — зависит от контекста.'},
-    {term:'家人们',title:'家人们 (jiārénmen)',meaning:'Народ! Ребята!',detail:'Дружеское обращение автора ролика к своей аудитории.'}
+    {term:'家人们',title:'家人们 (jiārénmen)',meaning:'Народ! Ребята!',detail:'Дружеское обращение автора ролика к своей аудитории.'},
+    {term:'我真的会谢',title:'我真的会谢 (wǒ zhēn de huì xiè)',meaning:'«Ну всё, я уже не могу»; «спасибо, конечно…»',detail:'Популярная саркастическая интернет-фраза. Буквально — «я правда буду благодарна», но обычно её пишут в ответ на раздражающую, нелепую или абсурдную ситуацию. Это не искренняя благодарность, а эмоциональная реакция: усталость, беспомощность или возмущение.'},
+    {term:'真的会谢',title:'真的会谢 (zhēn de huì xiè)',meaning:'«Ну я уже не могу»; «вот спасибо…»',detail:'Сокращённый вариант мемной фразы 我真的会谢; чаще всего звучит иронично или саркастически.'}
   ];
-  const foundMemes=memeGlossary.filter(item=>t.toLowerCase().includes(item.term.toLowerCase()));
+  const foundMemes=memeGlossary.filter(item=>normalized.toLowerCase().includes(item.term.replace(/\\s/g,'').toLowerCase()));
   const memeBox=document.createElement('div');
   memeBox.className='meme-analysis-card';
   memeBox.innerHTML='<h3>Мемный контекст ✨</h3>';
