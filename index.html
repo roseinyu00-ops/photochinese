@@ -2236,6 +2236,35 @@ body.profile-editing #profileAvatar::after {
 
 
 #coachLessonExample{white-space:pre-line;line-height:1.8}#coachLessonExplanation{line-height:1.75}.coach-word-pinyin{font-size:13px;color:var(--accent);font-weight:600;letter-spacing:.02em}#coachLessonExample{font-size:14px}
+
+/* HSK diagnostic */
+.hsk-diagnostic{max-width:850px;margin:0 auto}
+.hsk-kicker{font-size:11px;letter-spacing:.16em;font-weight:800;color:var(--accent);margin-bottom:9px}
+.hsk-intro-stats{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:10px;margin:22px 0}
+.hsk-intro-stats>div{padding:15px 10px;border:1px solid var(--line);border-radius:15px;background:var(--surface-soft,rgba(180,130,150,.06));display:flex;flex-direction:column;gap:4px;text-align:center}
+.hsk-intro-stats strong{font-size:24px}.hsk-intro-stats span{font-size:12px;color:var(--muted)}
+.hsk-test-top{display:flex;justify-content:space-between;gap:12px;font-size:13px;font-weight:700;margin:22px 0 10px}
+.hsk-progress-track{height:8px;background:var(--line);border-radius:99px;overflow:hidden;margin-bottom:20px}
+#hskProgressFill{height:100%;width:0;background:var(--accent);border-radius:99px;transition:width .2s}
+.hsk-question-card{border:1px solid var(--line);border-radius:18px;padding:clamp(16px,4vw,26px);background:var(--surface,transparent)}
+.hsk-question-type{font-size:11px;text-transform:uppercase;letter-spacing:.12em;color:var(--accent);font-weight:800;margin-bottom:12px}
+#hskQuestionText{font-size:clamp(19px,4vw,25px);line-height:1.55;margin:0}
+.hsk-question-pinyin{font-size:14px;line-height:1.6;color:var(--accent);margin:8px 0 20px}
+.hsk-options{display:grid;gap:10px}
+.hsk-option{width:100%;text-align:left;padding:13px 15px;border:1px solid var(--line);border-radius:12px;background:transparent;color:var(--text);font:inherit;cursor:pointer;transition:border-color .15s,background .15s}
+.hsk-option:hover:not(:disabled){border-color:var(--accent);background:rgba(180,130,150,.07)}
+.hsk-option:disabled{cursor:default;opacity:1}
+.hsk-option.is-correct{border-color:#4c9a72;background:rgba(76,154,114,.12)}
+.hsk-option.is-wrong{border-color:#c56d75;background:rgba(197,109,117,.10)}
+.hsk-answer-feedback{margin-top:16px;padding:13px;border-radius:12px;background:rgba(180,130,150,.08);font-size:14px;line-height:1.65}
+.hsk-test-actions{display:flex;justify-content:space-between;gap:10px;flex-wrap:wrap;margin-top:18px}
+.hsk-result-score{font-size:25px;font-weight:800;margin:14px 0}
+.hsk-level-breakdown{display:grid;gap:9px;margin:18px 0}
+.hsk-level-row{display:grid;grid-template-columns:68px 1fr auto;align-items:center;gap:10px;font-size:13px}
+.hsk-level-bar{height:8px;background:var(--line);border-radius:99px;overflow:hidden}
+.hsk-level-bar span{display:block;height:100%;background:var(--accent);border-radius:99px}
+.hsk-level-status{font-size:12px;color:var(--muted);min-width:66px;text-align:right}
+@media(max-width:480px){.hsk-intro-stats{gap:6px}.hsk-intro-stats>div{padding:12px 5px}.hsk-intro-stats strong{font-size:20px}.hsk-test-actions button{flex:1}.hsk-level-row{grid-template-columns:55px 1fr auto;gap:7px}}
 </style>
 </head>
 <body>
@@ -2423,20 +2452,47 @@ body.profile-editing #profileAvatar::after {
 </section>
 
 <section id="hsk" class="tab" hidden>
-  <div class="panel">
-    <h1>Определи свой HSK</h1>
-    <p>Короткий стартовый тест поможет приблизительно оценить уровень. Это не официальный экзамен.</p>
-    <div id="quiz">
-      <h2 id="question">1. Что означает 朋友 (péngyou)?</h2>
-      <div id="options">
-        <button class="quiz-option" data-correct="false">Учитель</button>
-        <button class="quiz-option" data-correct="true">Друг</button>
-        <button class="quiz-option" data-correct="false">Семья</button>
+  <div class="panel hsk-diagnostic">
+    <div class="hsk-kicker">PHOTOCHINESE · ДИАГНОСТИКА</div>
+    <h1>Определи свой уровень HSK</h1>
+    <p>30 заданий постепенно возрастающей сложности: лексика, грамматика и понимание фраз. В конце ты получишь ориентировочную оценку от HSK 1 до HSK 6.</p>
+    <div id="hskIntro" class="hsk-intro">
+      <div class="hsk-intro-stats">
+        <div><strong>30</strong><span>заданий</span></div>
+        <div><strong>6</strong><span>ступеней сложности</span></div>
+        <div><strong>≈ 10–15</strong><span>минут</span></div>
       </div>
-      <div class="actions"><button class="primary" id="nextQuestion">Следующий вопрос</button></div>
-      <div id="quizFeedback" class="small"></div>
+      <p class="small">Отвечай самостоятельно, не пользуясь словарём. Это внутренняя диагностическая проверка PhotoChinese, а не официальный экзамен и не точная сертификация уровня.</p>
+      <button class="primary" id="startHskDiagnostic" type="button">Начать тест</button>
+      <div id="hskPreviousResult" class="small" aria-live="polite"></div>
     </div>
-    <div id="hskResult" class="result" hidden></div>
+    <div id="hskTest" hidden>
+      <div class="hsk-test-top"><span id="hskQuestionNumber">Задание 1 из 30</span><span id="hskQuestionBand">HSK 1</span></div>
+      <div class="hsk-progress-track"><div id="hskProgressFill"></div></div>
+      <div class="hsk-question-card">
+        <div id="hskQuestionType" class="hsk-question-type">Лексика</div>
+        <h2 id="hskQuestionText"></h2>
+        <p id="hskQuestionPinyin" class="hsk-question-pinyin"></p>
+        <div id="hskOptions" class="hsk-options"></div>
+        <div id="hskAnswerFeedback" class="hsk-answer-feedback" hidden aria-live="polite"></div>
+      </div>
+      <div class="hsk-test-actions">
+        <button class="secondary" id="quitHskDiagnostic" type="button">Выйти из теста</button>
+        <button class="primary" id="nextHskQuestion" type="button" disabled>Следующее задание</button>
+      </div>
+    </div>
+    <div id="hskResult" class="hsk-result" hidden aria-live="polite">
+      <div class="hsk-kicker">РЕЗУЛЬТАТ ДИАГНОСТИКИ</div>
+      <h2 id="hskResultTitle"></h2>
+      <p id="hskResultDescription"></p>
+      <div id="hskResultScore" class="hsk-result-score"></div>
+      <div id="hskLevelBreakdown" class="hsk-level-breakdown"></div>
+      <p class="small" id="hskResultAdvice"></p>
+      <div class="actions">
+        <button class="primary" id="applyHskLevel" type="button">Перейти к этому уровню в ИИ-учителе</button>
+        <button class="secondary" id="retryHskDiagnostic" type="button">Пройти ещё раз</button>
+      </div>
+    </div>
   </div>
 </section>
 
@@ -4337,6 +4393,93 @@ document.querySelectorAll('[data-coach-help]').forEach(button=>button.addEventLi
  const lesson=coachCourses[currentCoachLevel()][activeCoachLesson],kind=button.dataset.coachHelp;
  document.getElementById('coachHelpAnswer').textContent=lesson.help[kind];document.getElementById('coachHelpAnswer').hidden=false;
 }));
+
+const hskDiagnosticQuestions=[
+{level:1,type:'Лексика',q:'Что означает слово 朋友？',py:'péngyou',opts:['семья','друг','учитель','студент'],a:1,why:'朋友 (péngyou) — друг, приятель.'},
+{level:1,type:'Грамматика',q:'Выбери правильное предложение: «Я студент».',py:'',opts:['我学生。','我是学生。','我在学生。','我有学生。'],a:1,why:'Для называния профессии или статуса используется 是: 我是学生 (Wǒ shì xuésheng) — Я студент.'},
+{level:1,type:'Понимание фразы',q:'你叫什么名字？',py:'Nǐ jiào shénme míngzi?',opts:['Сколько тебе лет?','Как тебя зовут?','Откуда ты?','Где ты живёшь?'],a:1,why:'你 (ты) + 叫 (называться) + 什么名字 (какое имя). Это вопрос «Как тебя зовут?».'},
+{level:1,type:'Грамматика',q:'Заполни пропуск: 我___一个妹妹。',py:'Wǒ ___ yí ge mèimei.',opts:['是','在','有','叫'],a:2,why:'有 (yǒu) означает «иметь»: 我有一个妹妹 — У меня есть младшая сестра.'},
+{level:1,type:'Числа',q:'Как записать число  двадцать один?',py:'èrshíyī',opts:['十二','二十一','两一','二十两'],a:1,why:'Двадцать один строится как 二十 + 一: 二十一 (èrshíyī).'},
+{level:2,type:'Лексика',q:'Что означает глагол 觉得？',py:'juéde',opts:['думать; считать; ощущать','забывать','помогать','встречать'],a:0,why:'觉得 (juéde) — считать, полагать, чувствовать или иметь мнение.'},
+{level:2,type:'Грамматика',q:'Выбери правильное продолжение: 因为今天很忙，……',py:'Yīnwèi jīntiān hěn máng, …',opts:['所以我不去了。','但是所以我去。','如果所以不去。','虽然因为我不去。'],a:0,why:'Причина и результат часто соединяются парой 因为……所以……: «Поскольку сегодня я занят(а), поэтому не пойду».'},
+{level:2,type:'Грамматика',q:'Заполни пропуск: 我___他一起去学校。',py:'Wǒ ___ tā yìqǐ qù xuéxiào.',opts:['比','跟','从','给'],a:1,why:'跟……一起 означает «вместе с кем-либо»: 我跟他一起去学校 — Я иду в школу вместе с ним.'},
+{level:2,type:'Понимание фразы',q:'你吃过北京烤鸭吗？',py:'Nǐ chī guo Běijīng kǎoyā ma?',opts:['Ты собираешься приготовить утку?','Ты когда-нибудь ел(а) пекинскую утку?','Ты не любишь утку?','Где продают утку?'],a:1,why:'过 после глагола обозначает наличие опыта: 吃过 — доводилось есть, ел(а) когда-либо.'},
+{level:2,type:'Грамматика',q:'Выбери естественный порядок действий: «Сначала поужинай, потом делай уроки».',py:'',opts:['先做作业，再吃晚饭。','先吃晚饭，再做作业。','再吃晚饭，先做作业。','先晚饭吃，再作业做。'],a:1,why:'先……再…… задаёт последовательность: сначала одно действие, затем другое.'},
+{level:3,type:'Грамматика',q:'Закончи предложение: 虽然下雨，……',py:'Suīrán xiàyǔ, …',opts:['但是我们还是出去了。','所以但是我们出去。','如果我们还是出去。','因为我们还是出去。'],a:0,why:'虽然……但是…… означает «хотя…, но…». Вторая часть показывает контраст.'},
+{level:3,type:'Лексика',q:'Что означает 除了？',py:'chúle',opts:['вместо','кроме; за исключением','несмотря на','вследствие'],a:1,why:'除了 (chúle) — кроме, за исключением. Например: 除了他，大家都来了 — Кроме него, все пришли.'},
+{level:3,type:'Грамматика',q:'Выбери правильную конструкцию: «Я положил книгу на стол».',py:'Wǒ bǎ shū fàng zài zhuōzi shàng.',opts:['我把书放在桌子上。','我被书放在桌子上。','我对书放桌子上。','我比书放在桌子上。'],a:0,why:'Конструкция 把 выносит объект перед глаголом, когда действие воздействует на него: субъект + 把 + объект + глагол + результат/место.'},
+{level:3,type:'Грамматика',q:'Заполни пропуск: 她一边听音乐，___做作业。',py:'Tā yìbiān tīng yīnyuè, ___ zuò zuòyè.',opts:['一共','一向','一边','一面儿'],a:2,why:'一边……一边…… описывает два действия, происходящие одновременно: слушать музыку и делать домашнее задание.'},
+{level:3,type:'Лексика и управление',q:'Как сказать «интересоваться китайской культурой»?',py:'',opts:['对中国文化感兴趣','把中国文化感兴趣','比中国文化感兴趣','从中国文化感兴趣'],a:0,why:'Модель 对 + объект + 感兴趣: быть заинтересованным чем-либо. 对中国文化感兴趣 — интересоваться китайской культурой.'},
+{level:4,type:'Грамматика',q:'Выбери правильное продолжение: 他不但会说中文，……',py:'Tā búdàn huì shuō Zhōngwén, …',opts:['而且说得很流利。','虽然说得很流利。','因此但是很流利。','即使说得很流利。'],a:0,why:'不但……而且…… означает «не только…, но и…» и соединяет два дополняющих факта.'},
+{level:4,type:'Грамматика',q:'Заполни пропуск: ___明天下雨，我们也要按计划出发。',py:'___ míngtiān xiàyǔ, wǒmen yě yào àn jìhuà chūfā.',opts:['既然','即使','既','由于'],a:1,why:'即使……也…… — «даже если…, всё равно…». Здесь подчёркивается, что дождь не изменит план.'},
+{level:4,type:'Грамматика',q:'Выбери логичную пару: 既然你已经决定了，……',py:'Jìrán nǐ yǐjīng juédìng le, …',opts:['就勇敢地去做吧。','即使勇敢地去做。','不但勇敢地去做。','反而因为去做。'],a:0,why:'既然……就…… связывает уже известное условие с логичным выводом или решением.'},
+{level:4,type:'Лексика',q:'Что означает 尽管 в предложении 尽管很累，他还是坚持工作？',py:'Jǐnguǎn hěn lèi, tā háishi jiānchí gōngzuò.',opts:['поскольку','несмотря на то что','до тех пор пока','вместо того чтобы'],a:1,why:'尽管……还是…… выражает уступку: «Хотя он очень устал, он всё же продолжал работать».'},
+{level:4,type:'Грамматика',q:'Как точнее передать: «Вместо того чтобы жаловаться, лучше найти решение»?',py:'',opts:['与其抱怨，不如找办法。','既然抱怨，虽然找办法。','不但抱怨，而且找办法。','即使抱怨，反而找办法。'],a:0,why:'与其……不如…… предлагает предпочтительный вариант: «вместо того чтобы…, лучше…».'},
+{level:5,type:'Лексика',q:'Что означает 难免？',py:'nánmiǎn',opts:['неизбежно; трудно избежать','внезапно','временно','намеренно'],a:0,why:'难免 (nánmiǎn) — трудно избежать, неизбежно. Например: 第一次做，难免会紧张 — В первый раз неизбежно немного волнуешься.'},
+{level:5,type:'Грамматика',q:'Заполни пропуск: 请把重要文件保存好，___以后找不到。',py:'Qǐng bǎ zhòngyào wénjiàn bǎocún hǎo, ___ yǐhòu zhǎo bú dào.',opts:['以免','尽管','何况','反而'],a:0,why:'以免 (yǐmiǎn) вводит нежелательное последствие, которого хотят избежать: «чтобы не…, во избежание…».'},
+{level:5,type:'Лексика и контекст',q:'Выбери значение 反而: 我以为他会生气，他反而笑了。',py:'Wǒ yǐwéi tā huì shēngqì, tā fǎn’ér xiào le.',opts:['поэтому','наоборот; вместо ожидаемого','сначала','в частности'],a:1,why:'反而 (fǎn’ér) показывает неожиданный результат, противоположный ожиданию: думал(а), что он рассердится, а он, наоборот, засмеялся.'},
+{level:5,type:'Грамматика',q:'Какое предложение выражает «не только…, но и…» с акцентом на два свойства?',py:'',opts:['这本书既有意思，又很实用。','这本书虽然有意思，但是实用。','这本书即使有意思，也实用。','这本书与其有意思，不如实用。'],a:0,why:'既……又…… соединяет два одновременно верных признака: книга и интересная, и практичная.'},
+{level:5,type:'Грамматика',q:'Выбери подходящий союз: 他没有直接回答，___提出了另一个问题。',py:'Tā méiyǒu zhíjiē huídá, ___ tíchū le lìng yí ge wèntí.',opts:['反而','以免','尽管','既然'],a:0,why:'反而 подчёркивает неожиданный поворот: вместо прямого ответа он задал другой вопрос.'},
+{level:6,type:'Фразеологизм',q:'Что означает 成语 不言而喻？',py:'bù yán ér yù',opts:['говорить без остановки','само собой разумеется; понятно без объяснений','не держать обещание','сначала подумать, потом говорить'],a:1,why:'不言而喻 — идиома: смысл настолько очевиден, что не нуждается в объяснении.'},
+{level:6,type:'Грамматика',q:'Выбери правильное продолжение: 无论遇到什么困难，……',py:'Wúlùn yùdào shénme kùnnan, …',opts:['都要保持冷静。','以免保持冷静。','反而保持冷静吗。','何况保持冷静。'],a:0,why:'无论……都…… означает «независимо от того…, всё равно…».'},
+{level:6,type:'Логика и связки',q:'Заполни пропуск: 他连最基本的资料都没看，___更谈不上提出建议了。',py:'Tā lián zuì jīběn de zīliào dōu méi kàn, ___ gèng tán bu shàng tíchū jiànyì le.',opts:['何况','以免','尽管','既然'],a:0,why:'何况 (hékuàng) — тем более; не говоря уже о том. Если он не изучил даже базовые материалы, тем более не может говорить о рекомендациях.'},
+{level:6,type:'Лексика',q:'Что означает 恰恰 в предложении 问题恰恰出在这里？',py:'Wèntí qiàqià chū zài zhèlǐ.',opts:['примерно','случайно','как раз; именно','постепенно'],a:2,why:'恰恰 (qiàqià) подчёркивает точное совпадение или неожиданно точное место: проблема как раз здесь.'},
+{level:6,type:'Понимание смысла',q:'Что выражает связка 由此可见？',py:'yóu cǐ kě jiàn',opts:['несмотря на это','из этого можно сделать вывод; отсюда видно','в любом случае','в отличие от этого'],a:1,why:'由此可见 вводит вывод, который следует из приведённых фактов: «отсюда видно», «таким образом можно заключить».'}
+];
+let hskDiagnosticIndex=0,hskDiagnosticAnswers=[],hskSuggestedLevel=1;
+function renderHskDiagnosticQuestion(){
+ const item=hskDiagnosticQuestions[hskDiagnosticIndex];
+ document.getElementById('hskQuestionNumber').textContent='Задание '+(hskDiagnosticIndex+1)+' из '+hskDiagnosticQuestions.length;
+ document.getElementById('hskQuestionBand').textContent='HSK '+item.level;
+ document.getElementById('hskProgressFill').style.width=(hskDiagnosticIndex/hskDiagnosticQuestions.length*100)+'%';
+ document.getElementById('hskQuestionType').textContent=item.type;
+ document.getElementById('hskQuestionText').textContent=item.q;
+ document.getElementById('hskQuestionPinyin').textContent=item.py||'Выбери один правильный вариант.';
+ const options=document.getElementById('hskOptions');options.innerHTML='';
+ item.opts.forEach((option,index)=>{const button=document.createElement('button');button.type='button';button.className='hsk-option';button.textContent=option;button.addEventListener('click',()=>answerHskDiagnostic(index));options.appendChild(button)});
+ document.getElementById('hskAnswerFeedback').hidden=true;
+ document.getElementById('nextHskQuestion').disabled=true;
+ document.getElementById('nextHskQuestion').textContent=hskDiagnosticIndex===hskDiagnosticQuestions.length-1?'Посмотреть результат':'Следующее задание';
+}
+function answerHskDiagnostic(choice){
+ if(hskDiagnosticAnswers[hskDiagnosticIndex]!==undefined)return;
+ const item=hskDiagnosticQuestions[hskDiagnosticIndex],correct=choice===item.a;
+ hskDiagnosticAnswers[hskDiagnosticIndex]=choice;
+ document.querySelectorAll('#hskOptions .hsk-option').forEach((button,index)=>{button.disabled=true;if(index===item.a)button.classList.add('is-correct');if(index===choice&&!correct)button.classList.add('is-wrong')});
+ const feedback=document.getElementById('hskAnswerFeedback');feedback.hidden=false;
+ feedback.textContent=(correct?'Верно! ':'Пока неверно. Правильный ответ: '+item.opts[item.a]+'. ')+item.why;
+ document.getElementById('nextHskQuestion').disabled=false;
+}
+function startHskDiagnostic(){
+ hskDiagnosticIndex=0;hskDiagnosticAnswers=[];document.getElementById('hskIntro').hidden=true;document.getElementById('hskResult').hidden=true;document.getElementById('hskTest').hidden=false;renderHskDiagnosticQuestion();
+}
+function finishHskDiagnostic(){
+ const scores=[0,0,0,0,0,0],totals=[0,0,0,0,0,0];
+ hskDiagnosticQuestions.forEach((q,i)=>{totals[q.level-1]++;if(hskDiagnosticAnswers[i]===q.a)scores[q.level-1]++});
+ let passed=0;
+ for(let i=0;i<6;i++){if(scores[i]>=4)passed=i+1;else break;}
+ hskSuggestedLevel=Math.max(1,passed);
+ const totalCorrect=scores.reduce((a,b)=>a+b,0);
+ document.getElementById('hskTest').hidden=true;
+ document.getElementById('hskResult').hidden=false;
+ document.getElementById('hskProgressFill').style.width='100%';
+ document.getElementById('hskResultTitle').textContent=passed===0?'Начальный этап — HSK 1':passed===6?'Уверенный результат на уровне HSK 6':'Ориентировочно: HSK '+passed;
+ document.getElementById('hskResultDescription').textContent=passed===0?'Пока не набран порог даже на первой ступени. Это нормально: тест помогает выбрать точку старта.':'Ты уверенно справился(ась) с заданиями до HSK '+passed+'. Следующая ступень пока требует дополнительной практики.';
+ document.getElementById('hskResultScore').textContent=totalCorrect+' из 30 правильных ответов';
+ document.getElementById('hskLevelBreakdown').innerHTML='';
+ scores.forEach((score,i)=>{const row=document.createElement('div');row.className='hsk-level-row';const label=document.createElement('strong');label.textContent='HSK '+(i+1);const bar=document.createElement('div');bar.className='hsk-level-bar';const fill=document.createElement('span');fill.style.width=(score/5*100)+'%';bar.appendChild(fill);const status=document.createElement('span');status.className='hsk-level-status';status.textContent=score+'/5 '+(score>=4?'· пройден':'· повторить');row.append(label,bar,status);document.getElementById('hskLevelBreakdown').appendChild(row)});
+ document.getElementById('hskResultAdvice').textContent='Для перехода на следующую ступень нужен результат не менее 4 из 5 заданий на каждом предыдущем уровне. Оценка приблизительная: тест проверяет только выбранные навыки чтения, лексики и грамматики.';
+ localStorage.setItem('photoChineseHskDiagnostic',JSON.stringify({level:hskSuggestedLevel,score:totalCorrect,scores,at:new Date().toISOString()}));
+ const badge=document.getElementById('profileHskBadge');if(badge)badge.textContent='HSK '+hskSuggestedLevel;
+ document.getElementById('applyHskLevel').textContent='Открыть курс HSK '+hskSuggestedLevel+' в ИИ-учителе';
+}
+document.getElementById('startHskDiagnostic').addEventListener('click',startHskDiagnostic);
+document.getElementById('nextHskQuestion').addEventListener('click',()=>{if(hskDiagnosticAnswers[hskDiagnosticIndex]===undefined)return;if(hskDiagnosticIndex<hskDiagnosticQuestions.length-1){hskDiagnosticIndex++;renderHskDiagnosticQuestion()}else finishHskDiagnostic()});
+document.getElementById('quitHskDiagnostic').addEventListener('click',()=>{if(!confirm('Выйти из теста? Текущие ответы не сохранятся.'))return;document.getElementById('hskTest').hidden=true;document.getElementById('hskIntro').hidden=false});
+document.getElementById('retryHskDiagnostic').addEventListener('click',startHskDiagnostic);
+document.getElementById('applyHskLevel').addEventListener('click',()=>{document.getElementById('coachLevel').value=String(hskSuggestedLevel);document.getElementById('coachLessonPanel').hidden=true;document.getElementById('coachExamPanel').hidden=true;renderCoachCourse();document.querySelector('nav button[data-tab="coach"]').click();document.getElementById('coachLevelNotice').textContent='Тест предложил HSK '+hskSuggestedLevel+'. Ты можешь изменить уровень вручную в любое время.'});
+const previousHskDiagnostic=localStorage.getItem('photoChineseHskDiagnostic');
+if(previousHskDiagnostic){try{const saved=JSON.parse(previousHskDiagnostic);if(saved.level){hskSuggestedLevel=saved.level;document.getElementById('hskPreviousResult').textContent='Последний результат: HSK '+saved.level+' · '+saved.score+'/30. Новый тест можно пройти повторно.';document.getElementById('profileHskBadge').textContent='HSK '+saved.level;}}catch(e){}}
 document.getElementById('openHskTest').addEventListener('click',()=>{
  document.querySelector('nav button[data-tab="hsk"]').click();
  document.getElementById('hsk').scrollIntoView({behavior:'smooth',block:'start'});
