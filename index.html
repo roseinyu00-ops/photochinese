@@ -3383,7 +3383,8 @@ document.getElementById('translateBtn').onclick=async()=>{
     return token.text+' — '+(token.m||'значение пока не найдено в словаре');
   });
   const hasChinese=/\p{Script=Han}/u.test(t);
-  if(!hasChinese){result.textContent='В тексте не нашлись китайские иероглифы. Проверь ввод или распознавание.';return;}
+  const hasKnownLatinMeme=/(yyds|awsl|xswl|dbq|zqsg|u1s1)/i.test(t.replace(/\s/g,''));
+  if(!hasChinese&&!hasKnownLatinMeme){result.textContent='В тексте не нашлись китайские иероглифы или знакомые интернет-сокращения. Проверь распознавание или введи текст вручную.';return;}
   result.innerHTML='<div class="meme-analysis-card"><h3>Пиньинь</h3><p>'+esc(pinyin)+'</p></div>'+
     '<div class="meme-analysis-card"><h3>'+(exact?'Перевод':'Значение по словам')+'</h3><p>'+esc(exact||gloss.join(' · '))+'</p>'+
     (exact?'':'<p class="small">Это словарная подсказка, а не точный перевод всей фразы: смысл зависит от контекста.</p>')+'</div>'+
