@@ -3872,9 +3872,14 @@ document.getElementById('retryCoachPractice').addEventListener('click',()=>{
  coachPracticeIndex=0;coachPracticeCorrect=0;coachPracticePassed=false;renderCoachPracticeQuestion();
 });
 function startCoachExam(){
- const level=currentCoachLevel(),lessons=coachCourses[level],pool=[];
- lessons.forEach(lesson=>pool.push(...buildCoachPractice(lesson)));
- activeCoachExamQuestions=shuffleCoachItems(pool).slice(0,Math.min(25,pool.length));
+ const level=currentCoachLevel(),lessons=coachCourses[level],core=[],extra=[];
+ lessons.forEach(lesson=>{
+  const lessonQuestions=buildCoachPractice(lesson);
+  if(lessonQuestions.length)core.push(lessonQuestions[0]);
+  extra.push(...lessonQuestions.slice(1));
+ });
+ activeCoachExamQuestions=core.concat(shuffleCoachItems(extra).slice(0,Math.max(0,25-core.length)));
+ activeCoachExamQuestions=shuffleCoachItems(activeCoachExamQuestions);
  coachExamIndex=0;coachExamCorrect=0;coachExamAnswered=false;
  document.getElementById('coachLessonPanel').hidden=true;
  document.getElementById('coachExamPanel').hidden=false;
