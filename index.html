@@ -3959,8 +3959,11 @@ function renderCoachCourse(){
  const list=document.getElementById('coachLessonList');list.innerHTML='';
  lessons.forEach((lesson,index)=>{
   const isDone=done.includes(index), locked=index>0&&!done.includes(index-1);
+  const supplemental=(coachSupplementalVocabulary[level]||{})[index]||{};
+  const wordCount=lesson.words.length+(supplemental.words||[]).length;
+  const phraseCount=(supplemental.phrases||[]).length;
   const b=document.createElement('button');b.type='button';b.className='coach-lesson-card';b.disabled=locked;
-  b.innerHTML='<span class="coach-lesson-number">'+(isDone?'✓':index+1)+'</span><span><strong>'+lesson.title+'</strong><span class="coach-lesson-meta">'+(isDone?'Урок завершён':locked?'Сначала пройди предыдущий урок':'Урок · '+lesson.words.length+' слов, грамматика и серия заданий')+'</span></span><span class="coach-lesson-status">'+(locked?'🔒':'›')+'</span>';
+  b.innerHTML='<span class="coach-lesson-number">'+(isDone?'✓':index+1)+'</span><span><strong>'+lesson.title+'</strong><span class="coach-lesson-meta">'+(isDone?'Урок завершён':locked?'Сначала пройди предыдущий урок':'Урок · '+wordCount+' слов · '+phraseCount+' фраз · грамматика и практика')+'</span></span><span class="coach-lesson-status">'+(locked?'🔒':'›')+'</span>';
   b.addEventListener('click',()=>openCoachLesson(index));list.appendChild(b);
  });
 }
