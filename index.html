@@ -4004,7 +4004,7 @@ function collectPhotoChineseData() {
     const value = localStorage.getItem(key);
     if (value !== null) storage[key] = value;
   });
-  return { storage, updatedAt: new Date().toISOString() };
+  return { storage, bannerPath: localStorage.getItem("profileBannerPath") || null, updatedAt: new Date().toISOString() };
 }
 
 function applyPhotoChineseData(appData) {
@@ -4068,6 +4068,7 @@ function savePhotoChineseDataNow() {
           .upload(path, bannerFile, { upsert: true, contentType: bannerFile.type || "application/octet-stream" });
         if (uploadError) throw uploadError;
         payload.bannerPath = path;
+        localStorage.setItem("profileBannerPath", path);
         window.photoChineseBannerDirty = false;
       }
     }
@@ -4119,18 +4120,25 @@ async function loadCloudProfile(user) {
   if (profile.app_data && profile.app_data.storage && Object.keys(profile.app_data.storage).length) {
     applyPhotoChineseData(profile.app_data);
     if (profile.app_data.bannerPath) {
+      localStorage.setItem("profileBannerPath", profile.app_data.bannerPath);
       const { data: mediaUrl } = client.storage.from("profile-media").getPublicUrl(profile.app_data.bannerPath);
       if (mediaUrl && mediaUrl.publicUrl) {
         try {
-          const mediaResponse = await fetch(mediaUrl.publicUrl);
-          if (mediaResponse.ok) {
-            const mediaBlob = await mediaResponse.blob();
-            await saveBannerFile(mediaBlob);
-            showBanner(mediaBlob);
-          }
+          const mediaResponse = await fetch(mediaUrl.publicUrl, { cache: "no-store" });
+          if (!mediaResponse.ok) throw new Error("HTTP " + mediaResponse.status);
+          const mediaBlob = await mediaResponse.blob();
+          await saveBannerFile(mediaBlob);
+          showBanner(mediaBlob);
         } catch (mediaError) {
           console.warn("Не удалось загрузить баннер из облака:", mediaError);
         }
+      }
+    } else {
+      // Баннер мог быть выбран до входа в аккаунт: отправляем его в облако.
+      const localBanner = await getSavedBanner();
+      if (localBanner) {
+        window.photoChineseBannerDirty = true;
+        await savePhotoChineseDataNow();
       }
     }
   } else {
