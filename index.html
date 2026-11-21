@@ -3,6 +3,7 @@
 <head>
   <meta name="google-site-verification" content="Xi3b0S50r1MNS9hq3xFDxpsJYAnNzXaipgk4D-_DbYg" />
   <link rel="manifest" href="./manifest.json">
+  <link rel="stylesheet" href="./study-tools.css">
 <meta name="theme-color" content="#F8E4EA">
 <meta name="mobile-web-app-capable" content="yes">
 <meta charset="UTF-8" />
@@ -2316,6 +2317,7 @@ body.profile-editing #profileAvatar::after {
     <button data-tab="meme">Мемы</button>
     <button data-tab="coach">ИИ-учитель</button>
     <button data-tab="hsk">Уровень HSK</button>
+    <button data-tab="studytools">Мой словарь</button>
  <button data-tab="profile">Профиль</button>
   </nav>
 
@@ -5668,7 +5670,8 @@ const PHOTOCHINESE_SYNC_KEYS = [
   "completedLessons", "achievements", "profileCollection",
   "equippedDecoration", "profileAvatar", "photoChineseCoachProgress",
   "photoChineseCoachVocabulary", "photoChineseCoachExams",
-  "photoChineseHskDiagnostic", "photoChineseActivityDays"
+  "photoChineseHskDiagnostic", "photoChineseActivityDays",
+  "photoChineseStudyWords", "photoChineseReviewState"
 ];
 
 let photoChineseSyncTimer = null;
@@ -5728,6 +5731,7 @@ function applyPhotoChineseData(appData) {
   renderCollection();
   renderSavedCharacters();
   renderEquippedDecoration();
+  window.dispatchEvent(new Event("photoChineseDataLoaded"));
 }
 
 function savePhotoChineseDataNow() {
@@ -6005,6 +6009,93 @@ window.addEventListener("keydown", function(event) {
   document.addEventListener("visibilitychange", update);
 })();
 </script>
+
+<script src="./study-tools.js"></script>
+
+<section id="studytools" class="tab" hidden>
+  <div id="studyToolsRoot">
+    <div class="panel study-tools-hero">
+      <h1>Твой личный китайский словарь</h1>
+      <p>Собирай слова из уроков, повторяй их с интервалами и тренируй произношение.</p>
+      <div class="study-tools-stats">
+        <div class="study-tools-stat"><strong id="studyToolsWordCount">0</strong><span>слов в словаре</span></div>
+        <div class="study-tools-stat"><strong id="studyToolsDueCount">0</strong><span>пора повторить</span></div>
+        <div class="study-tools-stat"><strong id="studyToolsLearnedCount">0</strong><span>повторено</span></div>
+      </div>
+    </div>
+    <div class="study-tools-tabs" role="tablist" aria-label="Инструменты изучения">
+      <button type="button" class="active" data-study-view="review">Повторение</button>
+      <button type="button" data-study-view="dictionary">Словарь</button>
+      <button type="button" data-study-view="speak">Произношение</button>
+    </div>
+
+    <section id="studyViewReview" class="study-tools-view panel" aria-label="Повторение слов">
+      <h2>Пора вспомнить слова</h2>
+      <p id="studyReviewPrompt">Вспомни значение и произношение.</p>
+      <div id="studyReviewCard" class="study-tools-card" hidden>
+        <div id="studyReviewHanzi" class="study-tools-hanzi">你好</div>
+        <button id="studyReviewAudio" type="button" class="secondary">🔊 Послушать</button>
+        <div id="studyReviewAnswer" hidden>
+          <div id="studyReviewPinyin" class="study-tools-pinyin"></div>
+          <div id="studyReviewMeaning" class="study-tools-meaning"></div>
+          <div id="studyReviewLevel" class="study-tools-word-meta"></div>
+        </div>
+        <div class="study-tools-actions">
+          <button id="studyReviewReveal" type="button" class="primary">Показать ответ</button>
+        </div>
+        <div id="studyReviewRatings" class="study-tools-rating" hidden>
+          <button type="button" data-rating="again">Снова<strong>1 мин</strong></button>
+          <button type="button" data-rating="hard">Трудно<strong>1 день</strong></button>
+          <button type="button" data-rating="good">Хорошо<strong>по графику</strong></button>
+          <button type="button" data-rating="easy">Легко<strong>дольше</strong></button>
+        </div>
+      </div>
+      <div id="studyReviewEmpty" class="study-tools-empty"></div>
+      <div class="study-tools-note">После ответа оцени, насколько легко вспомнила слово. Сложные слова появятся раньше, знакомые — позже.</div>
+    </section>
+
+    <section id="studyViewDictionary" class="study-tools-view panel" hidden aria-label="Личный словарь">
+      <h2>Все твои слова</h2>
+      <p>Сюда автоматически попадают слова, отмеченные как выученные в ИИ-учителе, и сохранённые иероглифы.</p>
+      <label for="studyDictionarySearch">Поиск по иероглифу, пиньиню или переводу</label>
+      <input id="studyDictionarySearch" class="study-tools-input" type="search" placeholder="Например, 朋友 или друг">
+      <label for="studyDictionaryLevel">Уровень</label>
+      <select id="studyDictionaryLevel" class="study-tools-input">
+        <option value="all">Все уровни</option><option value="1">HSK 1</option><option value="2">HSK 2</option><option value="3">HSK 3</option><option value="4">HSK 4</option><option value="5">HSK 5</option><option value="6">HSK 6</option><option value="0">Без уровня</option>
+      </select>
+      <p id="studyDictionaryCount" class="small"></p>
+      <div id="studyDictionaryList" class="study-tools-list"></div>
+      <div class="section">
+        <h3>Добавить своё слово</h3>
+        <form id="studyWordForm" class="study-tools-form">
+          <label>Иероглифы<input id="studyWordHanzi" class="study-tools-input" required maxlength="40" placeholder="朋友"></label>
+          <label>Пиньинь<input id="studyWordPinyin" class="study-tools-input" maxlength="80" placeholder="péngyou"></label>
+          <label class="wide">Перевод<input id="studyWordTranslation" class="study-tools-input" required maxlength="180" placeholder="друг; приятель"></label>
+          <label class="wide">Уровень<select id="studyWordLevel" class="study-tools-input"><option value="0">Без уровня</option><option value="1">HSK 1</option><option value="2">HSK 2</option><option value="3">HSK 3</option><option value="4">HSK 4</option><option value="5">HSK 5</option><option value="6">HSK 6</option></select></label>
+          <button class="primary wide" type="submit">＋ Добавить в словарь</button>
+        </form>
+      </div>
+    </section>
+
+    <section id="studyViewSpeak" class="study-tools-view panel" hidden aria-label="Тренировка произношения">
+      <h2>Слушай и повторяй</h2>
+      <p>Выбери слово из своего словаря, послушай произношение на китайском и попробуй повторить.</p>
+      <label for="studySpeakSelect">Слово для тренировки</label>
+      <select id="studySpeakSelect" class="study-tools-input"></select>
+      <div class="study-tools-card">
+        <div id="studySpeakHanzi" class="study-tools-hanzi">文</div>
+        <div id="studySpeakPinyin" class="study-tools-pinyin"></div>
+        <div id="studySpeakMeaning" class="study-tools-meaning"></div>
+      </div>
+      <div class="study-tools-actions">
+        <button id="studySpeakAudio" class="primary" type="button">🔊 Прослушать</button>
+        <button id="studySpeakMic" class="secondary" type="button">🎙 Повторить</button>
+      </div>
+      <p id="studySpeakMicStatus" class="study-tools-mic-status" aria-live="polite"></p>
+      <div class="study-tools-note">Озвучка использует китайский голос, установленный в браузере или устройстве. Распознавание речи — ориентировочное: оно может распознать слово, но не умеет надёжно оценивать правильность тонов.</div>
+    </section>
+  </div>
+</section>
 
 </body>
 </html>
