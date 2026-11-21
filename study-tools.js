@@ -16,7 +16,7 @@
   const clean = value => String(value || "").trim();
   const escapeHtml = value => String(value ?? "").replace(/[&<>"']/g, ch => ({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"}[ch]));
   const day = ms => new Date(ms).toLocaleDateString("ru-RU", {day:"numeric",month:"short"});
-  let activeView = "review";
+  let activeView = "dictionary";
   let currentReviewId = null;
   let currentSpeakId = null;
   let recognition = null;
@@ -58,19 +58,37 @@
     return state;
   }
 
-  function speak(text) {
-    if (!("speechSynthesis" in window)) {
-      alert("В этом браузере пока нет встроенного синтеза речи. Попробуй открыть PhotoChinese в Chrome.");
+  function speak(text, statusElement) {
+    const synth = window.speechSynthesis;
+    if (!synth || typeof window.SpeechSynthesisUtterance !== "function") {
+      const message = "Озвучивание не поддерживается этим браузером. Открой сайт в Chrome и проверь настройки синтеза речи.";
+      if (statusElement) statusElement.textContent = message; else alert(message);
       return;
     }
-    window.speechSynthesis.cancel();
-    const utterance = new SpeechSynthesisUtterance(text);
-    utterance.lang = "zh-CN";
-    utterance.rate = 0.82;
-    utterance.pitch = 1;
-    window.speechSynthesis.speak(utterance);
+    try {
+      synth.cancel();
+      const utterance = new SpeechSynthesisUtterance(String(text || ""));
+      utterance.lang = "zh-CN";
+      utterance.rate = 0.78;
+      utterance.pitch = 1;
+      const voices = synth.getVoices ? synth.getVoices() : [];
+      const chineseVoice = voices.find(v => /^zh(-|_)?cn$/i.test(v.lang))
+        || voices.find(v => /^zh/i.test(v.lang))
+        || voices.find(v => /chinese|中文|mandarin/i.test(v.name));
+      if (chineseVoice) utterance.voice = chineseVoice;
+      utterance.onstart = () => { if (statusElement) statusElement.textContent = "▶ Воспроизводится китайское произношение…"; };
+      utterance.onend = () => { if (statusElement) statusElement.textContent = "Готово. Можно прослушать ещё раз или повторить самостоятельно."; };
+      utterance.onerror = event => {
+        if (statusElement) statusElement.textContent = "Не удалось воспроизвести звук (" + (event.error || "ошибка синтеза") + "). Проверь громкость и наличие китайского голоса в настройках Android.";
+      };
+      synth.resume();
+      synth.speak(utterance);
+      if (statusElement && !chineseVoice) statusElement.textContent = "Запрашиваю китайский голос устройства… Если звука нет, установи китайский голос в настройках преобразования текста в речь Android.";
+    } catch (error) {
+      if (statusElement) statusElement.textContent = "Ошибка запуска озвучивания. Проверь, включён ли синтез речи на устройстве.";
+      else alert("Не удалось запустить китайскую озвучку. Проверь настройки синтеза речи Android.");
+    }
   }
-
   function renderStats(words, state) {
     const due = words.filter(w => !state[w.id] || state[w.id].due <= Date.now()).length;
     $("studyToolsWordCount").textContent = words.length;
@@ -154,8 +172,9 @@
       const meta = document.createElement("div"); meta.className = "study-tools-word-meta"; meta.textContent = (w.level ? "HSK "+w.level+" · " : "") + (w.source || "Личный словарь");
       main.append(hanzi,pinyin,meaning,meta);
       const actions = document.createElement("div"); actions.className = "study-tools-actions";
-      const audio = document.createElement("button"); audio.type="button"; audio.className="study-tools-icon-btn"; audio.textContent="🔊"; audio.title="Прослушать"; audio.addEventListener("click",()=>speak(w.hanzi));
-      actions.appendChild(audio); row.append(main,actions); list.appendChild(row);
+      const audio = document.createElement("button"); audio.type="button"; audio.className="study-tools-icon-btn"; audio.textContent="🔊"; audio.title="Прослушать"; audio.addEventListener("click",()=>speak(w.hanzi, status));
+      const status = document.createElement("span"); status.className = "study-tools-word-status"; status.setAttribute("aria-live","polite");
+      actions.appendChild(audio); row.append(main,actions); list.appendChild(row); list.appendChild(status);
     });
   }
 
@@ -237,10 +256,10 @@
       $("studyWordForm").reset(); renderDictionary(); renderReview(); populateSpeakSelect();
     });
     $("studySpeakSelect").addEventListener("change",renderSpeakWord);
-    $("studySpeakAudio").addEventListener("click",()=>{const w=getWords().find(x=>x.id===currentSpeakId);if(w)speak(w.hanzi);});
-    $("studyReviewAudio").addEventListener("click",()=>{const w=getWords().find(x=>x.id===currentReviewId);if(w)speak(w.hanzi);});
+    $("studySpeakAudio").addEventListener("click",()=>{const w=getWords().find(x=>x.id===currentSpeakId);if(w)speak(w.hanzi, $("studyReviewPrompt"));});
+    $("studyReviewAudio").addEventListener("click",()=>{const w=getWords().find(x=>x.id===currentReviewId);if(w)speak(w.hanzi, $("studySpeakMicStatus"));});
     $("studySpeakMic").addEventListener("click",startRecognition);
-    setView(activeView);
+    setView("dictionary");
   }
 
   if(document.readyState==="loading") document.addEventListener("DOMContentLoaded",init,{once:true}); else init();

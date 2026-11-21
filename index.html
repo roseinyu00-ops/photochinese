@@ -6015,19 +6015,15 @@ window.addEventListener("keydown", function(event) {
     <div class="panel study-tools-hero">
       <h1>Твой личный китайский словарь</h1>
       <p>Собирай слова из уроков, повторяй их с интервалами и тренируй произношение.</p>
-      <div class="study-tools-stats">
-        <div class="study-tools-stat"><strong id="studyToolsWordCount">0</strong><span>слов в словаре</span></div>
-        <div class="study-tools-stat"><strong id="studyToolsDueCount">0</strong><span>пора повторить</span></div>
-        <div class="study-tools-stat"><strong id="studyToolsLearnedCount">0</strong><span>повторено</span></div>
-      </div>
+
     </div>
     <div class="study-tools-tabs" role="tablist" aria-label="Инструменты изучения">
-      <button type="button" class="active" data-study-view="review">Повторение</button>
-      <button type="button" data-study-view="dictionary">Словарь</button>
+      <button type="button" data-study-view="review">Повторение</button>
+      <button type="button" class="active" data-study-view="dictionary">Словарь</button>
       <button type="button" data-study-view="speak">Произношение</button>
     </div>
 
-    <section id="studyViewReview" class="study-tools-view panel" aria-label="Повторение слов">
+    <section id="studyViewReview" class="study-tools-view panel" hidden aria-label="Повторение слов">
       <h2>Пора вспомнить слова</h2>
       <p id="studyReviewPrompt">Вспомни значение и произношение.</p>
       <div id="studyReviewCard" class="study-tools-card" hidden>
@@ -6052,7 +6048,7 @@ window.addEventListener("keydown", function(event) {
       <div class="study-tools-note">После ответа оцени, насколько легко вспомнила слово. Сложные слова появятся раньше, знакомые — позже.</div>
     </section>
 
-    <section id="studyViewDictionary" class="study-tools-view panel" hidden aria-label="Личный словарь">
+    <section id="studyViewDictionary" class="study-tools-view panel" aria-label="Личный словарь">
       <h2>Все твои слова</h2>
       <p>Сюда автоматически попадают слова, отмеченные как выученные в ИИ-учителе, и сохранённые иероглифы.</p>
       <label for="studyDictionarySearch">Поиск по иероглифу, пиньиню или переводу</label>
