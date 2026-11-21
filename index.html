@@ -3374,7 +3374,7 @@ document.getElementById('translateBtn').onclick=async()=>{
     {term:'我真的会谢',title:'我真的会谢 (wǒ zhēn de huì xiè)',meaning:'«Ну всё, я уже не могу»; «спасибо, конечно…»',detail:'Популярная саркастическая интернет-фраза. Буквально — «я правда буду благодарна», но обычно её пишут в ответ на раздражающую, нелепую или абсурдную ситуацию. Это не искренняя благодарность, а эмоциональная реакция: усталость, беспомощность или возмущение.'},
     {term:'真的会谢',title:'真的会谢 (zhēn de huì xiè)',meaning:'«Ну я уже не могу»; «вот спасибо…»',detail:'Сокращённый вариант мемной фразы 我真的会谢; чаще всего звучит иронично или саркастически.'}
   ];
-  const foundMemes=memeGlossary.filter(item=>normalized.toLowerCase().includes(item.term.replace(/\\s/g,'').toLowerCase()));
+  const foundMemes=memeGlossary.filter(item=>normalized.toLowerCase().includes(item.term.toLowerCase()));
   const memeBox=document.createElement('div');
   memeBox.className='meme-analysis-card';
   memeBox.innerHTML='<h3>Мемный контекст ✨</h3>';
