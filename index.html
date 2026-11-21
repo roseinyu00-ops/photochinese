@@ -3970,7 +3970,7 @@ function renderCoachCourse(){
 function shuffleCoachItems(items){return items.slice().sort(()=>Math.random()-.5);}
 function buildCoachPractice(lesson){
  const questions=[{question:lesson.question,options:lesson.options.slice(),answer:lesson.answer,explanation:(lesson.help&&lesson.help.grammar)||lesson.explanation||'Вспомни правило из урока.'}];
- (lesson.words||[]).concat(lesson.extraWords||[]).forEach(word=>{
+ (lesson.words||[]).concat((lesson.extraWords||[]).slice(0,3)).forEach(word=>{
   const translations=[...new Set(lesson.words.map(w=>w[2]).filter(v=>v&&v!==word[2]))];
   const pinyins=[...new Set(lesson.words.map(w=>w[1]).filter(v=>v&&v!==word[1]))];
   const translationDistractors=shuffleCoachItems(translations).slice(0,2);
