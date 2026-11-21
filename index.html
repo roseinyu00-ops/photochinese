@@ -2389,7 +2389,7 @@ body.profile-editing #profileAvatar::after {
     </div>
     <div id="coachLessonSupplement" class="coach-grammar-box" hidden>
       <h3>Полный список новых слов и фраз</h3>
-      <p class="small">Дополнительная лексика по теме урока. Отмечай слова, которые уже выучила.</p>
+      <p class="small">Полный тематический список слов и выражений урока. Отмечай слова, которые уже выучила.</p>
       <h4>Слова и выражения</h4>
       <div id="coachLessonSupplementWords" class="coach-word-grid"></div>
       <h4>Готовые фразы</h4>
@@ -3852,6 +3852,9 @@ coachCourses[1].push(makeExtraLesson(
  'Сначала определи, какую информацию хочешь узнать, и поставь вопросительное слово на её место в обычном предложении.'
 ));
 coachSupplementalVocabulary[1][12]={words:[],phrases:hsk1MoreVocabulary[9].phrases};
+for(let orphanIndex=13;orphanIndex<=18;orphanIndex++)delete coachSupplementalVocabulary[1][orphanIndex];
+coachSupplementalVocabulary[1][1].words=coachSupplementalVocabulary[1][1].words.filter(w=>w[0]!=='零岁');
+coachCourses[1][12].objectives=['Задавать общие и специальные вопросы','Различать вопросы с 吗 и вопросительными словами','Строить вопросы с правильным порядком слов'];
 
 // Расширенные тематические словари для HSK 2–6.
 // Формат каждой записи: иероглифы~пиньинь~перевод; фразы оформлены так же.
