@@ -74,30 +74,65 @@
   let chineseVoices = [];
   function refreshChineseVoices() {
     const synth = window.speechSynthesis;
-    if (!synth || !synth.getVoices) return;
+    if (!synth || !synth.getVoices) {
+      chineseVoices = [];
+      return [];
+    }
     chineseVoices = synth.getVoices().filter(v => /^zh([_-]|$)/i.test(v.lang) || /chinese|中文|mandarin/i.test(v.name));
+    return chineseVoices;
   }
 
   let activeAudio = null;
   let speechRequestId = 0;
-  function speakWithBrowser(text, statusElement, requestId) {
+
+  function mediaErrorDescription(audio) {
+    const code = audio.error?.code || 0;
+    const descriptions = {
+      1: "загрузка отменена браузером",
+      2: "сетевая ошибка при загрузке",
+      3: "браузер не смог декодировать аудио",
+      4: "формат или источник аудио не поддерживается"
+    };
+    return code ? descriptions[code] + " (MediaError " + code + ")" : "браузер не сообщил код MediaError";
+  }
+
+  function playErrorDescription(error) {
+    if (!error) return "браузер не сообщил причину";
+    const descriptions = {
+      NotAllowedError: "браузер запретил запуск воспроизведения",
+      NotSupportedError: "формат аудио не поддерживается",
+      AbortError: "воспроизведение было прервано",
+      SecurityError: "браузер заблокировал источник по соображениям безопасности",
+      TypeError: "не удалось обработать адрес аудио"
+    };
+    return descriptions[error.name] || ((error.name || "Ошибка") + (error.message ? ": " + error.message : ""));
+  }
+
+  function speakWithBrowser(text, statusElement, requestId, failures) {
     const synth = window.speechSynthesis;
     if (!synth || typeof window.SpeechSynthesisUtterance !== "function") {
-      if (statusElement && requestId === speechRequestId) statusElement.textContent = "Системная озвучка недоступна в этом браузере.";
+      if (statusElement && requestId === speechRequestId) {
+        statusElement.textContent = failures.join("\n") + "\nСистемный голос: Web Speech API недоступен в этом браузере.";
+      }
       return;
     }
     try {
-      refreshChineseVoices();
+      const voices = refreshChineseVoices();
       const utterance = new SpeechSynthesisUtterance(text);
       utterance.lang = "zh-CN";
       utterance.rate = 0.82;
-      const voice = chineseVoices.find(v => /^zh[-_]?(cn|hans)/i.test(v.lang))
-        || chineseVoices.find(v => /^zh/i.test(v.lang));
+      const voice = voices.find(v => /^zh[-_]?(cn|hans)/i.test(v.lang))
+        || voices.find(v => /^zh/i.test(v.lang));
       if (voice) utterance.voice = voice;
+      const voiceSummary = voices.length
+        ? voices.map(v => v.name + " [" + v.lang + "]").slice(0, 4).join(", ")
+        : "китайские голоса не обнаружены";
       let startTimer = null;
       utterance.onstart = () => {
         if (startTimer) clearTimeout(startTimer);
-        if (statusElement && requestId === speechRequestId) statusElement.textContent = "▶ Воспроизводится системная китайская озвучка.";
+        if (statusElement && requestId === speechRequestId) {
+          statusElement.textContent = failures.join("\n") + "\nСистемный голос: запущен" + (voice ? " — " + voice.name + " [" + voice.lang + "]" : " — выбран по языку zh-CN") + ".";
+        }
       };
       utterance.onend = () => {
         if (startTimer) clearTimeout(startTimer);
@@ -107,20 +142,22 @@
         if (startTimer) clearTimeout(startTimer);
         if (!statusElement || requestId !== speechRequestId) return;
         if (event.error === "interrupted" || event.error === "canceled") return;
-        statusElement.textContent = "Системная озвучка не сработала (" + (event.error || "ошибка") + ").";
+        statusElement.textContent = failures.join("\n") + "\nСистемный голос: ошибка " + (event.error || "unknown") + ". Доступные китайские голоса: " + voiceSummary + ".";
       };
       synth.resume();
       synth.speak(utterance);
       if (statusElement && requestId === speechRequestId) {
-        statusElement.textContent = "Запускаю системную китайскую озвучку…";
+        statusElement.textContent = failures.join("\n") + "\nСистемный голос: запускаю… Доступные китайские голоса: " + voiceSummary + ".";
         startTimer = setTimeout(() => {
           if (requestId === speechRequestId) {
-            statusElement.textContent = "Системная озвучка не запустилась. Возможно, на устройстве или в браузере нет доступного китайского голоса.";
+            statusElement.textContent = failures.join("\n") + "\nСистемный голос: событие запуска не пришло за 6 секунд. Доступные китайские голоса: " + voiceSummary + ".";
           }
         }, 6000);
       }
-    } catch (_) {
-      if (statusElement && requestId === speechRequestId) statusElement.textContent = "Не удалось запустить системную озвучку.";
+    } catch (error) {
+      if (statusElement && requestId === speechRequestId) {
+        statusElement.textContent = failures.join("\n") + "\nСистемный голос: не удалось запустить — " + playErrorDescription(error) + ".";
+      }
     }
   }
 
@@ -138,41 +175,56 @@
     const synth = window.speechSynthesis;
     if (synth && (synth.speaking || synth.pending)) synth.cancel();
 
-    // Сначала пробуем актуальный Google Translate TTS endpoint, затем резервный адрес.
     const encoded = encodeURIComponent(phrase);
-    const urls = [
-      "https://translate.googleapis.com/translate_tts?ie=UTF-8&client=gtx&tl=zh-CN&q=" + encoded,
-      "https://translate.google.com/translate_tts?ie=UTF-8&client=gtx&tl=zh-CN&q=" + encoded
+    const sources = [
+      {label:"Google audio 1 (translate.googleapis.com)", url:"https://translate.googleapis.com/translate_tts?ie=UTF-8&client=gtx&tl=zh-CN&q=" + encoded},
+      {label:"Google audio 2 (translate.google.com)", url:"https://translate.google.com/translate_tts?ie=UTF-8&client=gtx&tl=zh-CN&q=" + encoded}
     ];
+    const failures = [];
 
     const tryAudio = index => {
       if (requestId !== speechRequestId) return;
-      if (index >= urls.length) {
-        if (statusElement) statusElement.textContent = "Онлайн-озвучка недоступна. Пробую системный китайский голос…";
-        speakWithBrowser(phrase, statusElement, requestId);
+      if (index >= sources.length) {
+        if (statusElement) statusElement.textContent = failures.join("\n") + "\nПроверяю системный китайский голос…";
+        speakWithBrowser(phrase, statusElement, requestId, failures);
         return;
       }
+      const source = sources[index];
       let settled = false;
-      const audio = new Audio(urls[index]);
+      let reachedCanPlay = false;
+      const audio = new Audio();
       activeAudio = audio;
       audio.preload = "auto";
       const clearAttempt = () => {
         if (audioAttemptTimer) clearTimeout(audioAttemptTimer);
       };
-      const fail = () => {
+      const fail = reason => {
         if (settled || requestId !== speechRequestId) return;
         settled = true;
         clearAttempt();
+        failures.push(source.label + ": " + reason);
         if (activeAudio === audio) activeAudio = null;
         try { audio.pause(); } catch (_) {}
         tryAudio(index + 1);
       };
-      let audioAttemptTimer = setTimeout(fail, 7000);
+      let audioAttemptTimer = setTimeout(() => {
+        const phase = reachedCanPlay ? "тайм-аут запуска после загрузки" : "тайм-аут ожидания аудио";
+        fail(phase + " (readyState=" + audio.readyState + ", networkState=" + audio.networkState + ")");
+      }, 8000);
+      audio.onloadedmetadata = () => {
+        if (requestId === speechRequestId && statusElement) {
+          statusElement.textContent = "Проверка " + (index + 1) + "/2: метаданные получены, пробую воспроизвести…";
+        }
+      };
+      audio.oncanplay = () => { reachedCanPlay = true; };
+      audio.onstalled = () => {
+        if (requestId === speechRequestId && statusElement) statusElement.textContent = "Источник " + (index + 1) + "/2: загрузка приостановилась, жду…";
+      };
       audio.onplaying = () => {
         if (requestId !== speechRequestId) return;
         settled = true;
         clearAttempt();
-        if (statusElement) statusElement.textContent = "▶ Воспроизводится китайская аудиозапись.";
+        if (statusElement) statusElement.textContent = "▶ Китайская аудиозапись воспроизводится (" + source.label + ").";
       };
       audio.onended = () => {
         clearAttempt();
@@ -181,15 +233,19 @@
           if (statusElement) statusElement.textContent = "Воспроизведение завершено.";
         }
       };
-      audio.onerror = fail;
+      audio.onerror = () => fail(mediaErrorDescription(audio));
+      audio.src = source.url;
       const result = audio.play();
-      if (result && typeof result.catch === "function") result.catch(fail);
-      if (statusElement && requestId === speechRequestId) statusElement.textContent = "Загружаю китайское произношение…";
+      if (result && typeof result.catch === "function") result.catch(error => fail(playErrorDescription(error)));
+      if (statusElement && requestId === speechRequestId) {
+        statusElement.textContent = "Проверка источника " + (index + 1) + "/2: " + source.label + "…";
+      }
     };
     try {
       tryAudio(0);
-    } catch (_) {
-      speakWithBrowser(phrase, statusElement, requestId);
+    } catch (error) {
+      failures.push("Онлайн-аудио: " + playErrorDescription(error));
+      speakWithBrowser(phrase, statusElement, requestId, failures);
     }
   }
   function renderReview() {
