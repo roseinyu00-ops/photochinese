@@ -2349,7 +2349,7 @@ body.profile-editing #profileAvatar::after {
     <h2 id="coachLessonTitle"></h2>
     <p id="coachLessonIntro"></p>
     <div id="coachLessonWords" class="coach-word-grid"></div>
-    <div class="coach-grammar-box"><h3>Грамматика</h3><p id="coachLessonGrammar"></p><p id="coachLessonExample" class="coach-example"></p><h3>Разбор и закрепление</h3><p id="coachLessonExplanation"></p></div>
+    <div class="coach-grammar-box"><h3>Грамматика</h3><p id="coachLessonGrammar"></p><div id="coachLessonExample" class="coach-example"></div><h3>Разбор и закрепление</h3><p id="coachLessonExplanation"></p></div>
     <div class="coach-practice">
       <h3>Практика по уроку</h3>
       <p id="coachPracticeCounter" class="small"></p>
@@ -3679,7 +3679,7 @@ function renderCoachCourse(){
  lessons.forEach((lesson,index)=>{
   const isDone=done.includes(index), locked=index>0&&!done.includes(index-1);
   const b=document.createElement('button');b.type='button';b.className='coach-lesson-card';b.disabled=locked;
-  b.innerHTML='<span class="coach-lesson-number">'+(isDone?'✓':index+1)+'</span><span><strong>'+lesson.title+'</strong><span class="coach-lesson-meta">'+(isDone?'Урок завершён':locked?'Сначала пройди предыдущий урок':'Урок · '+lesson.words.length+' слов, грамматика и практика')+'</span></span><span class="coach-lesson-status">'+(locked?'🔒':'›')+'</span>';
+  b.innerHTML='<span class="coach-lesson-number">'+(isDone?'✓':index+1)+'</span><span><strong>'+lesson.title+'</strong><span class="coach-lesson-meta">'+(isDone?'Урок завершён':locked?'Сначала пройди предыдущий урок':'Урок · '+lesson.words.length+' слов, грамматика и серия заданий')+'</span></span><span class="coach-lesson-status">'+(locked?'🔒':'›')+'</span>';
   b.addEventListener('click',()=>openCoachLesson(index));list.appendChild(b);
  });
 }
