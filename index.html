@@ -4118,7 +4118,7 @@ function openCoachLesson(index){
   const ruleBlocks=detailedRule.split(/(?=^\d+\. )/m).map(part=>part.trim()).filter(Boolean);
   ruleBlocks.forEach((part,ruleIndex)=>{
    const lines=part.split('\n').map(line=>line.trim()).filter(Boolean);
-   const first=lines.shift()||part;const match=first.match(/^\\d+\\.\\s*(.*)$/);
+   const first=lines.shift()||part;const match=first.match(/^\d+\.\s*(.*)$/);
    const card=document.createElement('section');card.className='coach-grammar-rule';
    const heading=document.createElement('h4');heading.textContent=match?match[1].split('. ')[0]:'Правило '+(ruleIndex+1);card.appendChild(heading);
    const bodyLines=[...(match&&first.includes('. ')?[first.slice(first.indexOf('. ')+2)]:[]),...lines].filter(Boolean);
