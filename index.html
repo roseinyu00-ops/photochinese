@@ -3735,47 +3735,6 @@ updateProfileProgress();
 
 </script>
 
-// ===== PHOTOCHINESE: КОЛЛЕКЦИЯ =====
-
-function renderCollection() {
-  const collectionList = document.getElementById("collectionList");
-  const collectionCount = document.getElementById("collectionCount");
-
-  if (!collectionList || !collectionCount) return;
-
-  const items = JSON.parse(
-    localStorage.getItem("profileCollection") || "[]"
-  );
-
-  collectionList.innerHTML = "";
-
-  if (items.length === 0) {
-    collectionList.textContent = "Пока коллекция пуста...";
-  }
-
-  items.forEach((item, index) => {
-    const card = document.createElement("div");
-    card.className = "collection-item";
-
-    const emoji = document.createElement("span");
-    emoji.className = "collection-icon";
-    emoji.innerHTML = profileIconMarkup(item);
-
-    const name = document.createElement("span");
-    name.textContent = "Награда " + (index + 1);
-
-    card.append(emoji, name);
-    collectionList.appendChild(card);
-  });
-
-  collectionCount.textContent =
-    "Получено предметов: " + items.length;
-}
-
-renderCollection();
-
-</script>
-
 <script>
 // ===== PHOTOCHINESE: ДОСТИЖЕНИЯ И КОЛЛЕКЦИЯ =====
 
