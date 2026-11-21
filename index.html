@@ -3863,7 +3863,7 @@ function renderAchievements() {
 
 // Сохранение иероглифа из карточки разбора
 function saveCharacterToCollection(character) {
-  if (!character || !/\\p{Script=Han}/u.test(character)) return;
+  if (!character || !/\p{Script=Han}/u.test(character)) return;
   const saved = JSON.parse(localStorage.getItem("savedCharacters") || "[]");
   if (!saved.includes(character)) {
     saved.push(character);
