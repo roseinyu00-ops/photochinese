@@ -3271,6 +3271,7 @@ function completeLesson(lessonId) {
 
   saveProgress();
   updateAchievements();
+  updateProfileProgress();
 }
 
 // Проверка достижений
@@ -3301,6 +3302,8 @@ function updateAchievements() {
       console.log("Получено достижение:", rule.id);
     }
   });
+
+  updateProfileProgress();
 }
 
 // Обновление цифр в профиле
