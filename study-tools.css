@@ -48,7 +48,7 @@ body.dark-theme .study-tools-input{background:#49383d;color:#fff1ed;border-color
 .study-tools-word-status{grid-column:1/-1;font-size:12px;color:var(--muted);padding:0 3px}
 .study-tools-word{margin-bottom:2px}
 
-.study-tools-audio-status{min-height:20px;margin:8px 0;color:var(--muted);font-size:13px}
+.study-tools-audio-status{min-height:20px;margin:8px 0;color:var(--muted);font-size:13px;white-space:pre-line;line-height:1.5}
 
 .study-review-input-area{display:grid;gap:8px;margin:14px 0}
 .study-review-input-area label{font-size:13px;font-weight:600;color:var(--ink);margin-top:4px}
