@@ -52,6 +52,15 @@ p{margin:6px 0;color:var(--muted)}
 .drop{margin-top:18px;border:2px dashed #edc5cf;border-radius:17px;padding:23px;text-align:center;background:#fffafb}
 .drop strong{display:block;margin:5px 0}
 .drop input{display:none}
+.ocr-locked-card{display:flex;align-items:flex-start;gap:15px;margin-top:20px;padding:18px;border:1px solid #edc5cf;border-radius:17px;background:linear-gradient(135deg,#fffafb,#fff1f4)}
+.ocr-locked-icon{width:44px;height:44px;flex:0 0 44px;display:grid;place-items:center;border-radius:14px;background:#f8dce3;font-size:22px}
+.ocr-locked-card strong{display:block;color:var(--ink);font-size:16px}
+.ocr-locked-card p{margin:6px 0 9px;line-height:1.55}
+.ocr-locked-note{display:inline-block;padding:5px 9px;border-radius:999px;background:#f8dce3;color:#925066;font-size:12px;font-weight:700}
+body.dark-theme .ocr-locked-card{background:#49383d;border-color:#76545d}
+body.dark-theme .ocr-locked-card strong{color:#fff1ed}
+body.dark-theme .ocr-locked-icon,body.dark-theme .ocr-locked-note{background:#62434c;color:#ffe1e8}
+@media(max-width:480px){.ocr-locked-card{gap:11px;padding:14px}.ocr-locked-icon{width:38px;height:38px;flex-basis:38px}}
 .ocr-status{margin-top:12px;padding:11px 13px;border-radius:12px;background:#fff7f9;border:1px solid var(--line);color:var(--muted)}
 .ocr-output{margin-top:14px}
 .ocr-output textarea{min-height:130px;font-size:18px;line-height:1.7}
@@ -2319,15 +2328,23 @@ body.profile-editing #profileAvatar::after {
   <div class="panel hero">
     <h1>Китайский начинается<br>с одного фото.</h1>
     <p>Наведи камеру на текст или загрузи изображение — PhotoChinese поможет прочитать, понять и запомнить каждый иероглиф.</p>
-    <div class="actions">
-      <label class="primary" for="photo" style="margin:0;cursor:pointer">＋ Загрузить фото</label>
-      <button class="secondary" id="cameraBtn" type="button">◎ Открыть камеру</button>
-      <input id="photo" type="file" accept="image/*" hidden>
-      <input id="cameraPhoto" type="file" accept="image/*" capture="environment" hidden>
+    <div class="ocr-locked-card" role="status" aria-live="polite">
+      <div class="ocr-locked-icon" aria-hidden="true">🔒</div>
+      <div>
+        <strong>Распознавание по фото временно недоступно</strong>
+        <p>Мы пока приостановили эту функцию, чтобы доработать качество распознавания китайских иероглифов. Она вернётся, когда будет работать надёжнее.</p>
+        <span class="ocr-locked-note">Фото и камера временно отключены</span>
+      </div>
     </div>
-    <div class="drop" id="drop">
+    <div class="actions" hidden>
+      <label class="primary" for="photo" style="margin:0;cursor:pointer">＋ Загрузить фото</label>
+      <button class="secondary" id="cameraBtn" type="button" disabled>◎ Открыть камеру</button>
+      <input id="photo" type="file" accept="image/*" hidden disabled>
+      <input id="cameraPhoto" type="file" accept="image/*" capture="environment" hidden disabled>
+    </div>
+    <div class="drop" id="drop" hidden>
       <div style="font-size:28px">▧</div><strong>Перетащи изображение сюда</strong>
-      <span class="small">Загрузи фото с китайским текстом. Распознавание выполняется в браузере; при первом запуске потребуется загрузить языковую модель.</span>
+      <span class="small">Распознавание по фото временно отключено.</span>
       <div id="fileName" class="small"></div>
       <img id="photoPreview" class="ocr-preview" alt="Предпросмотр выбранного изображения" hidden>
       <div id="ocrStatus" class="ocr-status" role="status" aria-live="polite" hidden></div>
