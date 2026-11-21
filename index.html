@@ -2013,6 +2013,63 @@ body.dark-theme #chooseBannerBtn {
   background: rgba(61,48,52,.96) !important;
 }
 
+
+/* Жёстко ограничиваем эффект редактирования кругом аватарки.
+   Размываем само изображение внутри контейнера, а не backdrop —
+   так blur не может рисоваться за пределами аватара. */
+#profileAvatar {
+  position: relative !important;
+  overflow: hidden !important;
+  border-radius: 50% !important;
+  clip-path: circle(50% at 50% 50%) !important;
+  -webkit-clip-path: circle(50% at 50% 50%) !important;
+  isolation: isolate !important;
+}
+#profileAvatarImage {
+  transition: filter .18s ease, transform .18s ease;
+}
+body.profile-editing #profileAvatarImage {
+  filter: blur(3px);
+  transform: scale(1.08);
+}
+#profileAvatar::after {
+  content: "изменить";
+  position: absolute !important;
+  inset: 0 !important;
+  display: flex !important;
+  align-items: center !important;
+  justify-content: center !important;
+  width: 100% !important;
+  height: 100% !important;
+  box-sizing: border-box !important;
+  margin: 0 !important;
+  padding: 0 !important;
+  border-radius: 50% !important;
+  clip-path: circle(50% at 50% 50%) !important;
+  -webkit-clip-path: circle(50% at 50% 50%) !important;
+  overflow: hidden !important;
+  transform: none !important;
+  background: rgba(53,41,46,.24) !important;
+  color: #fff !important;
+  font-size: 10px !important;
+  line-height: 1 !important;
+  text-align: center !important;
+  -webkit-backdrop-filter: none !important;
+  backdrop-filter: none !important;
+  pointer-events: none;
+  opacity: 0;
+}
+body.profile-editing #profileAvatar::after {
+  opacity: 1 !important;
+}
+/* На кнопке смены баннера вообще нет blur — только аккуратная плашка. */
+#chooseBannerBtn {
+  -webkit-backdrop-filter: none !important;
+  backdrop-filter: none !important;
+  filter: none !important;
+  box-shadow: 0 2px 8px rgba(73,53,61,.10) !important;
+}
+
 </style>
 </head>
 <body>
