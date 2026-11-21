@@ -176,6 +176,7 @@
     $("studyReviewPinyin").textContent = word.pinyin || "Пиньинь не указан";
     $("studyReviewMeaning").textContent = word.translation;
     $("studyReviewLevel").textContent = word.level ? "HSK " + word.level : (word.source || "Личный словарь");
+    updateReviewRatingLabels(word,state);
     $("studyReviewAnswer").hidden = true;
     $("studyReviewReveal").hidden = false;
   }
@@ -212,16 +213,42 @@
     $("studyReviewRatings").hidden = false;
   }
 
+  function calculateNextReview(rating, previous) {
+    const next = {...previous};
+    let interval;
+    if (rating === "again") { interval = 1/1440; next.reps = 0; next.ease = Math.max(1.3,(next.ease||2.5)-0.2); }
+    else if (rating === "hard") { interval = Math.max(1,(next.interval||1)*1.2); next.reps = (next.reps||0)+1; next.ease = Math.max(1.3,(next.ease||2.5)-0.15); }
+    else if (rating === "good") { interval = next.interval ? Math.max(2,next.interval*(next.ease||2.5)) : 1; next.reps = (next.reps||0)+1; }
+    else { interval = next.interval ? Math.max(4,next.interval*(next.ease||2.5)*1.3) : 4; next.reps = (next.reps||0)+1; next.ease = Math.min(3.2,(next.ease||2.5)+0.15); }
+    return {...next,interval};
+  }
+
+  function formatReviewInterval(days) {
+    const minutes = Math.max(1,Math.round(days*1440));
+    if (minutes < 60) return "примерно через " + minutes + " мин";
+    const hours = Math.round(minutes/60);
+    if (hours < 24) return "примерно через " + hours + " ч";
+    const count = Math.max(1,Math.round(days));
+    const mod10 = count % 10, mod100 = count % 100;
+    const noun = mod100 >= 11 && mod100 <= 14 ? "дней" : mod10 === 1 ? "день" : mod10 >= 2 && mod10 <= 4 ? "дня" : "дней";
+    return "примерно через " + count + " " + noun;
+  }
+
+  function updateReviewRatingLabels(word, state) {
+    const previous = state[word.id] || {interval:0,ease:2.5,reps:0};
+    ["again","hard","good","easy"].forEach(rating => {
+      const button = document.querySelector('#studyReviewRatings [data-rating="' + rating + '"]');
+      const detail = button?.querySelector("strong");
+      if (detail) detail.textContent = formatReviewInterval(calculateNextReview(rating,previous).interval);
+    });
+  }
+
   function rateReview(rating) {
     if (!currentReviewId) return;
     const state = safeRead(REVIEW_KEY,{});
     const old = state[currentReviewId] || {interval:0,ease:2.5,reps:0};
-    let interval;
-    if (rating === "again") { interval = 1/1440; old.reps = 0; old.ease = Math.max(1.3,(old.ease||2.5)-0.2); }
-    else if (rating === "hard") { interval = Math.max(1,(old.interval||1)*1.2); old.reps = (old.reps||0)+1; old.ease = Math.max(1.3,(old.ease||2.5)-0.15); }
-    else if (rating === "good") { interval = old.interval ? Math.max(2,old.interval*(old.ease||2.5)) : 1; old.reps = (old.reps||0)+1; }
-    else { interval = old.interval ? Math.max(4,old.interval*(old.ease||2.5)*1.3) : 4; old.reps = (old.reps||0)+1; old.ease = Math.min(3.2,(old.ease||2.5)+0.15); }
-    state[currentReviewId] = {...old,interval,due:Date.now()+interval*86400000,lastReviewed:Date.now()};
+    const next = calculateNextReview(rating,old);
+    state[currentReviewId] = {...next,due:Date.now()+next.interval*86400000,lastReviewed:Date.now()};
     safeWrite(REVIEW_KEY,state);
     renderReview();
   }
