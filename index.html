@@ -3833,7 +3833,7 @@ for(let n=0;n<=100;n++){
 }
 coachSupplementalVocabulary[1][1].words=[
  ...coachSupplementalVocabulary[1][1].words.filter(w=>!/^([零一二三四五六七八九十百]+)$/.test(w[0])),
- ...hsk1NumberWords,
+ ...hsk1NumberWords.filter(w=>!['一','二','三'].includes(w[0])),
  ['两','liǎng','два (перед счётным словом и некоторыми единицами)'],
  ['个','gè','универсальное счётное слово'],
  ['多少','duōshao','сколько (о количестве)']
@@ -4040,7 +4040,7 @@ function renderCoachCourse(){
 function shuffleCoachItems(items){return items.slice().sort(()=>Math.random()-.5);}
 function buildCoachPractice(lesson){
  const questions=[{question:lesson.question,options:lesson.options.slice(),answer:lesson.answer,explanation:(lesson.help&&lesson.help.grammar)||lesson.explanation||'Вспомни правило из урока.'}];
- (lesson.words||[]).concat((lesson.extraWords||[]).slice(0,3)).forEach(word=>{
+ (lesson.words||[]).concat(shuffleCoachItems(lesson.extraWords||[]).slice(0,8)).forEach(word=>{
   const translations=[...new Set(lesson.words.map(w=>w[2]).filter(v=>v&&v!==word[2]))];
   const pinyins=[...new Set(lesson.words.map(w=>w[1]).filter(v=>v&&v!==word[1]))];
   const translationDistractors=shuffleCoachItems(translations).slice(0,2);
