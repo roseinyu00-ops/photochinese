@@ -999,6 +999,61 @@ body.dark-theme .account-button {
 }
     /* ===== НОВЫЙ ДИЗАЙН РАЗБОРА ИЕРОГЛИФА ===== */
 
+.pc-save-character-button {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  margin: 8px 0 18px;
+  padding: 10px 16px;
+  border: 1px solid #edcbd5;
+  border-radius: 13px;
+  background: #fff4f7;
+  color: #94576a;
+  font: inherit;
+  font-size: 14px;
+  font-weight: 700;
+  cursor: pointer;
+}
+.pc-save-character-button.is-saved {
+  background: #f2e8ec;
+  color: #6f5960;
+}
+.saved-characters-heading {
+  margin: 18px 0 10px;
+  font-size: 15px;
+}
+.saved-character-item {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+.saved-character-symbol {
+  font-size: 27px;
+  min-width: 36px;
+  text-align: center;
+}
+.saved-character-details {
+  flex: 1;
+  min-width: 0;
+  font-size: 12px;
+  line-height: 1.4;
+}
+.saved-character-remove {
+  border: 0;
+  border-radius: 10px;
+  padding: 7px 10px;
+  background: #f8edf0;
+  color: #925b6c;
+  cursor: pointer;
+  font: inherit;
+  font-size: 12px;
+}
+body.dark-theme .pc-save-character-button,
+body.dark-theme .saved-character-remove {
+  background: #62434c;
+  color: #ffe1e8;
+  border-color: #76545d;
+}
 .pc-character-card {
   margin-top: 22px;
   padding: 28px;
@@ -2415,8 +2470,15 @@ body.profile-editing #profileAvatar::after {
 <section class="profile-section">
   <h2 class="profile-collection-title"><span class="collection-title-icon" aria-hidden="true"><svg viewBox="0 0 32 24"><path d="M15 11C10 4 4 3 3 6c-1 4 3 9 11 7l2-2-2-2Zm2 0c5-7 11-8 12-5 1 4-3 9-11 7l-2-2 2-2Z"/><path d="m14 12-3 10 5-5 5 5-3-10"/></svg></span>Моя коллекция</h2>
 
+  <h3 class="saved-characters-heading">Мои иероглифы</h3>
+  <div class="profile-collection saved-characters-list" id="savedCharactersList">
+    <p>Пока ничего не сохранено...</p>
+  </div>
+  <p id="savedCharactersCount">Сохранено иероглифов: 0</p>
+
+  <h3 class="saved-characters-heading">Награды</h3>
   <div class="profile-collection" id="collectionList">
-    <p>Пока коллекция пуста...</p>
+    <p>Пока нет наград...</p>
   </div>
 
   <p id="collectionCount">Получено предметов: 0</p>
@@ -3070,8 +3132,10 @@ function buildCharacterCard(ch, d) {
     '<span class="pc-character-stroke-count" data-stroke-count-for="' + esc(ch) + '">' + (strokeCount ? strokeCount + ' черт' : 'Число черт не найдено') + '</span>' +
     frequencyTag;
   const toneText = toneLabel ? '<span class="pc-character-tone">• ' + esc(toneLabel) + '</span>' : '';
+  const alreadySaved = JSON.parse(localStorage.getItem('savedCharacters') || '[]').includes(ch);
   return '<article class="pc-character-card">' +
     '<h2>Разбор иероглифа</h2>' +
+    '<button class="pc-save-character-button' + (alreadySaved ? ' is-saved' : '') + '" data-save-character="' + esc(ch) + '" type="button">' + (alreadySaved ? '✓ В коллекции' : '♡ Сохранить в коллекцию') + '</button>' +
     '<div class="pc-character-head"><div class="pc-character-symbol">' + esc(ch) + '</div><div>' +
     '<div class="pc-character-reading"><span class="pc-character-pinyin">' + esc(pinyinSource || 'Пиньинь не найден') + '</span>' + toneText + '</div>' +
     '<div class="pc-character-meaning">' + esc(displayMeaning) + '</div></div></div>' +
@@ -3156,6 +3220,12 @@ function buildCharacterCard(ch, d) {
   });
 
   analysisResults.innerHTML = html;
+
+  analysisResults.querySelectorAll('[data-save-character]').forEach(button => {
+    button.addEventListener('click', () => {
+      saveCharacterToCollection(button.dataset.saveCharacter);
+    });
+  });
 
   analysisResults.querySelectorAll('.pc-stroke-scheme').forEach(async container => {
     const ch = container.dataset.char;
@@ -3791,6 +3861,77 @@ function renderAchievements() {
   });
 }
 
+// Сохранение иероглифа из карточки разбора
+function saveCharacterToCollection(character) {
+  if (!character || !/\\p{Script=Han}/u.test(character)) return;
+  const saved = JSON.parse(localStorage.getItem("savedCharacters") || "[]");
+  if (!saved.includes(character)) {
+    saved.push(character);
+    localStorage.setItem("savedCharacters", JSON.stringify(saved));
+  }
+
+  learnCharacter(character);
+  window.photoChineseSync?.();
+  renderSavedCharacters();
+
+  document.querySelectorAll('[data-save-character]').forEach(button => {
+    if (button.dataset.saveCharacter === character) {
+      button.classList.add("is-saved");
+      button.textContent = "✓ В коллекции";
+    }
+  });
+}
+
+// Отображение сохранённых иероглифов в профиле
+function renderSavedCharacters() {
+  const list = document.getElementById("savedCharactersList");
+  const count = document.getElementById("savedCharactersCount");
+  if (!list || !count) return;
+
+  const saved = JSON.parse(localStorage.getItem("savedCharacters") || "[]");
+  list.innerHTML = "";
+
+  if (!saved.length) {
+    list.textContent = "Пока ничего не сохранено...";
+  }
+
+  saved.forEach(character => {
+    const info = getCharInfo(character);
+    const item = document.createElement("div");
+    item.className = "collection-item saved-character-item";
+
+    const symbol = document.createElement("strong");
+    symbol.className = "saved-character-symbol";
+    symbol.textContent = character;
+
+    const details = document.createElement("span");
+    details.className = "saved-character-details";
+    details.textContent = [info.p || info.pinyin || "", info.m || "Значение уточняется"].filter(Boolean).join(" · ");
+
+    const remove = document.createElement("button");
+    remove.type = "button";
+    remove.className = "saved-character-remove";
+    remove.textContent = "Убрать";
+    remove.addEventListener("click", () => {
+      const updated = JSON.parse(localStorage.getItem("savedCharacters") || "[]").filter(item => item !== character);
+      localStorage.setItem("savedCharacters", JSON.stringify(updated));
+      window.photoChineseSync?.();
+      renderSavedCharacters();
+      document.querySelectorAll('[data-save-character]').forEach(button => {
+        if (button.dataset.saveCharacter === character) {
+          button.classList.remove("is-saved");
+          button.textContent = "♡ Сохранить в коллекцию";
+        }
+      });
+    });
+
+    item.append(symbol, details, remove);
+    list.appendChild(item);
+  });
+
+  count.textContent = "Сохранено иероглифов: " + saved.length;
+}
+
 // Отображение коллекции
 function renderCollection() {
   const collectionList = document.getElementById("collectionList");
@@ -3886,6 +4027,7 @@ updateAchievements = function() {
 updateCollection();
 renderAchievements();
 renderCollection();
+renderSavedCharacters();
 renderEquippedDecoration();
 
 </script>
@@ -3949,7 +4091,7 @@ function switchAccountMode(mode) {
 // Загрузка профиля из облака
 const PHOTOCHINESE_SYNC_KEYS = [
   "profileNickname", "photoChineseNickname", "profileBio",
-  "profileSubtitle", "favoriteCharacter", "learnedCharacters",
+  "profileSubtitle", "favoriteCharacter", "learnedCharacters", "savedCharacters",
   "completedLessons", "achievements", "profileCollection",
   "equippedDecoration", "profileAvatar"
 ];
@@ -4008,6 +4150,7 @@ function applyPhotoChineseData(appData) {
   updateCollection();
   renderAchievements();
   renderCollection();
+  renderSavedCharacters();
   renderEquippedDecoration();
 }
 
