@@ -4464,10 +4464,11 @@ tabs.forEach(btn => btn.addEventListener('click', () => {
     section.classList.remove('is-entering');
   });
 
-  // Прогресс скрываем только в разделах HSK и личного словаря.
+  // Боковую учебную панель скрываем в HSK, личном словаре и панели владельца.
+  // В админ-разделе не показываем ни «Твой прогресс», ни «Слово дня».
   const learningSidebar = document.getElementById("learningSidebar");
   if (learningSidebar) {
-    learningSidebar.hidden = ["hsk", "studytools"].includes(btn.dataset.tab);
+    learningSidebar.hidden = ["hsk", "studytools", "admin"].includes(btn.dataset.tab);
   }
 
   document.body.classList.toggle("profile-open", btn.dataset.tab === "profile");
