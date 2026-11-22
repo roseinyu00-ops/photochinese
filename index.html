@@ -4023,6 +4023,10 @@ body.dark-theme .achievement-companion-reward{color:#dfabc4}
 
 <section id="profile" class="tab" hidden>
   <div class="profile-page">
+    <div id="ownerRoleDiagnosticTop" style="display:block!important;visibility:visible!important;margin:14px 0;padding:14px 16px;border:1px solid #b58ad8;border-radius:14px;background:rgba(181,138,216,.12);color:var(--text);font-size:13px;line-height:1.5;">
+      <strong style="display:block;margin-bottom:4px;">✦ Проверка доступа владельца</strong>
+      <span id="ownerRoleDiagnosticTopText">Если этот блок виден, новая версия сайта загружена. Проверяем аккаунт…</span>
+    </div>
 
     <!-- БАННЕР -->
     
@@ -4373,11 +4377,16 @@ window.photoChineseIsLoggedIn = () => Boolean(photoChineseUser);
 
 function setOwnerRoleDiagnostic(message, isError = false) {
   photoChineseRoleDiagnostic = message;
-  const node = document.getElementById("ownerRoleDiagnostic");
-  if (node) {
-    node.textContent = message;
-    node.style.color = isError ? "#e07878" : "var(--muted)";
-  }
+  const nodes = [
+    document.getElementById("ownerRoleDiagnostic"),
+    document.getElementById("ownerRoleDiagnosticTopText")
+  ];
+  nodes.forEach(node => {
+    if (node) {
+      node.textContent = message;
+      node.style.color = isError ? "#e07878" : "var(--text)";
+    }
+  });
 }
 
 function updateProfileAccess() {
