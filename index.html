@@ -3489,6 +3489,15 @@ body.dark-theme .hsk-diagnostic h1 {
   color: transparent !important;
   -webkit-text-fill-color: transparent !important;
 }
+
+/* Keep the highlighted word readable inside gradient headings in dark mode */
+body.dark-theme #learn > .hero h1 .pc-editorial-emphasis {
+  color: #f0b2c4 !important;
+  -webkit-text-fill-color: #f0b2c4 !important;
+  background: none !important;
+  -webkit-background-clip: initial !important;
+  background-clip: initial !important;
+}
 body.dark-theme #meme .meme-upload {
   background: linear-gradient(135deg, #49383d 0%, #4c3b50 100%) !important;
 }
