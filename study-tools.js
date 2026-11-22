@@ -219,6 +219,46 @@
     }
   }
 
+  // Готовые записи носителей китайского из открытого набора audio-cmn.
+  // Источник: https://github.com/hugolpz/audio-cmn — лицензия CC BY-SA.
+  const RECORDED_AUDIO_BASE = "https://raw.githubusercontent.com/hugolpz/audio-cmn/master/96k/hsk/cmn-";
+  function playRecordedSpeech(text, statusElement, requestId) {
+    const phrase = clean(text).replace(/[\\s，。！？、,.!?]+/g, "");
+    if (!phrase) return;
+    const audio = new Audio();
+    activeAudio = audio;
+    audio.preload = "auto";
+    let settled = false;
+    const finish = () => {
+      if (activeAudio === audio) activeAudio = null;
+    };
+    audio.onplaying = () => {
+      if (requestId !== speechRequestId) return;
+      settled = true;
+      if (statusElement) statusElement.textContent = "▶ Воспроизводится готовая запись китайского произношения.";
+    };
+    audio.onended = () => {
+      finish();
+      if (requestId === speechRequestId && statusElement) statusElement.textContent = "Воспроизведение завершено.";
+    };
+    audio.onerror = () => {
+      finish();
+      if (requestId === speechRequestId && statusElement) {
+        statusElement.textContent = "Для «" + phrase + "» в открытой библиотеке пока не нашлась готовая запись. Попробуй отдельные слова или иероглифы.";
+      }
+    };
+    audio.src = RECORDED_AUDIO_BASE + encodeURIComponent(phrase) + ".mp3";
+    const result = audio.play();
+    if (result && typeof result.catch === "function") {
+      result.catch(error => {
+        finish();
+        if (requestId === speechRequestId && statusElement) {
+          statusElement.textContent = "Не удалось воспроизвести готовую запись: " + playErrorDescription(error) + ".";
+        }
+      });
+    }
+  }
+
   function speak(text, statusElement) {
     const phrase = clean(text);
     if (!phrase) {
@@ -230,26 +270,11 @@
       try { activeAudio.pause(); activeAudio.currentTime = 0; } catch (_) {}
       activeAudio = null;
     }
-    const synth = window.speechSynthesis;
-    if (synth && (synth.speaking || synth.pending)) synth.cancel();
-
-    // Важно: если китайский голос уже установлен, запускаем его прямо
-    // в обработчике нажатия. После ожидания сетевых запросов браузер
-    // может потерять разрешение на запуск речи по действию пользователя.
-    const voices = refreshChineseVoices();
-    if (voices.length && synth && typeof window.SpeechSynthesisUtterance === "function") {
-      // Наличие голоса в списке ещё не означает, что Android действительно
-      // запустит его. Если системная озвучка зависнет или выдаст ошибку,
-      // автоматически переключаемся на сетевое аудио.
-      speakWithBrowser(phrase, statusElement, requestId, [], reason => {
-        if (requestId !== speechRequestId || activeAudio) return;
-        if (statusElement) statusElement.textContent = "Системный голос не запустился (" + reason + "). Переключаюсь на онлайн-озвучку…";
-        playOnlineSpeech(phrase, statusElement, requestId);
-      });
-      return;
+    if (window.speechSynthesis && (window.speechSynthesis.speaking || window.speechSynthesis.pending)) {
+      window.speechSynthesis.cancel();
     }
-
-    playOnlineSpeech(phrase, statusElement, requestId);
+    if (statusElement) statusElement.textContent = "Загружаю готовую запись…";
+    playRecordedSpeech(phrase, statusElement, requestId);
   }
   function renderReview() {
     const words = getWords();
