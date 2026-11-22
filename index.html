@@ -5172,7 +5172,7 @@ function appendCoachEmphasisText(container,text){
  const source=String(text||'');
  const patterns=[
   {re:/(Важно:|Обрати внимание:|Запомни:|Не путай:|Формула:|Порядок слов:|Например:|Подсказка:|Совет:|Исключение:|Обрати внимание на то, что:)/gi,cls:'pc-note-label',tag:'strong'},
-  {re:/(\\b(?:необходимо|важно|главное|только|всегда|никогда|исключение|порядок слов|обратный порядок|вопросительная частица)\\b)/gi,cls:'pc-inline-emphasis',tag:'strong'}
+  {re:/(\b(?:необходимо|важно|главное|только|всегда|никогда|исключение|порядок слов|обратный порядок|вопросительная частица)\b)/gi,cls:'pc-inline-emphasis',tag:'strong'}
  ];
  const matches=[];
  patterns.forEach((pattern,priority)=>{
