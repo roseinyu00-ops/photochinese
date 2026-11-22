@@ -5779,6 +5779,55 @@ function collectPhotoChineseData() {
   return { storage, bannerPath: localStorage.getItem("profileBannerPath") || null, updatedAt: new Date().toISOString() };
 }
 
+function mergePhotoChineseDictionaryData(localData, cloudData) {
+  const merged = {...(cloudData || {})};
+  const local = localData || {};
+
+  // Словарь собирается из нескольких локальных источников.
+  // Объединяем их с облаком, чтобы вход на другом устройстве
+  // не затирал слова, которые ещё не успели попасть в аккаунт.
+  ["learnedCharacters", "savedCharacters"].forEach(key => {
+    const cloudItems = Array.isArray(merged[key]) ? merged[key] : [];
+    const localItems = Array.isArray(local[key]) ? local[key] : [];
+    if (cloudItems.length || localItems.length) {
+      merged[key] = Array.from(new Set([...cloudItems, ...localItems]));
+    }
+  });
+
+  const cloudCoach = merged.photoChineseCoachVocabulary && typeof merged.photoChineseCoachVocabulary === "object"
+    ? merged.photoChineseCoachVocabulary : {};
+  const localCoach = local.photoChineseCoachVocabulary && typeof local.photoChineseCoachVocabulary === "object"
+    ? local.photoChineseCoachVocabulary : {};
+  const coach = {...cloudCoach};
+  new Set([...Object.keys(cloudCoach), ...Object.keys(localCoach)]).forEach(level => {
+    const cloudWords = Array.isArray(cloudCoach[level]) ? cloudCoach[level] : [];
+    const localWords = Array.isArray(localCoach[level]) ? localCoach[level] : [];
+    coach[level] = Array.from(new Set([...cloudWords, ...localWords]));
+  });
+  if (Object.keys(coach).length) merged.photoChineseCoachVocabulary = coach;
+
+  const cloudStudyWords = Array.isArray(merged.photoChineseStudyWords) ? merged.photoChineseStudyWords : [];
+  const localStudyWords = Array.isArray(local.photoChineseStudyWords) ? local.photoChineseStudyWords : [];
+  if (cloudStudyWords.length || localStudyWords.length) {
+    const words = new Map();
+    [...cloudStudyWords, ...localStudyWords].forEach(word => {
+      if (!word || !word.hanzi) return;
+      const id = String(word.hanzi).trim() + "|" + String(word.pinyin || "").trim();
+      words.set(id, {...(words.get(id) || {}), ...word});
+    });
+    merged.photoChineseStudyWords = Array.from(words.values());
+  }
+
+  // Состояния повторения объединяем по карточкам, не теряя записи,
+  // которые существуют только на одном из устройств.
+  const cloudReview = merged.photoChineseReviewState && typeof merged.photoChineseReviewState === "object"
+    ? merged.photoChineseReviewState : {};
+  const localReview = local.photoChineseReviewState && typeof local.photoChineseReviewState === "object"
+    ? local.photoChineseReviewState : {};
+  merged.photoChineseReviewState = {...cloudReview, ...localReview};
+  return merged;
+}
+
 function applyPhotoChineseData(appData) {
   if (!appData || !appData.storage) return;
   PHOTOCHINESE_SYNC_KEYS.forEach(key => {
@@ -5830,8 +5879,10 @@ function applyPhotoChineseData(appData) {
 function savePhotoChineseDataNow() {
   if (!photoChineseUser || !window.photoChineseSupabase) return Promise.resolve();
   const userId = photoChineseUser.id;
-  const payload = collectPhotoChineseData();
   photoChineseSyncQueue = photoChineseSyncQueue.catch(() => {}).then(async () => {
+    // Снимок данных делаем внутри очереди, чтобы более позднее сохранение
+    // не могло быть затёрто устаревшим payload из предыдущего вызова.
+    const payload = collectPhotoChineseData();
     if (window.photoChineseBannerDirty) {
       const bannerFile = await getSavedBanner();
       if (bannerFile) {
@@ -5893,7 +5944,14 @@ async function loadCloudProfile(user) {
   }
 
   if (profile.app_data && profile.app_data.storage && Object.keys(profile.app_data.storage).length) {
-    applyPhotoChineseData(profile.app_data);
+    const localSnapshot = collectPhotoChineseData();
+    const mergedAppData = {
+      ...profile.app_data,
+      storage: mergePhotoChineseDictionaryData(localSnapshot.storage, profile.app_data.storage)
+    };
+    applyPhotoChineseData(mergedAppData);
+    // Записываем объединённый словарь обратно в аккаунт.
+    await savePhotoChineseDataNow();
     if (profile.app_data.bannerPath) {
       localStorage.setItem("profileBannerPath", profile.app_data.bannerPath);
       const { data: mediaUrl } = client.storage.from("profile-media").getPublicUrl(profile.app_data.bannerPath);
