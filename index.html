@@ -3848,7 +3848,21 @@ body.dark-theme .writing-word-result-source,body.dark-theme .writing-selected-wo
       <div class="games-hero">
         <div class="games-kicker">PHOTOCHINESE · УЧЁБА МОЖЕТ БЫТЬ ИГРОЙ</div>
         <h2>Мини-игры <em>для практики</em></h2>
-        <p>Закрепляй слова и грамматику в коротких заданиях. За правильные ответы получай очки и постепенно улучшай результат.</p>
+        <p>Закрепляй слова и грамматику в коротких заданиях. Выбирай уровень, повторяй знакомые слова и открывай новые.</p>
+        <div class="games-level-picker">
+          <label for="gamesLevel">Уровень заданий</label>
+          <select id="gamesLevel">
+            <option value="all">Все уровни · смешанная практика</option>
+            <option value="1">HSK 1 · основы</option>
+            <option value="2">HSK 2 · повседневное общение</option>
+            <option value="3">HSK 3 · расширяем речь</option>
+            <option value="4">HSK 4 · уверенное общение</option>
+            <option value="5">HSK 5 · продвинутая лексика</option>
+            <option value="6">HSK 6 · высокий уровень</option>
+            <option value="learned">Мои выученные слова</option>
+          </select>
+          <small id="gamesLevelHint">В задания также попадут слова, отмеченные тобой как выученные.</small>
+        </div>
         <div class="games-total"><span class="games-total-icon">✦</span><span><strong id="gamesTotalScore">0</strong><small>очков набрано</small></span></div>
       </div>
       <div class="games-mode-grid">
@@ -7912,7 +7926,7 @@ window.addEventListener("keydown", function(event) {
       feedback.textContent='Верно! Черта '+(strokeNum+1)+' выполнена правильно.';
     }});
   });
-  // Мини-игры PhotoChinese
+  // Мини-игры PhotoChinese — расширенный банк HSK 1–6 + личная лексика
   (function initMiniGames(){
     const area=document.getElementById('gamesTaskArea');
     if(!area)return;
@@ -7924,33 +7938,83 @@ window.addEventListener("keydown", function(event) {
     const roundLabel=document.getElementById('gamesRoundLabel');
     const roundScore=document.getElementById('gamesRoundScore');
     const totalScoreEl=document.getElementById('gamesTotalScore');
+    const levelSelect=document.getElementById('gamesLevel');
+    const levelHint=document.getElementById('gamesLevelHint');
     const names={build:'Собери предложение',pairs:'Найди пару',missing:'Угадай пропущенный иероглиф',order:'Расставь слова'};
     const phrases=[
-      {ru:'Меня зовут Ли.',zh:'我叫李。',parts:['我','叫','李。']},
-      {ru:'Я студент.',zh:'我是学生。',parts:['我','是','学生。']},
-      {ru:'Она учитель.',zh:'她是老师。',parts:['她','是','老师。']},
-      {ru:'Мне восемнадцать лет.',zh:'我十八岁。',parts:['我','十八','岁。']},
-      {ru:'Как тебя зовут?',zh:'你叫什么名字？',parts:['你','叫','什么','名字？']},
-      {ru:'Привет! Как ты?',zh:'你好！你好吗？',parts:['你好！','你','好吗？']}
+      {level:1,ru:'Меня зовут Ли.',zh:'我叫李。',parts:['我','叫','李。']},
+      {level:1,ru:'Я студент.',zh:'我是学生。',parts:['我','是','学生。']},
+      {level:1,ru:'Она учитель.',zh:'她是老师。',parts:['她','是','老师。']},
+      {level:1,ru:'Как тебя зовут?',zh:'你叫什么名字？',parts:['你','叫','什么','名字？']},
+      {level:1,ru:'Я люблю чай.',zh:'我喜欢茶。',parts:['我','喜欢','茶。']},
+      {level:1,ru:'Это моя книга.',zh:'这是我的书。',parts:['这','是','我的','书。']},
+      {level:2,ru:'Сегодня очень холодно.',zh:'今天很冷。',parts:['今天','很','冷。']},
+      {level:2,ru:'Я хочу выпить воды.',zh:'我想喝水。',parts:['我','想','喝','水。']},
+      {level:2,ru:'Мой друг живёт в Пекине.',zh:'我的朋友住在北京。',parts:['我的','朋友','住在','北京。']},
+      {level:2,ru:'Вчера я ходил в магазин.',zh:'我昨天去了商店。',parts:['我','昨天','去了','商店。']},
+      {level:3,ru:'Потому что идёт дождь, я не иду гулять.',zh:'因为下雨，所以我不去散步。',parts:['因为','下雨，','所以','我','不去','散步。']},
+      {level:3,ru:'Если будет время, я позвоню тебе.',zh:'如果有时间，我给你打电话。',parts:['如果','有时间，','我','给你','打电话。']},
+      {level:3,ru:'Он уже прочитал эту книгу.',zh:'他已经看完这本书了。',parts:['他','已经','看完','这本书','了。']},
+      {level:3,ru:'Я учу китайский уже два года.',zh:'我学中文已经两年了。',parts:['我','学中文','已经','两年','了。']},
+      {level:4,ru:'Хотя было поздно, мы продолжили работать.',zh:'虽然很晚了，但是我们继续工作。',parts:['虽然','很晚了，','但是','我们','继续','工作。']},
+      {level:4,ru:'По сравнению со вчерашним днём сегодня теплее.',zh:'跟昨天相比，今天更暖和。',parts:['跟昨天相比，','今天','更','暖和。']},
+      {level:4,ru:'Он не только хорошо говорит, но и умеет писать.',zh:'他不但说得好，而且会写。',parts:['他','不但','说得好，','而且','会写。']},
+      {level:4,ru:'Пожалуйста, заранее сообщи мне о своих планах.',zh:'请提前告诉我你的计划。',parts:['请','提前','告诉我','你的','计划。']},
+      {level:5,ru:'Это решение оказало большое влияние на общество.',zh:'这个决定对社会产生了很大的影响。',parts:['这个决定','对社会','产生了','很大的','影响。']},
+      {level:5,ru:'Нам необходимо учитывать разные точки зрения.',zh:'我们需要考虑不同的观点。',parts:['我们','需要','考虑','不同的','观点。']},
+      {level:5,ru:'Он постепенно привык к новой обстановке.',zh:'他逐渐适应了新的环境。',parts:['他','逐渐','适应了','新的','环境。']},
+      {level:5,ru:'Эта проблема требует дальнейшего обсуждения.',zh:'这个问题需要进一步讨论。',parts:['这个问题','需要','进一步','讨论。']},
+      {level:6,ru:'Несмотря на трудности, проект был успешно завершён.',zh:'尽管遇到了困难，项目还是顺利完成了。',parts:['尽管','遇到了困难，','项目','还是','顺利完成了。']},
+      {level:6,ru:'Нельзя игнорировать долгосрочные последствия такого решения.',zh:'不能忽视这个决定带来的长期后果。',parts:['不能','忽视','这个决定','带来的','长期后果。']},
+      {level:6,ru:'Ключ к решению заключается в тщательном анализе данных.',zh:'解决问题的关键在于对数据进行仔细分析。',parts:['解决问题的关键','在于','对数据','进行','仔细分析。']},
+      {level:6,ru:'Его аргументация была убедительной, но не лишённой противоречий.',zh:'他的论证很有说服力，但并非没有矛盾。',parts:['他的论证','很有说服力，','但','并非没有','矛盾。']}
     ];
     const pairs=[
-      ['你好','привет'],['谢谢','спасибо'],['再见','до свидания'],['我','я'],['你','ты'],['他','он'],['她','она'],['老师','учитель'],['学生','студент'],['名字','имя'],['朋友','друг'],['喜欢','нравиться; любить'],['学习','учиться'],['水','вода'],['茶','чай'],['书','книга'],['猫','кошка'],['家','дом'],['爱','любовь; любить'],['是','быть; являться']
+      [1,'你好','привет'],[1,'谢谢','спасибо'],[1,'再见','до свидания'],[1,'我','я'],[1,'你','ты'],[1,'他','он'],[1,'她','она'],[1,'老师','учитель'],[1,'学生','студент'],[1,'名字','имя'],[1,'朋友','друг'],[1,'喜欢','нравиться; любить'],[1,'学习','учиться'],[1,'水','вода'],[1,'茶','чай'],[1,'书','книга'],[1,'猫','кошка'],[1,'家','дом'],[1,'爱','любовь; любить'],[1,'是','быть; являться'],[1,'吃','есть'],[1,'喝','пить'],[1,'大','большой'],[1,'小','маленький'],
+      [2,'昨天','вчера'],[2,'今天','сегодня'],[2,'明天','завтра'],[2,'天气','погода'],[2,'医院','больница'],[2,'商店','магазин'],[2,'觉得','считать; чувствовать'],[2,'希望','надеяться'],[2,'一起','вместе'],[2,'因为','потому что'],[2,'所以','поэтому'],[2,'已经','уже'],[2,'开始','начинать'],[2,'考试','экзамен'],[2,'运动','спорт; заниматься спортом'],
+      [3,'如果','если'],[3,'当然','конечно'],[3,'终于','наконец'],[3,'需要','нуждаться; необходимо'],[3,'解决','решать (проблему)'],[3,'提高','повышать; улучшать'],[3,'参加','участвовать'],[3,'影响','влиять; влияние'],[3,'选择','выбирать'],[3,'习惯','привычка; привыкать'],
+      [4,'虽然','хотя'],[4,'继续','продолжать'],[4,'提前','заранее'],[4,'按照','согласно; в соответствии с'],[4,'适合','подходить'],[4,'负责','отвечать за'],[4,'证明','доказывать'],[4,'丰富','богатый; разнообразный'],[4,'态度','отношение; позиция'],[4,'准确','точный'],
+      [5,'逐渐','постепенно'],[5,'观点','точка зрения'],[5,'环境','окружающая среда'],[5,'承担','брать на себя'],[5,'改善','улучшать'],[5,'措施','меры'],[5,'现象','явление'],[5,'价值','ценность'],[5,'资源','ресурсы'],[5,'趋势','тенденция'],
+      [6,'尽管','несмотря на; хотя'],[6,'忽视','игнорировать'],[6,'后果','последствия'],[6,'关键','ключевой; ключ'],[6,'论证','аргументация'],[6,'矛盾','противоречие'],[6,'顺利','гладко; успешно'],[6,'仔细','внимательно; тщательно'],[6,'长期','долгосрочный'],[6,'进一步','дальнейший; ещё больше']
     ];
-    let mode='build',round=0,score=0,selectedPair=null,matched=new Set(),orderChosen=[],current=null,answered=false;
-    let total=0;try{total=Number(localStorage.getItem('photoChineseMiniGamesScore')||0)||0;}catch(e){}
-    function updateTotal(){totalScoreEl.textContent=total;}
+    let mode='build',round=0,score=0,selectedPair=null,matched=new Set(),current=null,answered=false,streak=0;
+    let total=0,learned=[];
+    try{total=Number(localStorage.getItem('photoChineseMiniGamesScore')||0)||0;}catch(e){}
     function shuffle(items){const a=[...items];for(let i=a.length-1;i>0;i--){const j=Math.floor(Math.random()*(i+1));[a[i],a[j]]=[a[j],a[i]];}return a;}
+    function getLearned(){
+      try{
+        if(typeof getLearnedCoachVocabularyRecords!=='function')return [];
+        return getLearnedCoachVocabularyRecords().filter(x=>x&&x.hanzi&&x.translation).map(x=>({level:Number(x.level)||0,zh:String(x.hanzi),ru:String(x.translation),pinyin:String(x.pinyin||''),learned:true}));
+      }catch(e){return [];}
+    }
+    function getLevel(){return levelSelect?levelSelect.value:'all';}
+    function levelPhrases(){
+      const level=getLevel();
+      let base=phrases.filter(p=>level==='all'||level==='learned'||p.level===Number(level));
+      if(level==='learned')base=phrases.filter(p=>p.level===1);
+      return base.length?base:phrases.filter(p=>p.level===1);
+    }
+    function levelPairs(){
+      const level=getLevel();
+      let base=pairs.filter(p=>level==='all'||level==='learned'||p[0]===Number(level));
+      if(level==='learned')base=[];
+      const personal=learned.filter(x=>level==='all'||level==='learned'||!x.level||x.level===Number(level));
+      const combined=[...base.map(p=>({level:p[0],zh:p[1],ru:p[2]})),...personal];
+      const unique=new Map();combined.forEach(x=>{const key=x.zh+'|'+x.ru;if(!unique.has(key))unique.set(key,x);});
+      return [...unique.values()];
+    }
+    function updateTotal(){if(totalScoreEl)totalScoreEl.textContent=total;}
     function feedbackText(text,type=''){feedback.textContent=text;feedback.className='games-feedback'+(type?' '+type:'');}
     function button(text,cls,fn){const b=document.createElement('button');b.type='button';b.className=cls;b.textContent=text;b.addEventListener('click',fn);return b;}
     function finish(correct,explanation){
       if(answered)return;answered=true;
-      if(correct){score+=10;total+=10;roundScore.textContent=score;totalScoreEl.textContent=total;try{localStorage.setItem('photoChineseMiniGamesScore',String(total));}catch(e){}feedbackText('Верно! +10 очков. '+(explanation||''),'success');}
-      else feedbackText('Пока не совсем. '+(explanation||'Попробуй ещё раз в следующем раунде.'),'error');
+      if(correct){score+=10;total+=10;streak++;roundScore.textContent=score;updateTotal();try{localStorage.setItem('photoChineseMiniGamesScore',String(total));localStorage.setItem('photoChineseMiniGamesBestStreak',String(Math.max(streak,Number(localStorage.getItem('photoChineseMiniGamesBestStreak')||0))));}catch(e){}feedbackText('Верно! +10 очков · серия '+streak+'. '+(explanation||''),'success');}
+      else{streak=0;feedbackText('Пока не совсем. '+(explanation||'Попробуй ещё раз в следующем раунде.'),'error');}
       next.disabled=false;
-      area.querySelectorAll('button').forEach(b=>{if(!b.classList.contains('games-reset'))b.disabled=true;});
+      area.querySelectorAll('button').forEach(b=>b.disabled=true);
     }
     function start(nextMode=mode){
-      mode=nextMode;round++;answered=false;selectedPair=null;matched=new Set();orderChosen=[];current=null;
+      mode=nextMode;round++;answered=false;selectedPair=null;matched=new Set();current=null;
       title.textContent=names[mode];roundLabel.textContent='ИГРА 0'+(modes.findIndex(m=>m.dataset.gameMode===mode)+1)+' · ЗАДАНИЕ '+round;
       roundScore.textContent=score;next.disabled=true;area.innerHTML='';
       feedbackText('Выбери ответ, чтобы проверить себя.');
@@ -7960,7 +8024,8 @@ window.addEventListener("keydown", function(event) {
       if(mode==='order')orderTask();
     }
     function buildTask(){
-      current=shuffle(phrases)[0];prompt.textContent='Собери фразу по переводу: «'+current.ru+'»';
+      const pool=levelPhrases();current=shuffle(pool)[0];
+      prompt.textContent='Собери фразу по переводу: «'+current.ru+'»';
       const assembled=document.createElement('div');assembled.className='games-order-bank';
       const choices=document.createElement('div');choices.className='games-order-bank';choices.style.borderTop='0';choices.style.paddingTop='0';
       area.append(assembled,choices);
@@ -7970,54 +8035,58 @@ window.addEventListener("keydown", function(event) {
         if(!selected.length){const hint=document.createElement('span');hint.className='games-order-slot';hint.textContent='Твоё предложение появится здесь';assembled.appendChild(hint);}
         selected.forEach(part=>{const chip=document.createElement('span');chip.className='games-order-slot';chip.textContent=part;assembled.appendChild(chip);});
         if(selected.length===current.parts.length){finish(selected.join('')===current.parts.join(''),'Правильная фраза: '+current.zh);return;}
-        const index=selected.length,correct=current.parts[index];
-        const distractors=[...new Set(phrases.flatMap(p=>p.parts).filter(part=>part!==correct&&part!==selected[index-1]))];
-        shuffle([correct,...shuffle(distractors).slice(0,2)]).forEach(part=>choices.appendChild(button(part,'games-answer',()=>{
-          if(answered)return;
-          if(part===correct){selected.push(part);draw();}
-          else{feedbackText('Не совсем. Подумай, какое слово должно идти следующим.','error');}
-        })));
+        shuffle(current.parts.filter((part,index)=>!selected.slice().includes(part) || current.parts.indexOf(part)!==index)).forEach(()=>{});
+        const remaining=current.parts.filter((part,index)=>selected.filter(x=>x===part).length<current.parts.slice(0,index+1).filter(x=>x===part).length);
+        shuffle(remaining).forEach(part=>choices.appendChild(button(part,'games-answer',()=>{if(answered)return;selected.push(part);draw();})));
       }
       draw();
     }
     function pairsTask(){
+      const pool=levelPairs();if(pool.length<4){feedbackText('Для этого уровня пока мало личных слов. Выбери другой уровень или отметь больше слов в курсе.','error');return;}
       prompt.textContent='Найди пары: китайское слово и его перевод. Нажми сначала на слово, затем на перевод.';
-      const chosen=shuffle(pairs).slice(0,4);const cards=shuffle(chosen.flatMap((p,i)=>[{id:i,side:'zh',text:p[0]},{id:i,side:'ru',text:p[1]}]));
+      const chosen=shuffle(pool).slice(0,4);const cards=shuffle(chosen.flatMap((p,i)=>[{id:i,side:'zh',text:p.zh},{id:i,side:'ru',text:p.ru}]));
       cards.forEach(item=>{const b=button(item.text,'games-pair-card',()=>{
         if(answered||matched.has(item.id)||b.classList.contains('matched'))return;
         if(!selectedPair){selectedPair={...item,button:b};b.classList.add('selected');return;}
         if(selectedPair.id===item.id&&selectedPair.side!==item.side){
           b.classList.remove('selected');b.classList.add('matched');selectedPair.button.classList.remove('selected');selectedPair.button.classList.add('matched');matched.add(item.id);selectedPair=null;
+          feedbackText('Есть совпадение! Осталось пар: '+(chosen.length-matched.size)+'.');
           if(matched.size===chosen.length)finish(true,'Все четыре пары собраны.');
-        }else{
-          const previous=selectedPair.button;previous.classList.remove('selected');b.classList.add('selected');selectedPair={...item,button:b};
-          feedbackText('Эти карточки не совпали. Попробуй найти другую пару.');
-        }
-      });b.dataset.id=item.id;b.dataset.side=item.side;area.appendChild(b);});
+        }else{selectedPair.button.classList.remove('selected');b.classList.add('selected');selectedPair={...item,button:b};feedbackText('Эти карточки не совпали. Попробуй ещё раз.');}
+      });area.appendChild(b);});
     }
     function missingTask(){
-      current=shuffle(phrases)[0];const chars=[...current.zh].filter(ch=>/\p{Script=Han}/u.test(ch));const target=chars[Math.floor(Math.random()*chars.length)];
+      const pool=levelPhrases();current=shuffle(pool)[0];
+      const chars=[...current.zh].filter(ch=>/\p{Script=Han}/u.test(ch));const target=chars[Math.floor(Math.random()*chars.length)];
       const hidden=current.zh.replace(target,'＿');
       prompt.textContent='Какой иероглиф пропущен? Перевод: '+current.ru;
-      const distractors=[...new Set(pairs.flatMap(pair=>[...pair[0]]).filter(ch=>/\p{Script=Han}/u.test(ch)&&ch!==target))];
-      const options=shuffle([target,...shuffle(distractors).slice(0,3)]);
-      const unique=options.slice(0,4);if(!unique.includes(target))unique[0]=target;
+      const distractors=[...new Set(levelPairs().flatMap(pair=>[...pair.zh]).filter(ch=>/\p{Script=Han}/u.test(ch)&&ch!==target))];
+      const unique=shuffle([target,...shuffle(distractors).slice(0,3)]).slice(0,4);
       const shown=document.createElement('div');shown.className='games-order-slot';shown.style.fontSize='25px';shown.textContent=hidden;area.appendChild(shown);
       shuffle(unique).forEach(ch=>area.appendChild(button(ch,'games-answer',()=>finish(ch===target,'Полная фраза: '+current.zh))));
     }
     function orderTask(){
-      current=shuffle(phrases).filter(p=>p.parts.length>=3)[0];prompt.textContent='Расставь слова в правильном порядке: «'+current.ru+'»';
+      current=shuffle(levelPhrases().filter(p=>p.parts.length>=3))[0]||shuffle(levelPhrases())[0];
+      prompt.textContent='Расставь слова в правильном порядке: «'+current.ru+'»';
       const slots=document.createElement('div');slots.className='games-order-bank';const bank=document.createElement('div');bank.className='games-order-bank';bank.style.borderTop='0';bank.style.paddingTop='0';
       const chosen=[];
       function drawSlots(){slots.innerHTML='';if(!chosen.length){const hint=document.createElement('span');hint.className='games-order-slot';hint.textContent='Нажимай на слова ниже';slots.appendChild(hint);}chosen.forEach((part,i)=>slots.appendChild(button(part,'games-order-slot',()=>{if(answered)return;chosen.splice(i,1);drawSlots();drawBank();})));}
       function drawBank(){bank.innerHTML='';const used={};current.parts.forEach(part=>{used[part]=(used[part]||0)+1;const already=chosen.filter(x=>x===part).length;if(already>=used[part])return;const b=button(part,'games-answer',()=>{if(answered)return;chosen.push(part);drawSlots();drawBank();});bank.appendChild(b);});}
-      const check=button('Проверить порядок','primary',()=>finish(chosen.join('')===current.parts.join(''),'Верный порядок: '+current.parts.join(' ')));check.style.marginTop='8px';
+      const check=button('Проверить порядок','primary',()=>finish(chosen.length===current.parts.length&&chosen.join('')===current.parts.join(''),'Верный порядок: '+current.parts.join(' ')));check.style.marginTop='8px';
       area.append(slots,bank,check);drawSlots();drawBank();
+    }
+    function refreshPool(){
+      learned=getLearned();
+      if(levelHint){
+        const label=getLevel()==='learned'?'Режим личной лексики':getLevel()==='all'?'Смешанная практика HSK 1–6':'Подборка HSK '+getLevel();
+        levelHint.textContent=label+' · личных слов найдено: '+learned.length+'.';
+      }
     }
     modes.forEach(m=>m.addEventListener('click',()=>{modes.forEach(x=>x.classList.toggle('active',x===m));score=0;start(m.dataset.gameMode);}));
     next.addEventListener('click',()=>start(mode));
-    document.getElementById('gamesReset').addEventListener('click',()=>{score=0;start(mode);});
-    updateTotal();start('build');
+    document.getElementById('gamesReset').addEventListener('click',()=>{score=0;streak=0;start(mode);});
+    if(levelSelect)levelSelect.addEventListener('change',()=>{refreshPool();score=0;streak=0;start(mode);});
+    refreshPool();updateTotal();start('build');
   })();
   loadWritingCharacter();
 })();
