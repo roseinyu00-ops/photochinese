@@ -6324,7 +6324,7 @@ function finishHskDiagnostic(){
  document.getElementById('hskLevelBreakdown').innerHTML='';
  scores.forEach((score,i)=>{const row=document.createElement('div');row.className='hsk-level-row';const label=document.createElement('strong');label.textContent='HSK '+(i+1);const bar=document.createElement('div');bar.className='hsk-level-bar';const fill=document.createElement('span');fill.style.width=(score/5*100)+'%';bar.appendChild(fill);const status=document.createElement('span');status.className='hsk-level-status';status.textContent=score+'/5 '+(score>=4?'· пройден':'· повторить');row.append(label,bar,status);document.getElementById('hskLevelBreakdown').appendChild(row)});
  document.getElementById('hskResultAdvice').textContent='Для перехода на следующую ступень нужен результат не менее 4 из 5 заданий на каждом предыдущем уровне. Оценка приблизительная: тест проверяет только выбранные навыки чтения, лексики и грамматики.';
- localStorage.setItem('photoChineseHskDiagnostic',JSON.stringify({level:hskSuggestedLevel,score:totalCorrect,scores,at:new Date().toISOString()}));updateLearningDashboard();window.photoChineseSync?.();
+ localStorage.setItem('photoChineseHskDiagnostic',JSON.stringify({level:hskSuggestedLevel,score:totalCorrect,scores,at:new Date().toISOString()}));updateLearningDashboard();if(typeof updateAchievements==='function')updateAchievements();if(typeof renderCompanions==='function')renderCompanions();window.photoChineseSync?.();
  const badge=document.getElementById('profileHskBadge');if(badge)badge.textContent='HSK '+hskSuggestedLevel;
  document.getElementById('applyHskLevel').textContent='Открыть курс HSK '+hskSuggestedLevel+' в ИИ-учителе';
 }
@@ -7427,7 +7427,7 @@ const PHOTOCHINESE_SYNC_KEYS = [
   "profileNickname", "photoChineseNickname", "profileBio",
   "profileSubtitle", "favoriteCharacter", "learnedCharacters", "savedCharacters",
   "completedLessons", "achievements", "profileCollection",
-  "equippedDecoration", "profileAvatar", "photoChineseCoachProgress",
+  "equippedDecoration", "equippedCompanion", "profileAvatar", "photoChineseCoachProgress",
   "photoChineseCoachVocabulary", "photoChineseCoachExams",
   "photoChineseHskDiagnostic", "photoChineseActivityDays",
   "photoChineseStudyWords", "photoChineseReviewState", "photoChineseFavoriteLessons"
@@ -7540,6 +7540,7 @@ function applyPhotoChineseData(appData) {
   renderSavedCharacters();
   renderEquippedDecoration();
   window.dispatchEvent(new Event("photoChineseDataLoaded"));
+  if (typeof renderCompanions === "function") renderCompanions();
 }
 
 function savePhotoChineseDataNow() {
