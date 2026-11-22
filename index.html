@@ -2479,6 +2479,20 @@ body.dark-theme .coach-example {
 }
 
 
+.writing-word-picker{margin:18px 0 12px;padding:15px;border:1px solid #f0dce2;border-radius:15px;background:rgba(255,247,250,.8)}
+.writing-word-picker>label{display:block;margin-bottom:8px;font-weight:750}
+.writing-word-results{display:flex;flex-direction:column;gap:6px;max-height:210px;overflow:auto;margin-top:8px}
+.writing-word-result{display:flex;align-items:center;justify-content:space-between;gap:12px;width:100%;padding:9px 12px;border:1px solid #f0dce2;border-radius:11px;background:#fff;color:#704b5b;text-align:left}
+.writing-word-result strong{font-size:19px}.writing-word-result small{color:#987b87}
+.writing-word-characters{display:flex;flex-wrap:wrap;gap:9px;margin-top:12px}
+.writing-character-chip{width:54px;height:58px;border:1px solid #e8c8d4;border-radius:13px;background:#fff;color:#9e5877;font-family:serif;font-size:29px;font-weight:700}
+.writing-character-chip:active,.writing-character-chip.selected{background:#f8e4ec;border-color:#cf8da7;box-shadow:0 0 0 2px #edc8d6}
+.writing-word-empty{padding:9px 2px;color:var(--muted);font-size:12px}
+body.dark-theme .writing-word-picker{background:#40343d;border-color:#76545d}
+body.dark-theme .writing-word-result{background:#49383d;color:#fff1ed;border-color:#76545d}
+body.dark-theme .writing-word-result small{color:#e0bdc9}
+body.dark-theme .writing-character-chip{background:#49383d;color:#ffe1e8;border-color:#76545d}
+body.dark-theme .writing-character-chip.selected{background:#694653;border-color:#d18ca8}
 /* Learning hub navigation */
 .learning-hub-intro{padding:24px 26px 12px}
 .learning-hub-kicker,.writing-trainer-kicker{font-size:11px;letter-spacing:1.8px;font-weight:800;color:#b56c88}
@@ -3697,6 +3711,13 @@ body.dark-theme #coach .coach-practice-option {
       <div class="writing-trainer-kicker">ПИШИ · ПОВТОРЯЙ · ЗАПОМИНАЙ</div>
       <h2>Тренажёр иероглифов</h2>
       <p>Смотри, как правильно строится иероглиф, а затем повторяй его черты на поле. Тренажёр проверяет порядок и направление написания.</p>
+      <div class="writing-word-picker">
+        <label for="writingWordSearch">Или выбери слово из словаря и курса</label>
+        <input id="writingWordSearch" type="search" placeholder="Например, 你好, 学习, 朋友…" autocomplete="off">
+        <div id="writingWordResults" class="writing-word-results" aria-live="polite"></div>
+        <div id="writingWordCharacters" class="writing-word-characters" aria-label="Иероглифы выбранного слова"></div>
+        <p class="small">Выбери слово в результатах, затем нажми на отдельный иероглиф — например, в 你好 можно отдельно выбрать 你 или 好.</p>
+      </div>
       <div class="writing-trainer-controls">
         <label for="writingCharacter">Иероглиф для практики</label>
         <div class="writing-character-row">
@@ -7656,6 +7677,55 @@ window.addEventListener("keydown", function(event) {
   tabs.forEach(tab=>tab.addEventListener('click',()=>showLearningView(tab.dataset.learningView)));
   window.photoChineseShowLearningView=showLearningView;
 
+  const wordSearch=document.getElementById('writingWordSearch');
+  const wordResults=document.getElementById('writingWordResults');
+  const wordCharacters=document.getElementById('writingWordCharacters');
+  let selectedWord='';
+  function collectWritingWords(){
+    const found=new Map();
+    const add=(word,info,source)=>{
+      if(!word || !/\\p{Script=Han}/u.test(word))return;
+      const chars=[...word].filter(ch=>/\\p{Script=Han}/u.test(ch));
+      if(!chars.length)return;
+      const old=found.get(word);
+      if(!old || (source==='Курс HSK' && old.source!=='Курс HSK'))found.set(word,{word,pinyin:info?.p||info?.pinyin||'',meaning:info?.m||info?.r||info?.meaning||info?.translation||'',source});
+    };
+    Object.entries(window.wordDictionary||{}).forEach(([w,d])=>add(w,d,'Словарь'));
+    Object.entries(window.databaseWordDictionary||{}).forEach(([w,d])=>add(w,d,'Большой словарь'));
+    if(typeof coachCourses!=='undefined'){
+      Object.entries(coachCourses).forEach(([level,lessons])=>(lessons||[]).forEach(lesson=>(lesson.words||[]).forEach(item=>add(item[0],{p:item[1],m:item[2]},'HSK '+level))));
+    }
+    return [...found.values()].sort((a,b)=>a.word.localeCompare(b.word,'zh-Hans'));
+  }
+  function renderWritingWordResults(){
+    const query=wordSearch.value.trim().toLowerCase();
+    const words=collectWritingWords().filter(item=>!query || item.word.includes(query) || item.pinyin.toLowerCase().includes(query) || item.meaning.toLowerCase().includes(query));
+    const shown=words.slice(0,30);
+    wordResults.innerHTML='';
+    if(!shown.length){wordResults.innerHTML='<div class="writing-word-empty">Ничего не найдено. Попробуй другое слово или введи иероглиф вручную ниже.</div>';return;}
+    shown.forEach(item=>{
+      const button=document.createElement('button');button.type='button';button.className='writing-word-result';
+      const left=document.createElement('span');const hanzi=document.createElement('strong');hanzi.textContent=item.word;left.appendChild(hanzi);
+      const right=document.createElement('small');right.textContent=[item.pinyin,item.meaning,item.source].filter(Boolean).join(' · ');
+      button.append(left,right);
+      button.addEventListener('click',()=>selectWritingWord(item.word));
+      wordResults.appendChild(button);
+    });
+  }
+  function selectWritingWord(word){
+    selectedWord=word;wordCharacters.innerHTML='';
+    [...word].filter(ch=>/\\p{Script=Han}/u.test(ch)).forEach(ch=>{
+      const button=document.createElement('button');button.type='button';button.className='writing-character-chip';button.textContent=ch;button.title='Тренироваться с иероглифом '+ch;
+      button.addEventListener('click',()=>{
+        document.querySelectorAll('.writing-character-chip').forEach(el=>el.classList.toggle('selected',el===button));
+        input.value=ch;loadWritingCharacter();
+      });
+      wordCharacters.appendChild(button);
+    });
+  }
+  wordSearch.addEventListener('input',renderWritingWordResults);
+  renderWritingWordResults();
+  if(typeof dictionaryPromise!=='undefined' && dictionaryPromise?.then)dictionaryPromise.then(renderWritingWordResults).catch(()=>{});
   let writingDemo=null, writingQuiz=null, writingCharacter='爱', writingStrokeCount=0;
   const input=document.getElementById('writingCharacter');
   const demo=document.getElementById('writingDemoCanvas');
