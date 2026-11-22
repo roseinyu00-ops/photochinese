@@ -2394,6 +2394,90 @@ select:focus-visible {
   .tab.is-entering { animation: none !important; }
 }
 
+
+/* Видимые акценты PhotoChinese — не зависят от наведения */
+nav button.active {
+  position: relative;
+  box-shadow: 0 4px 14px rgba(190, 112, 137, .22);
+}
+nav button.active::after {
+  content: "";
+  position: absolute;
+  left: 22%;
+  right: 22%;
+  bottom: 3px;
+  height: 3px;
+  border-radius: 4px;
+  background: #f1a8bb;
+}
+.coach-word {
+  border-color: #edc5d0;
+  background: linear-gradient(145deg, #fff8fa, #fff0f4);
+}
+.coach-word strong,
+.coach-example-hanzi,
+.coach-dialogue-line strong {
+  color: #b85f7b;
+}
+.coach-phrase-item {
+  border-left: 3px solid #e7a5b7;
+  background: linear-gradient(100deg, rgba(255,239,244,.9), rgba(255,255,255,.65));
+}
+.coach-grammar-rule {
+  border-left: 3px solid #d9b7e8;
+}
+.coach-grammar-rule h4 {
+  color: #9c638b;
+}
+.coach-objectives {
+  border-color: #e8bdcb;
+  background: linear-gradient(135deg, #fff5f8, #fffafd);
+}
+.coach-example {
+  color: #ad6078;
+  background: #fff1f5;
+  border-radius: 10px;
+  padding: 8px 11px;
+}
+.coach-word:active,
+.coach-phrase-item:active,
+.coach-lesson-card:active,
+.coach-search-result:active {
+  transform: scale(.985);
+  background-color: #ffeaf0;
+}
+@media (hover: hover) and (pointer: fine) {
+  .coach-word:hover,
+  .coach-phrase-item:hover,
+  .coach-grammar-rule:hover,
+  .coach-lesson-card:hover,
+  .coach-search-result:hover {
+    border-color: #d98ca3;
+    box-shadow: 0 8px 22px rgba(178, 103, 128, .16);
+    transform: translateY(-3px);
+  }
+}
+body.dark-theme .coach-word {
+  background: linear-gradient(145deg, #503b43, #45343b);
+  border-color: #8b5c6d;
+}
+body.dark-theme .coach-word strong,
+body.dark-theme .coach-example-hanzi,
+body.dark-theme .coach-dialogue-line strong,
+body.dark-theme .coach-grammar-rule h4 {
+  color: #f2b5c5;
+}
+body.dark-theme .coach-phrase-item {
+  background: linear-gradient(100deg, #503b43, #45343b);
+  border-left-color: #d28ca4;
+}
+body.dark-theme .coach-objectives,
+body.dark-theme .coach-example {
+  background: #503b43;
+  border-color: #8b5c6d;
+  color: #ffeaf0;
+}
+
 </style>
 <style>
 .learning-progress-heading{display:flex;align-items:center;justify-content:space-between;gap:10px}
@@ -3257,10 +3341,37 @@ tabs.forEach(btn => btn.addEventListener('click', () => {
   document.body.classList.toggle("profile-open", btn.dataset.tab === "profile");
   if (btn.dataset.tab === "profile") updateProfileAccess();
 
-  // Повторное нажатие на текущий раздел не перезапускает анимацию.
+  // Анимация запускается через Web Animations API после снятия hidden.
+  // Так переход работает и на телефонах, где hover отсутствует.
   if (targetTab && !alreadyActive) {
-    void targetTab.offsetWidth;
-    targetTab.classList.add('is-entering');
+    const reduceMotion = window.matchMedia &&
+      window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+
+    if (!reduceMotion && typeof targetTab.animate === 'function') {
+      targetTab.animate(
+        [
+          { opacity: 0, transform: 'translate3d(0, 18px, 0)' },
+          { opacity: 1, transform: 'translate3d(0, 0, 0)' }
+        ],
+        { duration: 480, easing: 'cubic-bezier(.2,.75,.25,1)', fill: 'both' }
+      );
+
+      Array.from(targetTab.children).forEach((item, index) => {
+        if (item.hidden || typeof item.animate !== 'function') return;
+        item.animate(
+          [
+            { opacity: 0, transform: 'translate3d(0, 14px, 0) scale(.985)' },
+            { opacity: 1, transform: 'translate3d(0, 0, 0) scale(1)' }
+          ],
+          {
+            duration: 420,
+            delay: 55 + index * 65,
+            easing: 'cubic-bezier(.2,.75,.25,1)',
+            fill: 'both'
+          }
+        );
+      });
+    }
   }
 }));
 const photo = document.getElementById('photo');
