@@ -222,14 +222,20 @@
   // Готовые записи носителей китайского из открытого набора audio-cmn.
   // Источник: https://github.com/hugolpz/audio-cmn — лицензия CC BY-SA.
   const RECORDED_AUDIO_BASE = "https://raw.githubusercontent.com/hugolpz/audio-cmn/master/96k/hsk/cmn-";
+  // Отдельная цельная запись 你好 из Wikimedia Commons (Lingua Libre).
+  // Автор записи: Luilui6666; лицензия CC BY-SA 4.0 / CC0.
+  const SPECIAL_AUDIO = {
+    "你好": "https://upload.wikimedia.org/wikipedia/commons/7/77/LL-Q9192_%28cmn%29-Luilui6666-%E4%BD%A0%E5%A5%BD.wav"
+  };
   function playRecordedSpeech(text, statusElement, requestId) {
     const phrase = clean(text).replace(/[\\s，。！？、,.!?]+/g, "");
     if (!phrase) return;
 
     // Сначала пробуем цельную запись слова/фразы. Если её нет в каталоге,
     // последовательно воспроизводим записи отдельных иероглифов.
+    const specialUrl = SPECIAL_AUDIO[phrase];
     const candidates = [phrase];
-    if ([...phrase].length > 1) candidates.push(...[...phrase]);
+    if (!specialUrl && [...phrase].length > 1) candidates.push(...[...phrase]);
     let candidateIndex = 0;
     let currentAudio = null;
 
@@ -278,7 +284,9 @@
         }
       };
 
-      audio.src = RECORDED_AUDIO_BASE + encodeURIComponent(candidate) + ".mp3";
+      audio.src = specialUrl
+        ? specialUrl
+        : RECORDED_AUDIO_BASE + encodeURIComponent(candidate) + ".mp3";
       const result = audio.play();
       if (result && typeof result.catch === "function") {
         result.catch(() => {
