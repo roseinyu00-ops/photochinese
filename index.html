@@ -2864,30 +2864,45 @@ nav button.active{color:var(--ink);background:rgba(255,240,245,.55);box-shadow:i
 nav button.active::after{height:2px;box-shadow:none}
 .primary:not(:disabled),.secondary:not(:disabled),.theme-toggle,.settings-icon-button{transition:transform .32s cubic-bezier(.2,.75,.25,1),box-shadow .32s ease,filter .32s ease}
 .primary:not(:disabled):active,.secondary:not(:disabled):active,.theme-toggle:active,.settings-icon-button:active{transform:scale(.98)}
-/* Every page gets one coordinated entrance; nested text fades in without jumping. */
-@keyframes pc-tab-enter{0%{opacity:0;transform:translate3d(0,14px,0)}65%{opacity:1}100%{opacity:1;transform:translate3d(0,0,0)}}
-@keyframes pc-tab-content{0%{opacity:0}100%{opacity:1}}
-.tab.is-entering>.panel,.tab.is-entering>.section,.tab.is-entering>.side{
- animation:pc-tab-enter 760ms cubic-bezier(.16,1,.3,1) both
-}
-.tab.is-entering>.panel:nth-child(2),.tab.is-entering>.section:nth-child(2){animation-delay:90ms}
-.tab.is-entering>.panel:nth-child(3),.tab.is-entering>.section:nth-child(3){animation-delay:160ms}
-.tab.is-entering>.panel:nth-child(4),.tab.is-entering>.section:nth-child(4){animation-delay:220ms}
-.tab.is-entering>.panel :where(h1,h2,h3,p,label,button,.coach-word,.coach-lesson-card),
-.tab.is-entering>.section :where(h1,h2,h3,p,label,button,.coach-word,.coach-lesson-card){
- animation:pc-tab-content 560ms ease-out both
-}
-body.dark-theme .pc-editorial-emphasis,body.dark-theme .pc-inline-emphasis,body.dark-theme .pc-note-label,body.dark-theme .pc-keyword{color:#f0b2c4}
-body.dark-theme .pc-inline-emphasis{background:linear-gradient(transparent 66%,rgba(210,140,164,.3) 66%)}
-body.dark-theme .pc-note-label{background:#62434c;border-color:#805968}
-body.dark-theme .coach-word{background:var(--surface,#49383d);border-color:var(--line)}
-body.dark-theme .coach-objectives{background:linear-gradient(110deg,rgba(117,76,91,.24),rgba(100,79,119,.2));border-color:#76545d}
-@media(hover:hover) and (pointer:fine){.primary:not(:disabled):hover,.secondary:not(:disabled):hover{filter:brightness(1.025);box-shadow:0 5px 14px rgba(178,103,128,.12)}}
-@media(prefers-reduced-motion:reduce){
- .tab.is-entering>.panel,.tab.is-entering>.section,.tab.is-entering>.side{animation:pc-tab-content 280ms ease-out both}
- .tab.is-entering>.panel :where(h1,h2,h3,p,label,button,.coach-word,.coach-lesson-card),.tab.is-entering>.section :where(h1,h2,h3,p,label,button,.coach-word,.coach-lesson-card){animation:none}
-}
-</style>
+/* Whole-tab entrance: animate the actual visible section, not assumed child layouts. */
+ @keyframes pc-tab-shell-enter{0%{opacity:0;transform:translate3d(0,18px,0);filter:blur(2px)}70%{opacity:1;filter:blur(0)}100%{opacity:1;transform:translate3d(0,0,0);filter:blur(0)}}
+ @keyframes pc-tab-block-enter{0%{opacity:0;transform:translate3d(0,12px,0)}100%{opacity:1;transform:translate3d(0,0,0)}}
+ .tab.is-entering{animation:pc-tab-shell-enter 680ms cubic-bezier(.16,1,.3,1) both!important;animation-duration:680ms!important;will-change:opacity,transform}
+ .tab.is-entering>.panel,.tab.is-entering>.section,.tab.is-entering>.side{animation:pc-tab-block-enter 560ms cubic-bezier(.16,1,.3,1) both!important;animation-duration:560ms!important}
+ .tab.is-entering>.panel:nth-child(2),.tab.is-entering>.section:nth-child(2){animation-delay:70ms!important}
+ .tab.is-entering>.panel:nth-child(3),.tab.is-entering>.section:nth-child(3){animation-delay:135ms!important}
+ .tab.is-entering>.panel:nth-child(4),.tab.is-entering>.section:nth-child(4){animation-delay:195ms!important}
+ /* Meaningful visual hierarchy across lessons and learning tools. */
+ .tab h2{position:relative;padding-bottom:9px}
+ .tab h2::after{content:"";display:block;width:42px;height:3px;margin-top:8px;border-radius:8px;background:linear-gradient(90deg,#e7a5b7,#c9a8dc)}
+ .tab h3{letter-spacing:-.15px}
+ .coach-objectives{position:relative;border-left:3px solid #d99aae!important;padding-left:15px!important}
+ .coach-grammar-rule{position:relative;border-left:3px solid rgba(207,120,147,.55);transition:transform .28s ease,border-color .28s ease,box-shadow .28s ease}
+ .coach-grammar-rule h4{color:#a65370}
+ .coach-example{position:relative;border-left:3px solid #d99aae!important;border-radius:8px 14px 14px 8px!important}
+ .coach-dialogue-line{padding:12px 13px;margin:5px 0;border:1px solid transparent;border-radius:12px;transition:background .25s ease,border-color .25s ease}
+ .coach-dialogue-line:nth-child(odd){background:rgba(238,190,204,.10)}
+ .coach-dialogue-line strong,.coach-example-hanzi{color:#a65370}
+ .coach-example-pinyin,.coach-grammar-pinyin{color:#a45d73;font-weight:700}
+ .coach-word{position:relative;overflow:hidden}
+ .coach-word::before{content:"";position:absolute;left:0;top:0;bottom:0;width:3px;background:linear-gradient(#e7a5b7,#c9a8dc);opacity:.8}
+ .coach-phrase-item{border-left:3px solid rgba(207,120,147,.45)}
+ .coach-practice{border-top:2px solid rgba(207,120,147,.24);padding-top:17px}
+ .pc-inline-emphasis{padding:0 2px;border-radius:3px}
+ .pc-note-label{box-shadow:0 2px 8px rgba(190,112,137,.08)}
+ .pc-keyword{box-decoration-break:clone;-webkit-box-decoration-break:clone}
+ .coach-lesson-card,.coach-word,.coach-phrase-item,.coach-grammar-rule,.study-tools-card,.hsk-question-card,.profile-section,.info,.result{transition:transform .3s cubic-bezier(.2,.75,.25,1),box-shadow .3s ease,border-color .3s ease,background-color .3s ease}
+ .coach-lesson-card:active,.coach-word:active,.study-tools-card:active{transform:scale(.985)}
+ body.dark-theme .pc-editorial-emphasis,body.dark-theme .pc-inline-emphasis,body.dark-theme .pc-note-label,body.dark-theme .pc-keyword{color:#f0b2c4}
+ body.dark-theme .pc-inline-emphasis{background:linear-gradient(transparent 66%,rgba(210,140,164,.3) 66%)}
+ body.dark-theme .pc-note-label{background:#62434c;border-color:#805968}
+ body.dark-theme .coach-word{background:var(--surface,#49383d);border-color:var(--line)}
+ body.dark-theme .coach-objectives{background:linear-gradient(110deg,rgba(117,76,91,.24),rgba(100,79,119,.2));border-color:#76545d}
+ body.dark-theme .coach-grammar-rule h4,body.dark-theme .coach-dialogue-line strong,body.dark-theme .coach-example-hanzi{color:#f0b2c4}
+ body.dark-theme .coach-dialogue-line:nth-child(odd){background:rgba(210,140,164,.08)}
+ @media(hover:hover) and (pointer:fine){.primary:not(:disabled):hover,.secondary:not(:disabled):hover{filter:brightness(1.025);box-shadow:0 5px 14px rgba(178,103,128,.12)}.coach-grammar-rule:hover,.coach-phrase-item:hover{transform:translateY(-2px);border-color:#d99aae}}
+ @media(prefers-reduced-motion:reduce){.tab.is-entering{animation:pc-tab-shell-enter 360ms ease-out both!important;animation-duration:360ms!important}.tab.is-entering>.panel,.tab.is-entering>.section,.tab.is-entering>.side{animation:none!important}}
+ </style>
 
 </head>
 <body>
@@ -3553,21 +3568,17 @@ tabs.forEach(btn => btn.addEventListener('click', () => {
   document.body.classList.toggle("profile-open", btn.dataset.tab === "profile");
   if (btn.dataset.tab === "profile") updateProfileAccess();
 
-  // CSS-driven entrance is reliable on mobile browsers and animates the whole section.
+  // Повторяемая анимация всей вкладки: завершение слушаем именно на корневом section.
   if (targetTab && !alreadyActive) {
     targetTab.classList.remove('is-entering');
     void targetTab.offsetWidth;
-    targetTab.classList.add('is-entering');
-    let pendingEntranceBlocks = Array.from(targetTab.children).filter(item => !item.hidden && (item.matches('.panel, .section, .side'))).length;
     const finishEntrance = function(event) {
-      if (event.target.parentElement !== targetTab) return;
-      pendingEntranceBlocks -= 1;
-      if (pendingEntranceBlocks <= 0) {
-        targetTab.classList.remove('is-entering');
-        targetTab.removeEventListener('animationend', finishEntrance);
-      }
+      if (event.target !== targetTab) return;
+      targetTab.classList.remove('is-entering');
+      targetTab.removeEventListener('animationend', finishEntrance);
     };
-    if (pendingEntranceBlocks) targetTab.addEventListener('animationend', finishEntrance);
+    targetTab.addEventListener('animationend', finishEntrance);
+    targetTab.classList.add('is-entering');
   }
 }));
 const photo = document.getElementById('photo');
@@ -5617,7 +5628,7 @@ renderQ();
   <script>
 if ("serviceWorker" in navigator) {
   window.addEventListener("load", () => {
-    navigator.serviceWorker.register("./service-worker.js?v=16", { updateViaCache: "none" })
+    navigator.serviceWorker.register("./service-worker.js?v=17", { updateViaCache: "none" })
       .then(() => console.log("PhotoChinese PWA ready!"))
       .catch(error => console.error("PWA error:", error));
   });
