@@ -13,7 +13,12 @@ const grammar=[
 [2,"Опыт: 过","过 после глагола показывает, что человек когда-либо имел такой опыт. Важен сам факт опыта.","Подлежащее + глагол + 过 + дополнение",[["我去过中国。","Wǒ qùguo Zhōngguó.","Я бывал(а) в Китае."],["你吃过北京烤鸭吗？","Nǐ chīguo Běijīng kǎoyā ma?","Ты пробовал(а) утку по-пекински?"]],"过 — опыт, 了 — завершённое действие или изменение ситуации.","Как спросить «Ты бывал(а) в Шанхае»?",["你去上海了？","你去过上海吗？","你过上海去吗？"],1,"Опыт: 去 + 过 + место."],
 [3,"Сравнение с 比","比 вводит объект сравнения. Прилагательное ставится после 比-конструкции.","A + 比 + B + прилагательное",[["今天比昨天冷。","Jīntiān bǐ zuótiān lěng.","Сегодня холоднее, чем вчера."],["我比哥哥高一点儿。","Wǒ bǐ gēge gāo yìdiǎnr.","Я немного выше старшего брата."]],"Не ставь 很 перед прилагательным в обычной 比-конструкции.","Как сказать «Кофе дороже чая»?",["咖啡比茶贵。","咖啡贵比茶。","咖啡很比茶贵。"],0,"Сначала A, затем 比 + B + признак."],
 [3,"Причина и результат 因为…所以…","Парная конструкция связывает причину и следствие: 因为 вводит причину, 所以 — результат.","因为 + причина， 所以 + результат",[["因为下雨，所以我不去。","Yīnwèi xiàyǔ, suǒyǐ wǒ bú qù.","Поскольку идёт дождь, я не пойду."],["因为很忙，所以她没来。","Yīnwèi hěn máng, suǒyǐ tā méi lái.","Она не пришла, потому что была занята."]],"В разговоре один из элементов иногда опускают, если связь очевидна.","Как сказать «Я устал(а), поэтому пойду домой»?",["所以我累，因为回家。","因为我累，所以回家。","我因为所以累回家。"],1,"Причина после 因为, результат после 所以."],
-[4,"Уступка 虽然…但是…","Показывает контраст: несмотря на один факт, происходит другое. По-русски «хотя…, но…».","虽然 + факт， 但是 + контраст",[["虽然很忙，但是我很开心。","Suīrán hěn máng, dànshì wǒ hěn kāixīn.","Хотя я занят(а), я счастлив(а)."],["虽然下雨，但是他们继续比赛。","Suīrán xiàyǔ, dànshì tāmen jìxù bǐsài.","Хотя идёт дождь, они продолжают соревнование."]],"Вторая часть должна создавать ожидаемый контраст с первой.","Продолжи: 虽然很贵，……",["但是质量很好。","因为所以买。","所以但是贵。"],0,"虽然 вводит уступку, 但是 — противопоставление."]
+[4,"Уступка 虽然…但是…","Показывает контраст: несмотря на один факт, происходит другое. По-русски «хотя…, но…».","虽然 + факт， 但是 + контраст",[["虽然很忙，但是我很开心。","Suīrán hěn máng, dànshì wǒ hěn kāixīn.","Хотя я занят(а), я счастлив(а)."],["虽然下雨，但是他们继续比赛。","Suīrán xiàyǔ, dànshì tāmen jìxù bǐsài.","Хотя идёт дождь, они продолжают соревнование."]],"Вторая часть должна создавать ожидаемый контраст с первой.","Продолжи: 虽然很贵，……",["但是质量很好。","因为所以买。","所以但是贵。"],0,"虽然 вводит уступку, 但是 — противопоставление."],
+[3,"Дополнение с 得","得 вводит оценку того, как выполняется действие: быстро, хорошо, понятно и т. п.","Глагол + 得 + описание", [["他说得很快。","Tā shuō de hěn kuài.","Он говорит очень быстро."],["我听得懂。","Wǒ tīng de dǒng.","Я могу понять на слух."]],"Если после глагола есть прямое дополнение, часто повторяют глагол перед 得: 他汉语说得很好。","Как сказать «Она пишет красиво»?",["她写得很漂亮。","她得写很漂亮。","她写很得漂亮。"],0,"得 ставится после глагола и вводит характеристику действия."],
+[4,"Конструкция 把","把 выносит объект перед глаголом, когда говорящий показывает, что с ним сделали или как его изменили.","Подлежащее + 把 + объект + глагол + результат/место", [["我把书放在桌子上。","Wǒ bǎ shū fàng zài zhuōzi shàng.","Я положил(а) книгу на стол."],["请把门关上。","Qǐng bǎ mén guān shàng.","Пожалуйста, закрой дверь."]],"После глагола обычно указывается результат, направление, место или другой обязательный элемент. Простого 把 + глагол часто недостаточно.","Выбери правильное предложение.",["我把作业做完了。","我把做完了作业。","把我作业做。"],0,"把 ставит объект перед действием, которое с ним совершают."],
+[4,"Пассивная конструкция 被","被 показывает, что действие направлено на подлежащее; часто переводится пассивной формой.","Получатель действия + 被 + исполнитель + глагол", [["我的手机被弟弟拿走了。","Wǒ de shǒujī bèi dìdi názǒu le.","Мой телефон забрал младший брат."],["窗户被风吹开了。","Chuānghu bèi fēng chuīkāi le.","Окно открыло ветром."]],"Исполнитель после 被 может опускаться, если он неизвестен или неважен.","Как сказать «Мою сумку украли»?",["我的包被偷了。","我被包偷了。","我的包偷被了。"],0,"被 вводит действие, которое испытывает подлежащее."],
+[4,"Одновременные действия 一边…一边…","Конструкция описывает два действия, происходящие одновременно.","一边 + действие 1，一边 + действие 2", [["她一边听音乐，一边做作业。","Tā yìbiān tīng yīnyuè, yìbiān zuò zuòyè.","Она слушает музыку и одновременно делает домашнее задание."],["我喜欢一边走路一边聊天。","Wǒ xǐhuan yìbiān zǒulù yìbiān liáotiān.","Мне нравится разговаривать во время прогулки."]],"Обе части относятся к одному времени; часто подразумевается один и тот же исполнитель.","Как сказать «Он ест и смотрит телевизор одновременно»?",["他一边吃饭，一边看电视。","他一边吃饭，所以看电视。","他吃饭一边电视看。"],0,"一边…一边… = делать два дела одновременно."],
+[4,"Изменение степени 越来越","越来越 показывает постепенное усиление или изменение признака: «всё более…», «всё сильнее…».","越来越 + прилагательное/глагол состояния", [["天气越来越冷了。","Tiānqì yuèláiyuè lěng le.","Погода становится всё холоднее."],["我的中文越来越好了。","Wǒ de Zhōngwén yuèláiyuè hǎo le.","Мой китайский становится всё лучше."]],"Не ставь 很 между 越来越 и прилагательным. Конструкция подчёркивает процесс изменения.","Как сказать «Он говорит всё быстрее»?",["他说得越来越快。","他说越来越得快。","越来越他快说。"],0,"越来越 ставится перед признаком, который постепенно усиливается.")
 ];
 const dialogs=[
 ["cafe","☕","В кафе","Заказать напиток и еду, уточнить размер и оплату.",[["顾客","你好，我想要一杯拿铁。","Nǐ hǎo, wǒ xiǎng yào yì bēi nátiě.","Здравствуйте, я бы хотел(а) латте."],["店员","好的。要大杯还是中杯？","Hǎo de. Yào dà bēi háishi zhōng bēi?","Хорошо. Большой или средний?"],["顾客","中杯就好。可以少放一点糖吗？","Zhōng bēi jiù hǎo. Kěyǐ shǎo fàng yìdiǎn táng ma?","Средний подойдёт. Можно чуть меньше сахара?"],["店员","没问题。一共二十八块。","Méi wèntí. Yígòng èrshíbā kuài.","Без проблем. Всего 28 юаней."]],"我想要… — я хочу…; 不加糖 — без сахара; 带走 — с собой."],
@@ -67,18 +72,41 @@ const root=$("clDialogueContent"),d=dialogs.find(x=>x[0]===active);root.replaceC
 d[4].forEach(line=>{const row=make("div","cl-dialogue-line"),speaker=make("span","cl-speaker",line[0]),body=make("div"),audio=make("button","cl-audio-button","▶ Прослушать");body.append(make("div","cl-dialogue-zh",line[1]),make("div","cl-dialogue-pinyin",line[2]),make("div","cl-dialogue-translation",line[3]));audio.type="button";audio.addEventListener("click",()=>speak(line[1]));row.append(speaker,body,audio);root.append(row);});
 root.append(make("div","cl-dialogue-footer","Полезные выражения: "+d[5]),make("p","small","Нажми «Прослушать» рядом с репликой, чтобы услышать китайское произношение."));
 }
-function learned(){try{const a=JSON.parse(localStorage.getItem("learnedCharacters")||"[]");return Array.isArray(a)?[...new Set(a.filter(x=>typeof x==="string"&&x.trim()))]:[];}catch(e){return [];}}
+function learned(){
+const chars=new Set();
+try{const a=JSON.parse(localStorage.getItem("learnedCharacters")||"[]");if(Array.isArray(a))a.forEach(x=>[...String(x)].forEach(ch=>{if(/\p{Script=Han}/u.test(ch))chars.add(ch);}));}catch(e){}
+try{if(typeof getLearnedCoachVocabularyRecords==="function")getLearnedCoachVocabularyRecords().forEach(x=>[...(x.hanzi||"")].forEach(ch=>{if(/\p{Script=Han}/u.test(ch))chars.add(ch);}));}catch(e){}
+return [...chars];
+}
 function renderChips(){
 const root=$("clLearnedCharacterChips");root.replaceChildren();const chars=learned();
 if(!chars.length){root.append(make("span","small","Пока нет отмеченных иероглифов. Введи любой знак ниже."));return;}
 chars.slice(0,40).forEach(ch=>{const b=make("button","cl-character-chip",ch);b.type="button";b.addEventListener("click",()=>select(ch));root.append(b);});
 }
 function showWords(ch){
-const root=$("clWordBuildingResults"),hint=$("clCharacterHint"),d=families[ch];root.replaceChildren();
-hint.textContent=d?"Найдено слов: "+d[2].length+". Иероглиф «"+ch+"» встречается в этих сочетаниях.":"Подборка для этого знака ещё не добавлена. Попробуй другой изученный иероглиф.";
-if(!d){root.append(make("div","cl-empty","Для «"+ch+"» пока нет подборки. Библиотека будет расширяться."));return;}
-const card=make("section","cl-word-result-card"),head=make("div","cl-word-result-heading"),info=make("div");head.append(make("strong","cl-word-result-character",ch));info.append(make("h3","",ch+" · "+d[0]),make("p","small",d[1]));head.append(info);card.append(head);const grid=make("div","cl-word-grid");
-d[2].forEach(w=>{const item=make("div","cl-word-item");item.append(make("strong","",w[0]),make("small","",w[1]),make("span","",w[2]));grid.append(item);});card.append(grid);root.append(card);
+const root=$("clWordBuildingResults"),hint=$("clCharacterHint");root.replaceChildren();
+const entries=new Map();
+const add=(word,pinyin,translation)=>{
+if(!word||!word.includes(ch)||[...word].length<2||!translation)return;
+entries.set(word,{word,pinyin:pinyin||"",translation});
+};
+const preset=families[ch];
+if(preset)(preset[2]||[]).forEach(w=>add(w[0],w[1],w[2]));
+try{if(typeof wordDictionary!=="undefined")Object.entries(wordDictionary).forEach(([word,e])=>add(word,e.p,e.m));}catch(e){}
+try{if(typeof databaseWordDictionary!=="undefined")Object.entries(databaseWordDictionary).forEach(([word,e])=>add(word,e.p,e.m));}catch(e){}
+const words=[...entries.values()].sort((a,b)=>[...a.word].length-[...b.word].length||a.word.localeCompare(b.word,"zh"));
+const charInfo=preset||((typeof databaseCharDictionary!=="undefined"&&databaseCharDictionary[ch])?[databaseCharDictionary[ch].p,databaseCharDictionary[ch].m]:null);
+if(!words.length){
+hint.textContent="В доступном словаре пока не нашлось слов с этим иероглифом.";
+root.append(make("div","cl-empty","Для «"+ch+"» пока нет подходящей подборки. Большой словарь может ещё загружаться — попробуй немного позже или выбери другой знак."));
+return;
+}
+hint.textContent="Найдено слов: "+words.length+". Показаны сочетания из словаря PhotoChinese.";
+const card=make("section","cl-word-result-card"),head=make("div","cl-word-result-heading"),info=make("div");
+head.append(make("strong","cl-word-result-character",ch));info.append(make("h3","",ch+" · слова с этим иероглифом"),make("p","small",(charInfo?(charInfo[0]+" · "+charInfo[1]):"Иероглиф встречается в следующих словах.")));head.append(info);card.append(head);
+const grid=make("div","cl-word-grid");
+words.slice(0,120).forEach(w=>{const item=make("div","cl-word-item");item.append(make("strong","",w.word),make("small","",w.pinyin),make("span","",w.translation));grid.append(item);});
+card.append(grid);root.append(card);
 }
 function select(ch){$("clCharacterInput").value=ch;document.querySelectorAll(".cl-character-chip").forEach(b=>b.classList.toggle("active",b.textContent===ch));showWords(ch);}
 $("clGrammarLevel")?.addEventListener("change",renderGrammar);$("clGrammarSearch")?.addEventListener("input",renderGrammar);
