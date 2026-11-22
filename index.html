@@ -3028,18 +3028,83 @@ body.dark-theme #meme .meme-token:hover{background:rgba(210,140,164,.1)}
 #hsk .hsk-question-type{font-style:italic;font-weight:750;color:#a45d73}
 #hsk .hsk-test-top{font-weight:750}
 #hsk .hsk-result-score{background:linear-gradient(135deg,rgba(238,190,204,.25),rgba(201,168,220,.22));border:1px solid rgba(207,120,147,.2);border-radius:18px}
-/* Профиль: личное пространство */
-#profile .profile-banner{position:relative;isolation:isolate}
-#profile .profile-banner::after{content:"";position:absolute;inset:auto 0 0;height:48%;background:linear-gradient(0deg,rgba(44,30,39,.24),transparent);pointer-events:none;z-index:-0}
-#profile .profile-name-line h2{background:linear-gradient(100deg,#a65370,#c47d9c 58%,#a78ac5);-webkit-background-clip:text;background-clip:text;color:transparent}
-#profile .profile-bio{border-left:3px solid #d99aae;padding:10px 14px;background:linear-gradient(90deg,rgba(238,190,204,.13),transparent);border-radius:0 12px 12px 0}
-#profile .profile-facts{display:inline-flex;padding:8px 12px;border-radius:12px;background:linear-gradient(110deg,rgba(248,228,235,.6),rgba(239,230,248,.45));border:1px solid rgba(207,120,147,.2)}
-#profile .profile-section{position:relative;padding-top:18px}
-#profile .profile-section>h2{font-style:italic}
-#profile .companion-card{background:linear-gradient(115deg,rgba(248,228,235,.48),rgba(239,230,248,.45));border-color:rgba(207,120,147,.24)}
-#profile .companion-picture{filter:drop-shadow(0 5px 8px rgba(178,103,128,.14))}
-#profile .collection-item{transition:transform .25s ease,border-color .25s ease,box-shadow .25s ease}
-#profile .collection-item:hover{transform:translateY(-3px);border-color:rgba(207,120,147,.45);box-shadow:0 7px 18px rgba(178,103,128,.08)}
+/* Профиль: спокойные, точечные акценты */
+#profile .profile-banner{position:relative}
+#profile .profile-name-line h2{
+  color:#60464d;
+  background:none;
+  -webkit-text-fill-color:currentColor;
+  letter-spacing:-.035em;
+}
+#profile .profile-bio{
+  padding:13px 15px;
+  border:1px solid rgba(207,120,147,.13);
+  border-radius:13px;
+  background:rgba(248,228,235,.22);
+  line-height:1.65;
+}
+#profile .profile-facts{
+  display:inline-flex;
+  gap:8px;
+  padding:7px 0;
+  border:0;
+  border-radius:0;
+  background:none;
+  color:#987783;
+}
+#profile .profile-section{
+  position:relative;
+  padding:0;
+  border:0;
+  border-radius:0;
+  box-shadow:none;
+  background:transparent;
+}
+#profile .profile-section>h2{
+  font-style:normal;
+  letter-spacing:-.025em;
+}
+#profile .profile-section>h2::after{
+  width:34px;
+  height:2px;
+  margin-top:7px;
+  background:#d9a1b1;
+  opacity:.8;
+}
+#profile .companion-card{
+  background:rgba(248,228,235,.24);
+  border:1px solid rgba(207,120,147,.16);
+  box-shadow:none;
+}
+#profile .companion-picture{filter:none}
+#profile .collection-item{
+  transition:background-color .22s ease,border-color .22s ease,box-shadow .22s ease;
+}
+#profile .collection-item:hover{
+  transform:none;
+  border-color:rgba(207,120,147,.34);
+  box-shadow:0 4px 12px rgba(112,67,82,.045);
+  background:#fff8fa;
+}
+body.dark-theme #profile .profile-name-line h2{
+  color:#fff0f2;
+  background:none;
+  -webkit-text-fill-color:currentColor;
+}
+body.dark-theme #profile .profile-bio{
+  background:rgba(117,76,91,.16);
+  border-color:rgba(210,140,164,.18);
+}
+body.dark-theme #profile .profile-facts{color:#d8bec5}
+body.dark-theme #profile .profile-section>h2::after{background:#bd8799}
+body.dark-theme #profile .companion-card{
+  background:rgba(117,76,91,.17);
+  border-color:#604751;
+}
+body.dark-theme #profile .collection-item:hover{
+  background:#49383d;
+  border-color:#805968;
+}
 /* Словарь и инструменты */
 #studytools .study-tools-hero{background-image:radial-gradient(ellipse at 95% 0,rgba(201,168,220,.17),transparent 40%),linear-gradient(110deg,rgba(255,248,251,.55),transparent)}
 #studytools .study-tools-tabs{padding:5px;border:1px solid rgba(207,120,147,.2);border-radius:15px;background:rgba(248,228,235,.25)}
@@ -3062,7 +3127,6 @@ body.dark-theme #meme>.panel>h1{background-image:linear-gradient(100deg,#f0b2c4,
 body.dark-theme #meme>.panel>h1::before{color:#e1b3ce}
 body.dark-theme #learn .ocr-locked-card,body.dark-theme #learn #analysisInput,
 body.dark-theme #coach .coach-final-exam,body.dark-theme #hsk .hsk-intro-stats>div,
-body.dark-theme #profile .profile-facts,body.dark-theme #profile .companion-card,
 body.dark-theme #studytools .study-recommendations,body.dark-theme #studytools .study-tools-note,
 body.dark-theme #learningSidebar .learning-progress-stat{
   background-image:linear-gradient(120deg,rgba(117,76,91,.25),rgba(100,79,119,.22));border-color:#76545d;color:var(--ink)
@@ -3074,7 +3138,6 @@ body.dark-theme #studytools .study-tools-tabs{background:rgba(117,76,91,.18);bor
 body.dark-theme #studytools .study-tools-tabs button.active{background:linear-gradient(105deg,#76505e,#665274);color:#fff1f5}
 body.dark-theme #studytools .study-tools-hanzi{background-image:linear-gradient(100deg,#f0b2c4,#d8b6e8)}
 body.dark-theme #learn #analysisInput{background-color:#403438;color:var(--ink)}
-body.dark-theme #profile .profile-bio{background:linear-gradient(90deg,rgba(117,76,91,.25),transparent)}
 @media(hover:hover) and (pointer:fine){
   #profile .profile-section:hover,#studytools .study-tools-card:hover{transform:translateY(-2px)}
 }
