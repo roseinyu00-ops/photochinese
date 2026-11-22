@@ -2494,6 +2494,18 @@ body.dark-theme .writing-word-result{background:#49383d;color:#fff1ed;border-col
 body.dark-theme .writing-word-result small{color:#e0bdc9}
 body.dark-theme .writing-character-chip{background:#49383d;color:#ffe1e8;border-color:#76545d}
 body.dark-theme .writing-character-chip.selected{background:#694653;border-color:#d18ca8}
+/* Minimal PhotoChinese line icons */
+.pc-nav-icon,.pc-teacher-icon,.pc-button-icon{display:inline-flex;align-items:center;justify-content:center;color:#b66f89;vertical-align:middle}
+.pc-nav-icon{width:19px;height:19px;margin-right:5px}
+.pc-teacher-icon{width:27px;height:27px;margin:0 auto 2px}
+.pc-button-icon{width:17px;height:17px;margin-right:4px}
+.pc-nav-icon svg,.pc-teacher-icon svg,.pc-button-icon svg,.ocr-locked-icon svg,.writing-step-icon svg,.profile-avatar-placeholder svg{width:100%;height:100%;fill:none;stroke:currentColor;stroke-width:1.65;stroke-linecap:round;stroke-linejoin:round}
+.ocr-locked-icon{color:#a85e78}
+.writing-step-icon{display:inline-flex;width:25px;height:25px;color:#b66f89}
+.profile-avatar-placeholder{display:inline-flex;width:48px;height:48px;align-items:center;justify-content:center;color:#b66f89}
+.profile-avatar-placeholder svg{width:42px;height:42px;stroke-width:1.5}
+.pc-teacher-icon svg{width:26px;height:26px}
+body.dark-theme .pc-nav-icon,body.dark-theme .pc-teacher-icon,body.dark-theme .pc-button-icon,body.dark-theme .writing-step-icon,body.dark-theme .profile-avatar-placeholder{color:#e2a8bd}
 /* Learning hub navigation */
 .learning-hub-intro{padding:24px 26px 12px}
 .learning-hub-kicker,.writing-trainer-kicker{font-size:11px;letter-spacing:1.8px;font-weight:800;color:#b56c88}
@@ -3550,7 +3562,7 @@ body.dark-theme .writing-word-result-source,body.dark-theme .writing-selected-wo
     <h1>Китайский начинается<br>с <em class="pc-editorial-emphasis">одного</em> фото.</h1>
     <p>Наведи камеру на текст или загрузи изображение — PhotoChinese поможет <strong class="pc-inline-emphasis">прочитать, понять и запомнить</strong> каждый иероглиф.</p>
     <div class="ocr-locked-card" role="status" aria-live="polite">
-      <div class="ocr-locked-icon" aria-hidden="true">🔒</div>
+      <div class="ocr-locked-icon" aria-hidden="true"><svg viewBox="0 0 24 24"><rect x="4.5" y="10" width="15" height="11" rx="2.5"/><path d="M8 10V7a4 4 0 0 1 8 0v3"/></svg></div>
       <div>
         <strong>Распознавание по фото временно недоступно</strong>
         <p>Мы пока приостановили эту функцию, чтобы доработать качество распознавания китайских иероглифов. Она вернётся, когда будет работать надёжнее.</p>
@@ -3625,9 +3637,9 @@ body.dark-theme .writing-word-result-source,body.dark-theme .writing-selected-wo
     <p>Выбирай формат занятий и двигайся в своём темпе.</p>
   </div>
   <div class="learning-subnav" role="tablist" aria-label="Разделы обучения">
-    <button type="button" class="learning-subtab active" data-learning-view="course" role="tab" aria-selected="true"><span>📚</span> Курс HSK</button>
-    <button type="button" class="learning-subtab" data-learning-view="teacher" role="tab" aria-selected="false"><span>🤖</span> ИИ-учитель</button>
-    <button type="button" class="learning-subtab" data-learning-view="writing" role="tab" aria-selected="false"><span>✍️</span> Тренажёр иероглифов</button>
+    <button type="button" class="learning-subtab active" data-learning-view="course" role="tab" aria-selected="true"><span class="pc-nav-icon" aria-hidden="true"><svg viewBox="0 0 24 24"><path d="M4 5.5A2.5 2.5 0 0 1 6.5 3H20v16H6.5A2.5 2.5 0 0 0 4 21z"/><path d="M4 5.5v13A2.5 2.5 0 0 1 6.5 16H20M8 7h8M8 10h7"/></svg></span> Курс HSK</button>
+    <button type="button" class="learning-subtab" data-learning-view="teacher" role="tab" aria-selected="false"><span class="pc-nav-icon" aria-hidden="true"><svg viewBox="0 0 24 24"><rect x="4" y="7" width="16" height="13" rx="4"/><path d="M12 3v4M9 12h.01M15 12h.01M9 16h6M2 12h2M20 12h2"/></svg></span> ИИ-учитель</button>
+    <button type="button" class="learning-subtab" data-learning-view="writing" role="tab" aria-selected="false"><span class="pc-nav-icon" aria-hidden="true"><svg viewBox="0 0 24 24"><path d="m4 20 4.5-1 10.8-10.8a2.1 2.1 0 0 0-3-3L5.5 16zM14.8 6.2l3 3"/></svg></span> Тренажёр иероглифов</button>
   </div>
   <div id="learningView-course" class="learning-view">
   <div class="panel section" id="coachFindPanel">
@@ -3729,9 +3741,9 @@ body.dark-theme .writing-word-result-source,body.dark-theme .writing-selected-wo
     <h2>Мой преподаватель</h2>
     <p class="small">Выбери стиль обратной связи — содержание уроков от этого не меняется.</p>
     <div class="teacher" id="teacherChoices">
-      <button data-teacher="strict">😐<br>Требовательный</button>
-      <button data-teacher="balanced" class="chosen">🙂<br>Спокойный</button>
-      <button data-teacher="kind">🌸<br>Поддерживающий</button>
+      <button data-teacher="strict"><span class="pc-teacher-icon" aria-hidden="true"><svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="8.5"/><path d="M8.5 15h7M9 9.5h.01M15 9.5h.01"/></svg></span><br>Требовательный</button>
+      <button data-teacher="balanced" class="chosen"><span class="pc-teacher-icon" aria-hidden="true"><svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="8.5"/><path d="M8.5 14a4.2 4.2 0 0 0 7 0M9 9.5h.01M15 9.5h.01"/></svg></span><br>Спокойный</button>
+      <button data-teacher="kind"><span class="pc-teacher-icon" aria-hidden="true"><svg viewBox="0 0 24 24"><path d="M12 12c-2-2-2-6 0-8 2 2 2 6 0 8Zm0 0c2-2 6-2 8 0-2 2-6 2-8 0Zm0 0c2 2 2 6 0 8-2-2-2-6 0-8Zm0 0c-2 2-6 2-8 0 2-2 6-2 8 0Z"/><circle cx="12" cy="12" r="2"/></svg></span><br>Поддерживающий</button>
     </div>
     <label for="studentText">Напиши свой вопрос или предложение на китайском</label>
     <textarea id="studentText" placeholder="Например: 我喜欢学习中文。"></textarea>
@@ -3764,9 +3776,9 @@ body.dark-theme .writing-word-result-source,body.dark-theme .writing-selected-wo
     </div>
     <div class="writing-practice-grid">
       <div class="panel writing-step-card">
-        <div class="writing-card-heading"><div><span class="writing-step-label">ШАГ 1</span><h3>Посмотри порядок черт</h3></div><span class="writing-step-icon">👀</span></div>
+        <div class="writing-card-heading"><div><span class="writing-step-label">ШАГ 1</span><h3>Посмотри порядок черт</h3></div><span class="writing-step-icon" aria-hidden="true"><svg viewBox="0 0 24 24"><path d="M2.5 12s3.4-6 9.5-6 9.5 6 9.5 6-3.4 6-9.5 6-9.5-6-9.5-6Z"/><circle cx="12" cy="12" r="2.7"/></svg></span></div>
         <div id="writingDemoCanvas" class="writing-character-canvas" aria-label="Анимация написания иероглифа"></div>
-        <button type="button" class="secondary" id="writingPlayDemo">▶ Показать написание</button>
+        <button type="button" class="secondary" id="writingPlayDemo"><span class="pc-button-icon" aria-hidden="true"><svg viewBox="0 0 24 24"><path d="m9 6 10 6-10 6z"/></svg></span> Показать написание</button>
       </div>
       <div class="panel writing-step-card">
         <div class="writing-card-heading"><div><span class="writing-step-label">ШАГ 2</span><h3>Повтори самостоятельно</h3></div><span class="writing-step-icon">✍️</span></div>
@@ -3893,7 +3905,7 @@ body.dark-theme .writing-word-result-source,body.dark-theme .writing-selected-wo
         </div>
 
         <div class="profile-avatar" id="profileAvatar">
-          <span id="profileAvatarPlaceholder">🦊</span>
+          <span id="profileAvatarPlaceholder" class="profile-avatar-placeholder" aria-hidden="true"><svg viewBox="0 0 48 48"><path d="M8 20 7 7l12 7a17 17 0 0 1 10 0l12-7-1 13a17 17 0 1 1-32 0Z"/><path d="M17 25h.01M31 25h.01M20 32q4 3 8 0"/></svg></span>
           <img id="profileAvatarImage" hidden>
         </div>
 
@@ -4102,7 +4114,7 @@ body.dark-theme .writing-word-result-source,body.dark-theme .writing-selected-wo
       <p id="studyReviewPrompt">Вспомни значение и произношение.</p>
       <div id="studyReviewCard" class="study-tools-card" hidden>
         <div id="studyReviewHanzi" class="study-tools-hanzi">你好</div>
-        <button id="studyReviewAudio" type="button" class="secondary">🔊 Послушать</button>
+        <button id="studyReviewAudio" type="button" class="secondary"><span class="pc-button-icon" aria-hidden="true"><svg viewBox="0 0 24 24"><path d="M4 10v4h4l5 4V6l-5 4zM17 9a5 5 0 0 1 0 6M19.5 6.5a9 9 0 0 1 0 11"/></svg></span> Послушать</button>
         <p id="studyReviewAudioStatus" class="study-tools-audio-status" aria-live="polite"></p>
         <div id="studyReviewInputArea" class="study-review-input-area">
           <label for="studyReviewPinyinInput">Произношение (пиньинь)</label>
@@ -4171,8 +4183,8 @@ body.dark-theme .writing-word-result-source,body.dark-theme .writing-selected-wo
         <div id="studySpeakMeaning" class="study-tools-meaning"></div>
       </div>
       <div class="study-tools-actions">
-        <button id="studySpeakAudio" class="primary" type="button">🔊 Прослушать</button>
-        <button id="studySpeakMic" class="secondary" type="button">🎙 Повторить</button>
+        <button id="studySpeakAudio" class="primary" type="button"><span class="pc-button-icon" aria-hidden="true"><svg viewBox="0 0 24 24"><path d="M4 10v4h4l5 4V6l-5 4zM17 9a5 5 0 0 1 0 6M19.5 6.5a9 9 0 0 1 0 11"/></svg></span> Прослушать</button>
+        <button id="studySpeakMic" class="secondary" type="button"><span class="pc-button-icon" aria-hidden="true"><svg viewBox="0 0 24 24"><rect x="9" y="3" width="6" height="12" rx="3"/><path d="M6 11a6 6 0 0 0 12 0M12 17v4M9 21h6"/></svg></span> Повторить</button>
       </div>
       <p id="studySpeakAudioStatus" class="study-tools-audio-status" aria-live="polite"></p>
       <p id="studySpeakMicStatus" class="study-tools-mic-status" aria-live="polite"></p>
@@ -5207,7 +5219,7 @@ document.getElementById('translateBtn').onclick=async()=>{
   const foundMemes=memeGlossary.filter(item=>normalized.toLowerCase().includes(item.term.toLowerCase()));
   const memeBox=document.createElement('div');
   memeBox.className='meme-analysis-card';
-  memeBox.innerHTML='<h3>Мемный контекст ✨</h3>';
+  memeBox.innerHTML='<h3>Мемный контекст</h3>';
   if(foundMemes.length){
     foundMemes.forEach(item=>{
       const entry=document.createElement('div');
@@ -7477,7 +7489,7 @@ document.getElementById("accountForm").addEventListener("submit", async function
 
       if (!result.error && result.data.session) {
         await loadCloudProfile(result.data.user);
-        message.textContent = "Аккаунт создан! Профиль готов ❤️";
+        message.textContent = "Аккаунт создан! Профиль готов.";
       } else if (!result.error) {
         message.textContent = "Аккаунт создан! Проверь почту и подтверди регистрацию.";
       }
@@ -7491,7 +7503,7 @@ document.getElementById("accountForm").addEventListener("submit", async function
       if (!result.error) {
         await loadCloudProfile(result.data.user);
 
-        message.textContent = "Успешный вход! Профиль загружен ❤️";
+        message.textContent = "Успешный вход! Профиль загружен.";
 
         updateProfileAccess();
 
