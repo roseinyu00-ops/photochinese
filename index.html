@@ -7690,8 +7690,8 @@ window.addEventListener("keydown", function(event) {
       const old=found.get(word);
       if(!old || (source==='Курс HSK' && old.source!=='Курс HSK'))found.set(word,{word,pinyin:info?.p||info?.pinyin||'',meaning:info?.m||info?.r||info?.meaning||info?.translation||'',source});
     };
-    Object.entries(window.wordDictionary||{}).forEach(([w,d])=>add(w,d,'Словарь'));
-    Object.entries(window.databaseWordDictionary||{}).forEach(([w,d])=>add(w,d,'Большой словарь'));
+    if(typeof wordDictionary!=='undefined')Object.entries(wordDictionary).forEach(([w,d])=>add(w,d,'Словарь'));
+    if(typeof databaseWordDictionary!=='undefined')Object.entries(databaseWordDictionary).forEach(([w,d])=>add(w,d,'Большой словарь'));
     if(typeof coachCourses!=='undefined'){
       Object.entries(coachCourses).forEach(([level,lessons])=>(lessons||[]).forEach(lesson=>(lesson.words||[]).forEach(item=>add(item[0],{p:item[1],m:item[2]},'HSK '+level))));
     }
