@@ -2541,10 +2541,18 @@ body.dark-theme .games-reset{color:#e0bdc9;border-color:#76545d}
 @media(max-width:720px){.games-mode-grid{grid-template-columns:repeat(2,minmax(0,1fr))}.games-mode-card{min-height:135px}}
 @media(max-width:390px){.games-mode-card{padding:11px}.games-mode-card strong{font-size:12px}.games-play-panel{padding:14px}}
 
-.companion-picture{color:#b66f89}
-.companion-picture svg{width:52px;height:52px;fill:none;stroke:currentColor;stroke-width:1.55;stroke-linecap:round;stroke-linejoin:round}
+.companion-picture{color:#a85f4c;background:linear-gradient(145deg,#fffaf5,#fff0e8)}
+.companion-picture svg{width:60px;height:60px;fill:none;stroke:currentColor;stroke-width:1.8;stroke-linecap:round;stroke-linejoin:round}
+.companion-picture .fox-head{fill:#f3b18e;stroke:#a85f4c}
+.companion-picture .fox-ear-inner{fill:#d98583;stroke:none}
+.companion-picture .fox-muzzle{fill:#fff8f1;stroke:#a85f4c;stroke-width:1.35}
+.companion-picture .fox-eye{stroke:#573d39;stroke-width:3.2;stroke-linecap:round}
+.companion-picture .fox-nose{fill:#573d39;stroke:none}
+.companion-picture .fox-smile{stroke:#80524a;stroke-width:1.5}
 .pc-status-lock{width:16px;height:16px;vertical-align:middle;fill:none;stroke:currentColor;stroke-width:1.7;stroke-linecap:round;stroke-linejoin:round}
-body.dark-theme .companion-picture{color:#e2a8bd}
+body.dark-theme .companion-picture{color:#9b5b50;background:linear-gradient(145deg,#3a3034,#49343a)}
+body.dark-theme .companion-picture .fox-head{fill:#d99575;stroke:#f0b99f}
+body.dark-theme .companion-picture .fox-muzzle{fill:#fff0e6;stroke:#f0b99f}
 
 .pc-nav-icon,.pc-teacher-icon,.pc-button-icon{display:inline-flex;align-items:center;justify-content:center;color:#b66f89;vertical-align:middle}
 .pc-nav-icon{width:19px;height:19px;margin-right:5px}
@@ -4068,7 +4076,7 @@ body.dark-theme .writing-word-result-source,body.dark-theme .writing-selected-wo
       <section class="profile-section">
         <h2>Мой компаньон</h2>
         <div class="companion-card">
-          <div class="companion-picture" aria-hidden="true"><svg viewBox="0 0 48 48"><path d="M8 20 7 7l12 7a17 17 0 0 1 10 0l12-7-1 13a17 17 0 1 1-32 0Z"/><path d="M17 25h.01M31 25h.01M20 32q4 3 8 0"/></svg></div>
+          <div class="companion-picture" aria-hidden="true"><svg class="fox-face" viewBox="0 0 64 64"><path class="fox-head" d="M11 27 8 8q-.5-3 2-1l17 12a25 25 0 0 1 10 0L54 7q2.5-1 2 2l-3 19c2 5 2 11-1 17-4 8-12 13-20 13S16 53 12 45c-3-6-3-12-1-18Z"/><path class="fox-ear-inner" d="m13 13 11 8-9 3Z M51 13l-11 8 9 3Z"/><path class="fox-muzzle" d="M19 38q5-8 13-8t13 8q-1 10-13 10T19 38Z"/><path class="fox-eye" d="M22 31h.1M42 31h.1"/><path class="fox-nose" d="M29 37q3-2 6 0-1 4-3 4t-3-4Z"/><path class="fox-smile" d="M32 41v2m0 0q-3 4-7 1m7-1q3 4 7 1"/></svg></div>
           <div>
             <h3>Мой лисёнок</h3>
             <p>Твой маленький спутник в изучении китайского</p>
