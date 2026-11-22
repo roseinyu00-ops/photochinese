@@ -4404,7 +4404,7 @@ async function loadAdminUsers() {
   const users = data || []; if (count) count.textContent = String(users.length);
   status.textContent = users.length ? "Профили загружены из Supabase." : "Пока нет сохранённых профилей.";
   users.forEach((user, index) => {
-    const row=document.createElement("div");row.className="admin-user-row";const info=document.createElement("div");const name=document.createElement("div");name.className="admin-user-name";name.textContent=user.username||"Пользователь без ника";const meta=document.createElement("div");meta.className="admin-user-meta";meta.textContent="PC-USER-"+String(index+1).padStart(4,"0")+" · "+(user.bio||"Описание не заполнено");info.append(name,meta);const tag=document.createElement("span");tag.className="admin-user-tag";tag.textContent="USER";row.append(info,tag);list.appendChild(row);
+    const row=document.createElement("div");row.className="admin-user-row";const info=document.createElement("div");const name=document.createElement("div");name.className="admin-user-name";name.textContent=user.username||"Пользователь без ника";const meta=document.createElement("div");meta.className="admin-user-meta";meta.textContent="Профиль в облаке · "+(user.bio||"Описание не заполнено");info.append(name,meta);const tag=document.createElement("span");tag.className="admin-user-tag";tag.textContent="USER";row.append(info,tag);list.appendChild(row);
   });
 }
 
