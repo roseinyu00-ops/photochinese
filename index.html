@@ -7656,7 +7656,7 @@ window.addEventListener("keydown", function(event) {
   tabs.forEach(tab=>tab.addEventListener('click',()=>showLearningView(tab.dataset.learningView)));
   window.photoChineseShowLearningView=showLearningView;
 
-  let writingDemo=null, writingQuiz=null, writingCharacter='爱';
+  let writingDemo=null, writingQuiz=null, writingCharacter='爱', writingStrokeCount=0;
   const input=document.getElementById('writingCharacter');
   const demo=document.getElementById('writingDemoCanvas');
   const quiz=document.getElementById('writingQuizCanvas');
@@ -7665,11 +7665,13 @@ window.addEventListener("keydown", function(event) {
   async function loadWritingCharacter(){
     if(!validCharacter(input.value)){feedback.textContent='Введи один китайский иероглиф.';return;}
     writingCharacter=input.value.trim();
+    window.photoChineseWritingReady=false;
     demo.innerHTML='';quiz.innerHTML='';writingDemo=null;writingQuiz=null;
     feedback.textContent='Загружаем данные о чертах…';
     if(!window.HanziWriter){feedback.textContent='Модуль написания не загрузился. Проверь подключение к интернету.';return;}
     const data=await loadStrokeData(writingCharacter);
     if(!data || !data.strokes?.length){feedback.textContent='Для этого иероглифа пока не удалось найти данные о порядке черт.';return;}
+    writingStrokeCount=data.strokes.length;
     writingDemo=HanziWriter.create('writingDemoCanvas',writingCharacter,{width:220,height:220,padding:12,showOutline:true,showCharacter:true,strokeAnimationSpeed:1,delayBetweenStrokes:260,charDataLoader:(ch,done)=>loadStrokeData(ch).then(result=>{if(result)done(result);})});
     feedback.textContent='Готово! Сначала посмотри анимацию, затем попробуй написать знак самостоятельно.';
     window.photoChineseWritingReady=true;
@@ -7687,7 +7689,7 @@ window.addEventListener("keydown", function(event) {
     writingQuiz=HanziWriter.create('writingQuizCanvas',writingCharacter,{width:220,height:220,padding:12,showOutline:false,showCharacter:false,showHintAfterMisses:2,highlightOnComplete:true,charDataLoader:(ch,done)=>loadStrokeData(ch).then(result=>{if(result)done(result);})});
     writingQuiz.quiz({onComplete:summary=>{
       
-      feedback.textContent='Отлично! Ты завершила практику для '+writingCharacter+'. Правильных черт: '+summary.total+'/'+summary.total+'. Можешь повторить ещё раз или выбрать другой знак.';
+      feedback.textContent='Отлично! Ты завершила практику для '+writingCharacter+'. Правильных черт: '+(summary.totalCorrectStrokes||writingStrokeCount)+'/'+writingStrokeCount+'. Можешь повторить ещё раз или выбрать другой знак.';
     },onMistake:(strokeData,strokeNum)=>{
       feedback.textContent='Попробуй ещё раз: проверь направление и место начала черты.';
     },onCorrectStroke:(strokeData,strokeNum)=>{
