@@ -3619,6 +3619,16 @@ body.dark-theme .companion-option.selected{background:rgba(113,72,91,.45);border
 .companion-option.locked strong{opacity:.78}
 .companion-option.locked small{color:var(--muted,#8c7b82);font-size:9px;line-height:1.35}
 .achievement-companion-reward{display:block;margin-top:5px;color:#b47b9a;font-size:10px;font-weight:600;line-height:1.35}
+.legendary-section>h2{background:linear-gradient(100deg,#b27a9a,#d2a66f);-webkit-background-clip:text;background-clip:text;color:transparent}
+.legendary-achievements-list{margin-top:12px}
+.legendary-achievements-list[hidden]{display:none!important}
+.legendary-achievement{position:relative;border:1px solid rgba(190,145,177,.38);background:linear-gradient(115deg,rgba(250,239,248,.82),rgba(255,248,237,.76))}
+.legendary-achievement .achievement-mark{color:#b887a4}
+.legendary-achievement.unlocked{border-color:#c9a16d;box-shadow:0 0 0 1px rgba(201,161,109,.14),0 5px 18px rgba(177,135,94,.09)}
+.legendary-achievement.locked{opacity:.78}
+body.dark-theme .legendary-achievement{background:linear-gradient(115deg,rgba(75,53,75,.65),rgba(76,61,48,.5));border-color:rgba(207,164,190,.28)}
+body.dark-theme .legendary-achievement.unlocked{border-color:#b99a70}
+
 body.dark-theme .companion-option.locked{background:rgba(57,45,54,.45)}
 body.dark-theme .achievement-companion-reward{color:#dfabc4}
 
@@ -4116,6 +4126,12 @@ body.dark-theme .achievement-companion-reward{color:#dfabc4}
   </div>
   <button type="button" class="secondary profile-expand-button" id="showAllAchievements">Все достижения</button>
   <p class="profile-collection-note" id="achievementCollectionNote">Первые три достижения — начало твоего пути ♡</p>
+</section>
+<section class="profile-section legendary-section">
+  <h2><span aria-hidden="true">✧</span> Легендарные достижения</h2>
+  <p class="profile-collection-note">Особые испытания для тех, кто прошёл долгий путь. Каждое открывает уникального компаньона.</p>
+  <div class="profile-collection legendary-achievements-list" id="legendaryAchievementsList" hidden></div>
+  <button type="button" class="secondary profile-expand-button" id="showLegendaryAchievements">Показать легендарные</button>
 </section>
 
 
@@ -6932,7 +6948,13 @@ function updateAchievements() {
     {id:"hsk_three",condition:hsk>=3},
     {id:"hsk_four",condition:hsk>=4},
     {id:"hsk_five",condition:hsk>=5},
-    {id:"hsk_six",condition:hsk>=6}
+    {id:"hsk_six",condition:hsk>=6},
+    // Легендарные достижения: совокупные условия, заметно сложнее обычных.
+    {id:"legend_moon_fox",condition:progress.learnedCharacters.length>=150&&learnedWords>=50&&progress.completedLessons.length>=50&&activityDays.length>=45},
+    {id:"legend_wise_owl",condition:progress.completedLessons.length>=100&&learnedWords>=100},
+    {id:"legend_moon_bunny",condition:activityDays.length>=100},
+    {id:"legend_celestial_dragon",condition:hsk>=6&&progress.learnedCharacters.length>=300&&learnedWords>=150&&progress.completedLessons.length>=100&&activityDays.length>=90},
+    {id:"legend_phoenix",condition:progress.learnedCharacters.length>=500&&learnedWords>=250&&progress.completedLessons.length>=150}
   ];
 
   rules.forEach(rule => {
@@ -7044,6 +7066,13 @@ const achievementCatalog = [
   ["hsk_five","Почти эксперт","Получи результат HSK 5","lotus"],
   ["hsk_six","Вершина HSK","Получи результат HSK 6","crown"]
 ];
+const legendaryAchievementCatalog = [
+  ["legend_moon_fox","Хранитель лунного кодекса","Изучи 150 иероглифов, отметь 50 слов как выученные, заверши 50 уроков и занимайся в 45 разных дней","diamond"],
+  ["legend_wise_owl","Мудрость тысяч уроков","Заверши 100 уроков и выучи 100 слов","medal"],
+  ["legend_moon_bunny","Сто лунных дней","Занимайся в 100 разных дней","moon"],
+  ["legend_celestial_dragon","Путь небесного дракона","Получи HSK 6, изучи 300 иероглифов, выучи 150 слов, заверши 100 уроков и занимайся в 90 разных дней","crown"],
+  ["legend_phoenix","Возрождение феникса","Изучи 500 иероглифов, выучи 250 слов и заверши 150 уроков","lotus"]
+];
 function renderAchievements() {
   const list = document.getElementById("achievementsList");
   if (!list) return;
@@ -7076,11 +7105,38 @@ function renderAchievements() {
   });
   const button=document.getElementById("showAllAchievements");
   if(button){button.hidden=achievementCatalog.length<=3;button.textContent=achievementCatalogExpanded?"Свернуть достижения":"Все достижения";}
+  renderLegendaryAchievements();
+}
+function renderLegendaryAchievements(){
+  const list=document.getElementById("legendaryAchievementsList");
+  if(!list)return;
+  list.innerHTML="";
+  legendaryAchievementCatalog.forEach(([id,name,description,reward])=>{
+    const unlocked=progress.achievements.includes(id);
+    const item=document.createElement("div");
+    item.className="collection-item achievement-extra legendary-achievement"+(unlocked?" unlocked":" locked");
+    item.dataset.achievement=id;
+    const mark=document.createElement("span");mark.className="achievement-mark";mark.innerHTML=profileIconMarkup(reward);
+    const title=document.createElement("span");title.className="achievement-name";title.textContent=name;
+    const details=document.createElement("small");details.className="achievement-description";details.textContent=description;
+    const status=document.createElement("small");status.className="achievement-status";status.textContent=unlocked?"✦ Получено":"Пока закрыто";
+    const companion=legendaryAchievementCompanionRewards[id];
+    if(companion){const note=document.createElement("small");note.className="achievement-companion-reward";note.textContent="✦ Особая награда: "+companion;item.append(mark,title,details,note,status);}
+    else item.append(mark,title,details,status);
+    list.appendChild(item);
+  });
+  const button=document.getElementById("showLegendaryAchievements");
+  if(button)button.textContent=list.hidden?"Показать легендарные":"Скрыть легендарные";
 }
 let achievementCatalogExpanded=false;
 document.getElementById("showAllAchievements")?.addEventListener("click",()=>{
   achievementCatalogExpanded=!achievementCatalogExpanded;
   renderAchievements();
+});
+document.getElementById("showLegendaryAchievements")?.addEventListener("click",()=>{
+  const list=document.getElementById("legendaryAchievementsList");
+  if(list)list.hidden=!list.hidden;
+  renderLegendaryAchievements();
 });
 
 // Сохранение иероглифа из карточки разбора
@@ -7282,17 +7338,20 @@ const companionCatalog = [
   {level:4,id:"panda",emoji:"🐼",name:"Панда",description:"Спокойный компаньон для серьёзных занятий.",requirement:"Откроется на HSK 4"},
   {level:5,id:"deer",emoji:"🦌",name:"Оленёнок",description:"Изящный спутник на пути к свободному чтению.",requirement:"Откроется на HSK 5"},
   {level:6,id:"dragon",emoji:"🐉",name:"Дракончик",description:"Редкий спутник для покорителя самой высокой ступени.",requirement:"Откроется на HSK 6"},
-  {achievement:"character_master",id:"moon_fox",emoji:"🦊",name:"Лунная кицунэ",description:"Таинственная кицунэ с лунной магией.",requirement:"За достижение «Знаток знаков»"},
-  {achievement:"lesson_pro",id:"wise_owl",emoji:"🦉",name:"Сова-хранитель",description:"Мудрая сова, которая ценит упорство.",requirement:"За достижение «Мастер занятий»"},
-  {achievement:"month_journey",id:"moon_bunny",emoji:"🐇",name:"Лунный зайчик",description:"Редкий спутник тех, кто не бросает свой путь.",requirement:"За достижение «Длинный путь»"},
-  {achievement:"hsk_six",id:"celestial_dragon",emoji:"🐲",name:"Небесный дракон",description:"Особенный дракон для настоящего покорителя HSK.",requirement:"За достижение «Вершина HSK»"}
+  {achievement:"legend_moon_fox",id:"moon_fox",emoji:"🦊",name:"Лунная кицунэ",description:"Таинственная кицунэ с лунной магией.",requirement:"Легендарное достижение «Хранитель лунного кодекса»"},
+  {achievement:"legend_wise_owl",id:"wise_owl",emoji:"🦉",name:"Сова-хранитель",description:"Мудрая сова, которая ценит упорство.",requirement:"Легендарное достижение «Мудрость тысяч уроков»"},
+  {achievement:"legend_moon_bunny",id:"moon_bunny",emoji:"🐇",name:"Лунный зайчик",description:"Редкий спутник тех, кто не бросает свой путь.",requirement:"Легендарное достижение «Сто лунных дней»"},
+  {achievement:"legend_celestial_dragon",id:"celestial_dragon",emoji:"🐲",name:"Небесный дракон",description:"Особенный дракон для настоящего покорителя HSK.",requirement:"Легендарное достижение «Путь небесного дракона»"},
+  {achievement:"legend_phoenix",id:"phoenix",emoji:"🪽",name:"Звёздный феникс",description:"Появляется лишь у тех, кто прошёл по-настоящему долгий путь.",requirement:"Легендарное достижение «Возрождение феникса»"}
 ];
-const achievementCompanionRewards = {
-  character_master:"Лунная кицунэ",
-  lesson_pro:"Сова-хранитель",
-  month_journey:"Лунный зайчик",
-  hsk_six:"Небесный дракон"
+const legendaryAchievementCompanionRewards = {
+  legend_moon_fox:"Лунная кицунэ",
+  legend_wise_owl:"Сова-хранитель",
+  legend_moon_bunny:"Лунный зайчик",
+  legend_celestial_dragon:"Небесный дракон",
+  legend_phoenix:"Звёздный феникс"
 };
+const achievementCompanionRewards = legendaryAchievementCompanionRewards;
 function getUnlockedCompanionLevel(){
   try{return Math.max(1,Math.min(6,Number(JSON.parse(localStorage.getItem("photoChineseHskDiagnostic")||"{}").level)||1));}
   catch(e){return 1;}
