@@ -7960,9 +7960,25 @@ window.addEventListener("keydown", function(event) {
       if(mode==='order')orderTask();
     }
     function buildTask(){
-      current=shuffle(phrases)[0];prompt.textContent='Как по-китайски сказать: «'+current.ru+'»';
-      const wrong=shuffle(phrases.filter(p=>p.zh!==current.zh)).slice(0,2).map(p=>p.zh);
-      shuffle([current.zh,...wrong]).forEach(answer=>area.appendChild(button(answer,'games-answer',()=>finish(answer===current.zh,'Правильный вариант: '+current.zh))));
+      current=shuffle(phrases)[0];prompt.textContent='Собери фразу по переводу: «'+current.ru+'»';
+      const assembled=document.createElement('div');assembled.className='games-order-bank';
+      const choices=document.createElement('div');choices.className='games-order-bank';choices.style.borderTop='0';choices.style.paddingTop='0';
+      area.append(assembled,choices);
+      const selected=[];
+      function draw(){
+        assembled.innerHTML='';choices.innerHTML='';
+        if(!selected.length){const hint=document.createElement('span');hint.className='games-order-slot';hint.textContent='Твоё предложение появится здесь';assembled.appendChild(hint);}
+        selected.forEach(part=>{const chip=document.createElement('span');chip.className='games-order-slot';chip.textContent=part;assembled.appendChild(chip);});
+        if(selected.length===current.parts.length){finish(selected.join('')===current.parts.join(''),'Правильная фраза: '+current.zh);return;}
+        const index=selected.length,correct=current.parts[index];
+        const distractors=[...new Set(phrases.flatMap(p=>p.parts).filter(part=>part!==correct&&part!==selected[index-1]))];
+        shuffle([correct,...shuffle(distractors).slice(0,2)]).forEach(part=>choices.appendChild(button(part,'games-answer',()=>{
+          if(answered)return;
+          if(part===correct){selected.push(part);draw();}
+          else{feedbackText('Не совсем. Подумай, какое слово должно идти следующим.','error');}
+        })));
+      }
+      draw();
     }
     function pairsTask(){
       prompt.textContent='Найди пары: китайское слово и его перевод. Нажми сначала на слово, затем на перевод.';
