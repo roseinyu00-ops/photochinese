@@ -5192,22 +5192,27 @@ function appendCoachEmphasisText(container,text){
  });
  if(cursor<source.length)container.appendChild(document.createTextNode(source.slice(cursor)));
 }
-function appendCoachHighlightedText(container, text, vocabulary){
+function appendCoachHighlightedText(container,text,vocabulary){
  container.textContent='';
  const source=String(text||'');
- const matchWord=(vocabulary||[])
-  .map(item=>String(item&&item[0]||''))
-  .filter(Boolean)
-  .sort((a,b)=>b.length-a.length)
-  .find(word=>source.includes(word));
- if(!matchWord){container.textContent=source;return;}
- const start=source.indexOf(matchWord);
- if(start>0)container.appendChild(document.createTextNode(source.slice(0,start)));
- const accent=document.createElement('span');
- accent.className='pc-keyword';
- accent.textContent=matchWord;
- container.appendChild(accent);
- if(start+matchWord.length<source.length)container.appendChild(document.createTextNode(source.slice(start+matchWord.length)));
+ const words=[...new Set((vocabulary||[]).map(item=>String(item&&item[0]||'')).filter(Boolean))].sort((a,b)=>b.length-a.length);
+ const matches=[];
+ words.forEach(word=>{
+  let from=0,at;
+  while((at=source.indexOf(word,from))!==-1){
+   if(!matches.some(item=>at<item.end&&at+word.length>item.start))matches.push({start:at,end:at+word.length,text:word});
+   from=at+word.length;
+  }
+ });
+ matches.sort((a,b)=>a.start-b.start);
+ let cursor=0;
+ matches.forEach(item=>{
+  if(item.start<cursor)return;
+  if(item.start>cursor)container.appendChild(document.createTextNode(source.slice(cursor,item.start)));
+  const accent=document.createElement('span');accent.className='pc-keyword';accent.textContent=item.text;container.appendChild(accent);
+  cursor=item.end;
+ });
+ if(cursor<source.length)container.appendChild(document.createTextNode(source.slice(cursor)));
 }
 function openCoachLesson(index){
  const lesson=coachCourses[currentCoachLevel()][index];if(!lesson)return;
@@ -5262,7 +5267,7 @@ function openCoachLesson(index){
  document.querySelector('#coachLessonExample .coach-example-pinyin').textContent=pinyin;
  document.querySelector('#coachLessonExample .coach-example-translation').textContent=translation;
  const detail=document.getElementById('coachLessonExplanation');
- if(detail)detail.textContent=lesson.explanation||'Прочитай пример вслух, обрати внимание на порядок слов и попробуй составить собственное предложение по этой модели.';
+ if(detail)appendCoachEmphasisText(detail,lesson.explanation||'Прочитай пример вслух, обрати внимание на порядок слов и попробуй составить собственное предложение по этой модели.');
  const words=document.getElementById('coachLessonWords');words.innerHTML='';
  lesson.words.forEach(w=>{
   const card=document.createElement('div');card.className='coach-word';
@@ -5612,7 +5617,7 @@ renderQ();
   <script>
 if ("serviceWorker" in navigator) {
   window.addEventListener("load", () => {
-    navigator.serviceWorker.register("./service-worker.js?v=15", { updateViaCache: "none" })
+    navigator.serviceWorker.register("./service-worker.js?v=16", { updateViaCache: "none" })
       .then(() => console.log("PhotoChinese PWA ready!"))
       .catch(error => console.error("PWA error:", error));
   });
