@@ -2481,7 +2481,8 @@ body.dark-theme .coach-example {
 
 .writing-word-picker{margin:18px 0 12px;padding:15px;border:1px solid #f0dce2;border-radius:15px;background:rgba(255,247,250,.8)}
 .writing-word-picker>label{display:block;margin-bottom:8px;font-weight:750}
-.writing-word-results{display:flex;flex-direction:column;gap:6px;max-height:210px;overflow:auto;margin-top:8px}
+.writing-word-results{display:none;flex-direction:column;gap:6px;max-height:210px;overflow:auto;margin-top:8px;flex-basis:100%;width:100%}
+.writing-word-results.is-open{display:flex}
 .writing-word-result{display:flex;align-items:center;justify-content:space-between;gap:12px;width:100%;padding:9px 12px;border:1px solid #f0dce2;border-radius:11px;background:#fff;color:#704b5b;text-align:left}
 .writing-word-result strong{font-size:19px}.writing-word-result small{color:#987b87}
 .writing-word-characters{display:flex;flex-wrap:wrap;gap:9px;margin-top:12px}
@@ -7729,14 +7730,18 @@ window.addEventListener("keydown", function(event) {
       }))
       .sort((a,b)=>a.word.localeCompare(b.word,'zh-Hans'));
   }
+  let writingWordDropdownOpen=false;
+  // Список располагается прямо под кнопкой «Выбрать слово».
+  document.querySelector('.writing-character-row').appendChild(wordResults);
   function renderWritingWordResults(){
     const query=wordSearch.value.trim().toLowerCase();
     wordResults.innerHTML='';
-    // До ввода запроса ничего не показываем: слова выбираются через поиск.
-    if(!query)return;
-    const words=collectWritingWords().filter(item=>item.word.includes(query) || item.pinyin.toLowerCase().includes(query) || item.meaning.toLowerCase().includes(query));
+    const isOpen=writingWordDropdownOpen || Boolean(query);
+    wordResults.classList.toggle('is-open',isOpen);
+    if(!isOpen)return;
+    const words=collectWritingWords().filter(item=>!query || item.word.includes(query) || item.pinyin.toLowerCase().includes(query) || item.meaning.toLowerCase().includes(query));
     const shown=words.slice(0,30);
-    if(!shown.length){wordResults.innerHTML='<div class="writing-word-empty">Не нашла такое слово среди выученных. Попробуй другой запрос.</div>';return;}
+    if(!shown.length){wordResults.innerHTML='<div class="writing-word-empty">Пока нет выученных слов для выбора. Отметь слова как выученные в уроках.</div>';return;}
     shown.forEach(item=>{
       const button=document.createElement('button');button.type='button';button.className='writing-word-result';
       const left=document.createElement('span');left.className='writing-word-result-main';
@@ -7751,6 +7756,8 @@ window.addEventListener("keydown", function(event) {
   function selectWritingWord(word){
     selectedWord=word;
     wordSearch.value='';
+    writingWordDropdownOpen=false;
+    wordResults.classList.remove('is-open');
     wordResults.innerHTML='';
     wordCharacters.innerHTML='';
     const selectedLabel=document.createElement('div');
@@ -7767,7 +7774,10 @@ window.addEventListener("keydown", function(event) {
       wordCharacters.appendChild(button);
     });
   }
-  wordSearch.addEventListener('input',renderWritingWordResults);
+  wordSearch.addEventListener('input',()=>{
+    writingWordDropdownOpen=Boolean(wordSearch.value.trim());
+    renderWritingWordResults();
+  });
   renderWritingWordResults();
   if(typeof dictionaryPromise!=='undefined' && dictionaryPromise?.then)dictionaryPromise.then(renderWritingWordResults).catch(()=>{});
   let writingDemo=null, writingQuiz=null, writingCharacter='爱', writingStrokeCount=0;
@@ -7790,7 +7800,12 @@ window.addEventListener("keydown", function(event) {
     feedback.textContent='Готово! Сначала посмотри анимацию, затем попробуй написать знак самостоятельно.';
     window.photoChineseWritingReady=true;
   }
-  document.getElementById('writingLoadCharacter').addEventListener('click',loadWritingCharacter);
+  document.getElementById('writingLoadCharacter').textContent='Выбрать слово';
+  document.getElementById('writingLoadCharacter').addEventListener('click',()=>{
+    writingWordDropdownOpen=!writingWordDropdownOpen;
+    wordSearch.value='';
+    renderWritingWordResults();
+  });
   input.addEventListener('keydown',event=>{if(event.key==='Enter')loadWritingCharacter();});
   document.getElementById('writingPlayDemo').addEventListener('click',()=>{
     if(writingDemo){writingDemo.animateCharacter();feedback.textContent='Посмотри на порядок и направление каждой черты.';}
