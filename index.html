@@ -3558,7 +3558,7 @@ tabs.forEach(btn => btn.addEventListener('click', () => {
     targetTab.classList.remove('is-entering');
     void targetTab.offsetWidth;
     targetTab.classList.add('is-entering');
-    let pendingEntranceBlocks = targetTab.querySelectorAll(':scope > .panel, :scope > .section, :scope > .side').length;
+    let pendingEntranceBlocks = Array.from(targetTab.children).filter(item => !item.hidden && (item.matches('.panel, .section, .side'))).length;
     const finishEntrance = function(event) {
       if (event.target.parentElement !== targetTab) return;
       pendingEntranceBlocks -= 1;
