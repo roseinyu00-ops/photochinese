@@ -2842,6 +2842,8 @@ body.dark-theme nav button.active {
 /* PHOTOCHINESE — selective accents and calm, consistent motion */
 .tab > .panel,.tab > .section{border-color:var(--line);box-shadow:0 4px 16px rgba(112,67,82,.035)}
 /* Accent lines are reserved for meaningful, high-level blocks. */
+.tab > .panel::before,.tab > .section::before{display:none}
+
 #learn > .hero::before,#learn > #analysisPanel::before,#coach > .coach-hero::before,#hsk > .hsk-diagnostic::before,#studytools > .study-tools-hero::before{
  display:block;content:"";position:absolute;top:0;left:22px;right:22px;height:3px;border-radius:0 0 8px 8px;
  background:linear-gradient(90deg,#e7a5b7,#c9a8dc,#e7a5b7);opacity:.82;pointer-events:none
