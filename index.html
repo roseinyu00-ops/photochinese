@@ -2418,6 +2418,61 @@ body[data-text-size="normal"]{font-size:15px}
 body[data-text-size="large"]{font-size:17px}
 @media(max-width:800px){header{gap:12px}header nav{width:100%;overflow-x:auto;flex-wrap:nowrap;padding-bottom:5px}header nav button{white-space:nowrap;flex:0 0 auto}.header-actions{position:absolute;right:14px;top:14px}.brand{padding-right:100px}}
 @media(max-width:520px){.panel{padding:16px;border-radius:17px}.coach-lesson-row{gap:6px}.coach-favorite-button{width:42px;flex-basis:42px}.coach-lesson-card{padding:11px}.coach-search-result{padding:10px}.settings-card{padding:18px}.coach-word-grid{grid-template-columns:repeat(2,minmax(0,1fr))}}
+
+/* Полировка поиска и настроек */
+.coach-search-shell{position:relative;display:flex;align-items:center;gap:10px;width:100%;min-height:54px;padding:0 16px;border:1px solid #efdde2;border-radius:999px;background:#fff;box-shadow:0 5px 18px rgba(112,70,83,.055);transition:border-color .2s,box-shadow .2s}
+.coach-search-shell:focus-within{border-color:#df91a5;box-shadow:0 0 0 4px rgba(233,141,161,.13)}
+.coach-search-icon{width:19px;height:19px;flex:0 0 19px;fill:none;stroke:#b58e98;stroke-width:1.7;stroke-linecap:round;stroke-linejoin:round}
+.coach-search-shell input#coachGlobalSearch{width:100%;min-width:0;height:50px;padding:0;border:0!important;outline:0!important;box-shadow:none!important;background:transparent!important;color:var(--ink);font-size:15px}
+.coach-search-shell input#coachGlobalSearch::placeholder{color:#b49da3;opacity:1}
+.coach-search-clear{width:28px;height:28px;flex:0 0 28px;border-radius:50%;background:#f8e8ec;color:#946675;font-size:20px;line-height:1}
+.coach-search-results{gap:9px}
+.coach-search-result{border-radius:16px;padding:14px 16px;box-shadow:0 3px 12px rgba(112,70,83,.045);transition:transform .15s,border-color .15s}
+.coach-search-result:active{transform:scale(.99)}
+.settings-icon-button{display:grid;place-items:center;width:40px;height:40px;padding:0;border:1px solid #efdde2;border-radius:50%;background:#fff;color:#946675;transition:background .2s,border-color .2s}
+.settings-icon-button svg{width:20px;height:20px;fill:none;stroke:currentColor;stroke-width:1.45;stroke-linecap:round;stroke-linejoin:round}
+.settings-icon-button:hover{background:#fff3f5;border-color:#e7b8c4}
+body.dark-theme .settings-icon-button{background:#49383d;border-color:#76545d;color:#f0c4ce}
+body.dark-theme .coach-search-shell{background:#49383d;border-color:#76545d;box-shadow:none}
+body.dark-theme .coach-search-shell input#coachGlobalSearch{color:#fff1ed}
+body.dark-theme .coach-search-shell input#coachGlobalSearch::placeholder{color:#c5aeb5}
+body.dark-theme .coach-search-icon{stroke:#d5aab5}
+body.dark-theme .coach-search-clear{background:#62434c;color:#ffe1e8}
+body.dark-theme .coach-search-result{box-shadow:none}
+.settings-backdrop{backdrop-filter:blur(5px)}
+.settings-card{width:min(100%,430px);border:1px solid #f0e0e4;border-radius:25px;padding:24px;background:#fffaf8;box-shadow:0 24px 80px rgba(58,31,39,.22)}
+.settings-heading{display:flex;justify-content:space-between;align-items:flex-start;margin-bottom:10px}
+.settings-eyebrow{font-size:10px;letter-spacing:.16em;color:#bd8796;font-weight:700}
+.settings-heading h2{margin:4px 0 0;font-size:25px}
+.settings-card .settings-close{float:none;width:34px;height:34px;padding:0;border:1px solid #f0dfe4;border-radius:50%;background:#fff;color:#8d6872;font-size:22px;line-height:1}
+.settings-section{padding:17px 0;border-bottom:1px solid #f1e5e8}
+.settings-section h3{margin:0 0 4px;font-size:15px}
+.settings-section p{margin:0 0 12px;color:#a18b91;font-size:12px}
+.settings-segmented{display:flex;gap:5px;padding:4px;border-radius:14px;background:#f8edf0}
+.settings-segmented button{flex:1;min-height:38px;padding:7px 9px;border-radius:11px;background:transparent;color:#8b6c75;font-size:13px;transition:background .2s,color .2s,box-shadow .2s}
+.settings-segmented button.is-selected{background:#fff;color:#9a5e70;box-shadow:0 2px 8px rgba(104,63,76,.1);font-weight:650}
+.settings-theme-options button span{font-size:16px;margin-right:4px}
+.settings-sound-row{display:flex;align-items:center;justify-content:space-between;gap:12px}
+.settings-sound-row p{margin:0}
+.settings-switch{position:relative;display:inline-flex;align-items:center;flex:0 0 auto;margin:0!important}
+.settings-switch input{position:absolute;opacity:0;width:1px;height:1px}
+.settings-switch span{width:46px;height:27px;border-radius:99px;background:#e6d9dd;transition:background .2s;position:relative}
+.settings-switch span:after{content:"";position:absolute;left:3px;top:3px;width:21px;height:21px;border-radius:50%;background:#fff;box-shadow:0 1px 4px #0002;transition:transform .2s}
+.settings-switch input:checked+span{background:#df91a5}
+.settings-switch input:checked+span:after{transform:translateX(19px)}
+.settings-switch input:focus-visible+span{outline:3px solid #e9a9b8;outline-offset:3px}
+.settings-footnote{margin:15px 0 0;color:#aa969c;font-size:11px}
+body.dark-theme .settings-card{background:#3d3034;border-color:#604850;color:#fff1ed}
+body.dark-theme .settings-card .settings-close{background:#49383d;border-color:#76545d;color:#f4dce2}
+body.dark-theme .settings-section{border-color:#604850}
+body.dark-theme .settings-section p,body.dark-theme .settings-footnote{color:#c4aeb6}
+body.dark-theme .settings-segmented{background:#49383d}
+body.dark-theme .settings-segmented button{color:#d4bdc3}
+body.dark-theme .settings-segmented button.is-selected{background:#76545d;color:#fff1ed;box-shadow:none}
+body[data-text-size="small"] .app{zoom:.94}
+body[data-text-size="normal"] .app{zoom:1}
+body[data-text-size="large"] .app{zoom:1.07}
+@media(max-width:520px){.coach-search-shell{min-height:50px;padding:0 14px}.coach-search-shell input#coachGlobalSearch{height:46px}.settings-card{padding:20px;border-radius:22px}.settings-heading h2{font-size:23px}.settings-segmented button{font-size:12px;padding:7px 5px}}
 </style>
 </head>
 <body>
@@ -2438,7 +2493,9 @@ body[data-text-size="large"]{font-size:17px}
   </nav>
 
   <div class="header-actions">
-  <button class="secondary" id="openSettings" type="button" aria-label="Настройки">⚙️</button>
+  <button class="settings-icon-button" id="openSettings" type="button" aria-label="Настройки" title="Настройки">
+    <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 3.5v2M12 18.5v2M3.5 12h2M18.5 12h2M5.99 5.99l1.42 1.42m9.18 9.18 1.42 1.42m0-12.02-1.42 1.42m-9.18 9.18-1.42 1.42"></path><circle cx="12" cy="12" r="5.2"></circle><circle cx="12" cy="12" r="1.8"></circle></svg>
+  </button>
   <button class="theme-toggle" id="themeToggle" type="button" aria-label="Сменить тему">🌙</button>
 </div>
 </header>
@@ -2520,7 +2577,11 @@ body[data-text-size="large"]{font-size:17px}
   <div class="panel section" id="coachFindPanel">
     <h2>Найти урок или слово</h2>
     <p class="small">Поиск по всем уровням HSK, названиям уроков, словам, пиньиню и переводам.</p>
-    <input id="coachGlobalSearch" type="search" placeholder="Например: путешествие, 学习 или xuéxí" autocomplete="off">
+    <div class="coach-search-shell">
+      <svg class="coach-search-icon" viewBox="0 0 24 24" aria-hidden="true"><circle cx="10.8" cy="10.8" r="6.8"></circle><path d="m16 16 4.2 4.2"></path></svg>
+      <input id="coachGlobalSearch" type="search" placeholder="Найти слово, перевод или урок..." autocomplete="off">
+      <button id="clearCoachSearch" class="coach-search-clear" type="button" aria-label="Очистить поиск" hidden>×</button>
+    </div>
     <div id="coachSearchResults" class="coach-search-results" aria-live="polite"></div>
     <div class="actions"><button type="button" class="secondary" id="toggleFavoriteLessons">♡ Избранные уроки</button></div>
     <div id="coachFavoriteResults" class="coach-search-results" hidden></div>
@@ -5080,24 +5141,20 @@ if ("serviceWorker" in navigator) {
   </script>
 <script>
 const themeToggle = document.getElementById("themeToggle");
-
-if (localStorage.getItem("photoChineseTheme") === "dark") {
-  document.body.classList.add("dark-theme");
-  themeToggle.textContent = "☀️";
+function setPhotoChineseTheme(theme) {
+  const dark = theme === "dark";
+  document.body.classList.toggle("dark-theme", dark);
+  localStorage.setItem("photoChineseTheme", dark ? "dark" : "light");
+  themeToggle.innerHTML = dark
+    ? '<svg viewBox="0 0 24 24" aria-hidden="true"><circle cx="12" cy="12" r="3.6"></circle><path d="M12 2.5v2M12 19.5v2M4.93 4.93l1.42 1.42m11.3 11.3 1.42 1.42M2.5 12h2m15 0h2M4.93 19.07l1.42-1.42m11.3-11.3 1.42-1.42"></path></svg>'
+    : '<svg viewBox="0 0 24 24" aria-hidden="true"><path d="M19.5 15.2A8 8 0 0 1 8.8 4.5 8.4 8.4 0 1 0 19.5 15.2Z"></path></svg>';
+  document.querySelectorAll("[data-theme-choice]").forEach(button => {
+    button.classList.toggle("is-selected", button.dataset.themeChoice === (dark ? "dark" : "light"));
+    button.setAttribute("aria-pressed", button.dataset.themeChoice === (dark ? "dark" : "light") ? "true" : "false");
+  });
 }
-
-themeToggle.addEventListener("click", () => {
-  document.body.classList.toggle("dark-theme");
-
-  const isDark = document.body.classList.contains("dark-theme");
-
-  localStorage.setItem(
-    "photoChineseTheme",
-    isDark ? "dark" : "light"
-  );
-
-  themeToggle.textContent = isDark ? "☀️" : "🌙";
-});
+setPhotoChineseTheme(localStorage.getItem("photoChineseTheme") === "dark" ? "dark" : "light");
+themeToggle.addEventListener("click", () => setPhotoChineseTheme(document.body.classList.contains("dark-theme") ? "light" : "dark"));
 </script>
 <script>
 const nicknameInput = document.getElementById("nicknameInput");
@@ -6384,13 +6441,30 @@ window.addEventListener("keydown", function(event) {
 <script src="./study-tools.js"></script>
 <div class="settings-backdrop" id="settingsModal" hidden>
   <div class="settings-card" role="dialog" aria-modal="true" aria-labelledby="settingsTitle">
-    <button class="settings-close" id="closeSettings" type="button" aria-label="Закрыть настройки">✕</button>
-    <h2 id="settingsTitle">Настройки PhotoChinese</h2>
-    <label for="textSizeSetting">Размер текста</label>
-    <select id="textSizeSetting"><option value="small">Небольшой</option><option value="normal">Обычный</option><option value="large">Крупный</option></select>
-    <label><input id="soundSetting" type="checkbox" style="width:auto;margin-right:8px"> Разрешить озвучивание китайских слов</label>
-    <p class="small">Тема оформления меняется кнопкой ☀️/🌙 в верхней части сайта.</p>
-    <button class="primary" id="saveSettings" type="button">Сохранить настройки</button>
+    <div class="settings-heading">
+      <div><span class="settings-eyebrow">PHOTOCHINESE</span><h2 id="settingsTitle">Настройки</h2></div>
+      <button class="settings-close" id="closeSettings" type="button" aria-label="Закрыть настройки">×</button>
+    </div>
+    <section class="settings-section">
+      <h3>Размер текста</h3>
+      <p>Выбери, как удобно читать материалы.</p>
+      <div class="settings-segmented" role="group" aria-label="Размер текста">
+        <button type="button" data-text-choice="small">Меньше</button>
+        <button type="button" data-text-choice="normal">Обычно</button>
+        <button type="button" data-text-choice="large">Больше</button>
+      </div>
+    </section>
+    <section class="settings-section">
+      <div class="settings-sound-row"><div><h3>Звук</h3><p>Озвучивание китайских слов и фраз</p></div><label class="settings-switch"><input id="soundSetting" type="checkbox"><span></span></label></div>
+    </section>
+    <section class="settings-section">
+      <h3>Тема оформления</h3>
+      <div class="settings-segmented settings-theme-options" role="group" aria-label="Тема оформления">
+        <button type="button" data-theme-choice="light"><span>☼</span> Светлая</button>
+        <button type="button" data-theme-choice="dark"><span>☾</span> Тёмная</button>
+      </div>
+    </section>
+    <p class="settings-footnote">Изменения применяются сразу и сохраняются автоматически.</p>
   </div>
 </div>
 <script>
@@ -6398,10 +6472,13 @@ window.addEventListener("keydown", function(event) {
   const $=id=>document.getElementById(id);
   const favoritesKey='photoChineseFavoriteLessons';
   window.readFavoriteLessons=function(){try{const v=JSON.parse(localStorage.getItem(favoritesKey)||'[]');return Array.isArray(v)?v:[]}catch(e){return[]}};
-  const search=$('coachGlobalSearch'),results=$('coachSearchResults'),favoriteButton=$('toggleFavoriteLessons'),favoriteResults=$('coachFavoriteResults');
+  const search=$('coachGlobalSearch'),results=$('coachSearchResults'),favoriteButton=$('toggleFavoriteLessons'),favoriteResults=$('coachFavoriteResults'),clearSearch=$('clearCoachSearch');
+  clearSearch.addEventListener('click',()=>{search.value='';renderSearch();search.focus();});
+
   function lessonWords(level,index,lesson){const extra=(coachSupplementalVocabulary[level]||{})[index]||{};return (lesson.words||[]).concat(extra.words||[]).concat(extra.phrases||[]);}
   function renderSearch(){
     const q=(search.value||'').trim().toLocaleLowerCase();
+    clearSearch.hidden=!search.value;
     results.innerHTML='';
     if(q.length<2){results.textContent=q?'Введи ещё хотя бы один символ.':'Начни вводить слово, пиньинь, перевод или название темы.';return;}
     const matches=[];
@@ -6432,14 +6509,31 @@ window.addEventListener("keydown", function(event) {
   }
   search.addEventListener('input',renderSearch);
   favoriteButton.addEventListener('click',()=>{favoriteResults.hidden=!favoriteResults.hidden;favoriteButton.textContent=favoriteResults.hidden?'♡ Избранные уроки':'♡ Скрыть избранное';if(!favoriteResults.hidden)renderFavorites();});
-  const modal=$('settingsModal'),size=$('textSizeSetting'),sound=$('soundSetting');
-  function applySettings(){document.body.dataset.textSize=localStorage.getItem('photoChineseTextSize')||'normal';sound.checked=localStorage.getItem('photoChineseSoundEnabled')!=='false';size.value=document.body.dataset.textSize;}
-  $('openSettings').addEventListener('click',()=>{applySettings();modal.hidden=false;});
+  const modal=$('settingsModal'),sound=$('soundSetting');
+  function applyTextSize(value){
+    const size=['small','normal','large'].includes(value)?value:'normal';
+    document.body.dataset.textSize=size;
+    localStorage.setItem('photoChineseTextSize',size);
+    document.querySelectorAll('[data-text-choice]').forEach(button=>{
+      const selected=button.dataset.textChoice===size;
+      button.classList.toggle('is-selected',selected);
+      button.setAttribute('aria-pressed',selected?'true':'false');
+    });
+  }
+  function applySound(enabled){
+    sound.checked=enabled;
+    localStorage.setItem('photoChineseSoundEnabled',enabled?'true':'false');
+  }
+  $('openSettings').addEventListener('click',()=>{modal.hidden=false;applyTextSize(localStorage.getItem('photoChineseTextSize')||'normal');applySound(localStorage.getItem('photoChineseSoundEnabled')!=='false');setPhotoChineseTheme(document.body.classList.contains('dark-theme')?'dark':'light');});
   $('closeSettings').addEventListener('click',()=>modal.hidden=true);
   modal.addEventListener('click',event=>{if(event.target===modal)modal.hidden=true;});
-  $('saveSettings').addEventListener('click',()=>{localStorage.setItem('photoChineseTextSize',size.value);localStorage.setItem('photoChineseSoundEnabled',sound.checked?'true':'false');applySettings();modal.hidden=true;});
-  applySettings();
-})();
+  document.addEventListener('keydown',event=>{if(event.key==='Escape'&&!modal.hidden)modal.hidden=true;});
+  document.querySelectorAll('[data-text-choice]').forEach(button=>button.addEventListener('click',()=>applyTextSize(button.dataset.textChoice)));
+  document.querySelectorAll('[data-theme-choice]').forEach(button=>button.addEventListener('click',()=>setPhotoChineseTheme(button.dataset.themeChoice)));
+  sound.addEventListener('change',()=>applySound(sound.checked));
+  applyTextSize(localStorage.getItem('photoChineseTextSize')||'normal');
+  applySound(localStorage.getItem('photoChineseSoundEnabled')!=='false');
+  })();
 </script>
 </body>
 </html>
