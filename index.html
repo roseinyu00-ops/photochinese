@@ -8056,7 +8056,19 @@ window.addEventListener("keydown", function(event) {
       });area.appendChild(b);});
     }
     function missingTask(){
-      const pool=levelPhrases();current=shuffle(pool)[0];
+      const personal=getLevel()==='learned'&&learned.length?shuffle(learned)[0]:null;
+      if(personal){
+        const chars=[...personal.zh].filter(ch=>/\p{Script=Han}/u.test(ch));
+        const target=chars[Math.floor(Math.random()*chars.length)];
+        const hidden=personal.zh.replace(target,'＿');
+        prompt.textContent='Вспомни своё выученное слово: '+personal.ru;
+        const distractors=[...new Set(levelPairs().flatMap(pair=>[...pair.zh]).filter(ch=>/\p{Script=Han}/u.test(ch)&&ch!==target))];
+        const options=shuffle([target,...shuffle(distractors).slice(0,3)]).slice(0,4);
+        const shown=document.createElement('div');shown.className='games-order-slot';shown.style.fontSize='25px';shown.textContent=hidden;area.appendChild(shown);
+        shuffle(options).forEach(ch=>area.appendChild(button(ch,'games-answer',()=>finish(ch===target,'Слово: '+personal.zh+' · '+personal.pinyin))));
+        return;
+      }
+      current=shuffle(levelPhrases())[0];
       const chars=[...current.zh].filter(ch=>/\p{Script=Han}/u.test(ch));const target=chars[Math.floor(Math.random()*chars.length)];
       const hidden=current.zh.replace(target,'＿');
       prompt.textContent='Какой иероглиф пропущен? Перевод: '+current.ru;
