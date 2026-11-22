@@ -2677,6 +2677,167 @@ body[data-text-size="normal"] .app{zoom:1}
 body[data-text-size="large"] .app{zoom:1.07}
 @media(max-width:520px){.coach-search-shell{min-height:50px;padding:0 14px}.coach-search-shell input#coachGlobalSearch{height:46px}.settings-card{padding:20px;border-radius:22px}.settings-heading h2{font-size:23px}.settings-segmented button{font-size:12px;padding:7px 5px}}
 </style>
+<style id="photochinese-visual-refresh">
+/* PHOTOCHINESE visual refresh: permanent accents on the actual page components */
+:root {
+  --pc-accent: #cf7893;
+  --pc-accent-soft: #fff0f4;
+  --pc-lilac: #b99acb;
+}
+.tab > .panel,
+.tab > .section {
+  border: 1px solid rgba(207,120,147,.22);
+  box-shadow: 0 8px 26px rgba(112,67,82,.055);
+  position: relative;
+}
+.tab > .panel::before,
+.tab > .section::before {
+  content: "";
+  position: absolute;
+  top: 0;
+  left: 22px;
+  right: 22px;
+  height: 3px;
+  border-radius: 0 0 8px 8px;
+  background: linear-gradient(90deg, #e7a5b7, #c9a8dc, #e7a5b7);
+  opacity: .9;
+  pointer-events: none;
+}
+.hero h1, .coach-hero h1, .hsk-diagnostic h1 {
+  background: linear-gradient(100deg, #b85f7b 0%, #bd8bbd 55%, #d28ba0 100%);
+  -webkit-background-clip: text;
+  background-clip: text;
+  color: transparent;
+}
+.coach-lesson-card,
+.coach-word,
+.coach-grammar-box,
+.coach-practice,
+.hsk-question-card,
+.hsk-result,
+.profile-section,
+.study-tools-card,
+.learning-progress-stat,
+.pc-character-card,
+.result,
+.word-of-day,
+.companion-card {
+  border: 1px solid rgba(207,120,147,.3);
+  box-shadow: 0 5px 18px rgba(112,67,82,.06);
+  transition: transform .22s ease, box-shadow .22s ease, border-color .22s ease;
+}
+.coach-lesson-card,
+.coach-word,
+.hsk-question-card,
+.study-tools-card,
+.learning-progress-stat,
+.pc-character-card {
+  position: relative;
+  overflow: hidden;
+}
+.coach-lesson-card::before,
+.coach-word::before,
+.hsk-question-card::before,
+.study-tools-card::before,
+.learning-progress-stat::before,
+.pc-character-card::before {
+  content: "";
+  position: absolute;
+  inset: 0 auto 0 0;
+  width: 3px;
+  background: linear-gradient(180deg, #e7a5b7, #c5a5d8);
+  pointer-events: none;
+}
+.coach-grammar-box,
+.coach-practice,
+.profile-section {
+  border-left: 3px solid #d8b4df;
+}
+.coach-example,
+.coach-objectives,
+.coach-phrase-list {
+  border-radius: 13px;
+}
+.coach-example {
+  background: linear-gradient(110deg, #fff0f4, #fbf4ff);
+  border: 1px solid #f0d5df;
+  padding: 12px 14px;
+}
+.coach-word {
+  background: linear-gradient(145deg, #fffafd, #fff0f4);
+  border-color: #edc5d0;
+}
+.coach-word strong, .coach-example-hanzi { color: #b85f7b; }
+.coach-lesson-card:hover,
+.coach-word:hover,
+.coach-grammar-box:hover,
+.coach-practice:hover,
+.hsk-question-card:hover,
+.profile-section:hover,
+.study-tools-card:hover,
+.learning-progress-stat:hover,
+.pc-character-card:hover {
+  border-color: #d98ca3;
+  box-shadow: 0 11px 28px rgba(178,103,128,.15);
+  transform: translateY(-3px);
+}
+nav button.active {
+  color: #a95470;
+  background: linear-gradient(180deg, rgba(255,240,245,.95), rgba(255,255,255,.5));
+  box-shadow: 0 5px 18px rgba(190,112,137,.2);
+}
+nav button.active::after {
+  height: 3px;
+  background: linear-gradient(90deg, #e7a5b7, #b99acb);
+  box-shadow: 0 0 9px rgba(207,120,147,.4);
+}
+.primary:not(:disabled), .secondary:not(:disabled), .theme-toggle, .settings-icon-button {
+  transition: transform .2s ease, box-shadow .2s ease, filter .2s ease;
+}
+.primary:not(:disabled):active, .secondary:not(:disabled):active,
+.theme-toggle:active, .settings-icon-button:active {
+  transform: scale(.96);
+}
+@media (hover:hover) and (pointer:fine) {
+  .primary:not(:disabled):hover, .secondary:not(:disabled):hover {
+    filter: brightness(1.025);
+    box-shadow: 0 8px 20px rgba(178,103,128,.18);
+  }
+}
+body.dark-theme .tab > .panel,
+body.dark-theme .tab > .section {
+  border-color: rgba(210,140,164,.25);
+  box-shadow: 0 8px 26px rgba(0,0,0,.16);
+}
+body.dark-theme .tab > .panel::before,
+body.dark-theme .tab > .section::before {
+  background: linear-gradient(90deg, #b8758d, #9b7caf, #b8758d);
+}
+body.dark-theme .hero h1,
+body.dark-theme .coach-hero h1,
+body.dark-theme .hsk-diagnostic h1 {
+  background-image: linear-gradient(100deg, #f0b5c6, #d4b8e5);
+}
+body.dark-theme .coach-word,
+body.dark-theme .coach-example {
+  background: linear-gradient(145deg, #503b43, #45343b);
+  border-color: #805968;
+}
+body.dark-theme .coach-word strong,
+body.dark-theme .coach-example-hanzi { color: #f2b5c5; }
+body.dark-theme nav button.active {
+  color: #ffeaf0;
+  background: linear-gradient(180deg, #62434c, #49383d);
+}
+@media (prefers-reduced-motion: reduce) {
+  .coach-lesson-card, .coach-word, .coach-grammar-box, .coach-practice,
+  .hsk-question-card, .profile-section, .study-tools-card,
+  .learning-progress-stat, .pc-character-card {
+    transition: none !important;
+  }
+}
+</style>
+
 </head>
 <body>
 <div class="app">
@@ -3341,8 +3502,7 @@ tabs.forEach(btn => btn.addEventListener('click', () => {
   document.body.classList.toggle("profile-open", btn.dataset.tab === "profile");
   if (btn.dataset.tab === "profile") updateProfileAccess();
 
-  // Анимация запускается через Web Animations API после снятия hidden.
-  // Так переход работает и на телефонах, где hover отсутствует.
+  // Плавное появление вкладки и реальных карточек внутри неё.
   if (targetTab && !alreadyActive) {
     const reduceMotion = window.matchMedia &&
       window.matchMedia('(prefers-reduced-motion: reduce)').matches;
@@ -3350,24 +3510,26 @@ tabs.forEach(btn => btn.addEventListener('click', () => {
     if (!reduceMotion && typeof targetTab.animate === 'function') {
       targetTab.animate(
         [
-          { opacity: 0, transform: 'translate3d(0, 18px, 0)' },
-          { opacity: 1, transform: 'translate3d(0, 0, 0)' }
+          { opacity: 0, transform: 'translateY(22px)' },
+          { opacity: 1, transform: 'translateY(0)' }
         ],
-        { duration: 480, easing: 'cubic-bezier(.2,.75,.25,1)', fill: 'both' }
+        { duration: 560, easing: 'cubic-bezier(.16,1,.3,1)' }
       );
 
-      Array.from(targetTab.children).forEach((item, index) => {
+      const animatedItems = targetTab.querySelectorAll(
+        ':scope > .panel, :scope > .section, .coach-lesson-card, .coach-word, .coach-grammar-box, .coach-practice, .hsk-question-card, .hsk-result, .profile-section, .study-tools-card, .learning-progress-stat, .pc-character-card'
+      );
+      animatedItems.forEach((item, index) => {
         if (item.hidden || typeof item.animate !== 'function') return;
         item.animate(
           [
-            { opacity: 0, transform: 'translate3d(0, 14px, 0) scale(.985)' },
-            { opacity: 1, transform: 'translate3d(0, 0, 0) scale(1)' }
+            { opacity: 0, transform: 'translateY(16px) scale(.985)' },
+            { opacity: 1, transform: 'translateY(0) scale(1)' }
           ],
           {
-            duration: 420,
-            delay: 55 + index * 65,
-            easing: 'cubic-bezier(.2,.75,.25,1)',
-            fill: 'both'
+            duration: 480,
+            delay: Math.min(index * 55, 330),
+            easing: 'cubic-bezier(.16,1,.3,1)'
           }
         );
       });
