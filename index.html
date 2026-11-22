@@ -4574,6 +4574,7 @@ let activeCoachLesson=null, coachPracticePassed=false;
 let activeCoachQuestions=[], coachPracticeIndex=0, coachPracticeCorrect=0, coachPracticeAnswered=false;
 let activeCoachExamQuestions=[],coachExamIndex=0,coachExamCorrect=0,coachExamAnswered=false,coachExamSelected=null,coachExamAnswers=[],coachExamTimer=null,coachExamDeadline=0;
 function readCoachProgress(){try{return JSON.parse(localStorage.getItem(coachStorageKey)||'{}')}catch(e){return {}}}
+function readFavoriteLessons(){try{const value=JSON.parse(localStorage.getItem('photoChineseFavoriteLessons')||'[]');return Array.isArray(value)?value:[]}catch(e){return []}}
 function saveCoachProgress(data){localStorage.setItem(coachStorageKey,JSON.stringify(data));recordLearningActivity();updateLearningDashboard();window.photoChineseSync?.();}
 function currentCoachLevel(){return Number(document.getElementById('coachLevel').value)||1}
 function renderCoachCourse(){
