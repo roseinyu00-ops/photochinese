@@ -4062,6 +4062,7 @@ body.dark-theme .achievement-companion-reward{color:#dfabc4}
             <span class="profile-decoration" id="equippedDecoration"></span>
           </div>
           <p class="profile-subtitle" id="profileSubtitle">学习中文 ♡</p>
+          <p id="ownerRoleDiagnostic" style="margin:8px 0 0;font-size:12px;line-height:1.5;color:var(--muted);">Проверяем права владельца…</p>
         </div>
 
         <span class="profile-hsk-badge" id="profileHskBadge">HSK 1</span>
@@ -4366,7 +4367,18 @@ body.dark-theme .achievement-companion-reward{color:#dfabc4}
 <script>
 let photoChineseUser = null;
 let photoChineseRole = null;
+let photoChineseRoleDiagnostic = "Ожидаем авторизацию…";
+const PHOTOCHINESE_OWNER_ID = "b2b10979-18c6-406f-a2e3-b9800a290645";
 window.photoChineseIsLoggedIn = () => Boolean(photoChineseUser);
+
+function setOwnerRoleDiagnostic(message, isError = false) {
+  photoChineseRoleDiagnostic = message;
+  const node = document.getElementById("ownerRoleDiagnostic");
+  if (node) {
+    node.textContent = message;
+    node.style.color = isError ? "#e07878" : "var(--muted)";
+  }
+}
 
 function updateProfileAccess() {
   const profileTab = document.getElementById("profile");
@@ -4381,16 +4393,41 @@ function updateProfileAccess() {
   const ownerBadge = document.getElementById("profileOwnerBadge");
   if (adminButton) adminButton.hidden = !isOwner;
   if (ownerBadge) ownerBadge.hidden = !isOwner;
+  setOwnerRoleDiagnostic(photoChineseUser ? photoChineseRoleDiagnostic : "Войди в аккаунт владельца, чтобы проверить права.");
 }
 
 async function loadPhotoChineseRole(userId) {
   photoChineseRole = null;
+  setOwnerRoleDiagnostic("Проверяем роль…");
   updateProfileAccess();
-  const { data, error } = await window.photoChineseSupabase.from("admin_roles").select("role").eq("user_id", userId).maybeSingle();
-  if (error) { console.warn("Не удалось проверить роль PhotoChinese:", error); updateProfileAccess(); return null; }
-  photoChineseRole = data && data.role ? data.role : null;
-  updateProfileAccess();
-  return photoChineseRole;
+  if (userId !== PHOTOCHINESE_OWNER_ID) {
+    setOwnerRoleDiagnostic("Вход выполнен под другим аккаунтом. UID не совпадает с аккаунтом владельца.", true);
+  }
+  try {
+    const { data, error } = await window.photoChineseSupabase
+      .from("admin_roles").select("role").eq("user_id", userId).maybeSingle();
+    if (error) {
+      console.warn("Не удалось проверить роль PhotoChinese:", error);
+      setOwnerRoleDiagnostic("Ошибка чтения admin_roles: " + (error.message || error.code || "неизвестная ошибка"), true);
+      updateProfileAccess();
+      return null;
+    }
+    photoChineseRole = data && data.role ? data.role : null;
+    if (photoChineseRole === "owner") {
+      setOwnerRoleDiagnostic("✦ Права владельца подтверждены. Значок и панель должны быть доступны.");
+    } else if (userId === PHOTOCHINESE_OWNER_ID) {
+      setOwnerRoleDiagnostic("Аккаунт владельца распознан, но роль owner не найдена в admin_roles. Проверь запись в таблице.");
+    } else {
+      setOwnerRoleDiagnostic("Роль не назначена этому аккаунту.");
+    }
+    updateProfileAccess();
+    return photoChineseRole;
+  } catch (error) {
+    console.error("Ошибка проверки роли:", error);
+    setOwnerRoleDiagnostic("Не удалось связаться с admin_roles: " + (error.message || "ошибка сети"), true);
+    updateProfileAccess();
+    return null;
+  }
 }
 
 async function loadAdminUsers() {
@@ -7913,8 +7950,14 @@ document.getElementById("accountForm").addEventListener("submit", async function
 
   client.auth.onAuthStateChange((_event, session) => {
     photoChineseUser = session ? session.user : null;
-    if (!session) photoChineseRole = null;
-    updateProfileAccess();
+    if (!session) {
+      photoChineseRole = null;
+      setOwnerRoleDiagnostic("Войди в аккаунт владельца, чтобы проверить права.");
+      updateProfileAccess();
+    } else {
+      updateProfileAccess();
+      setTimeout(() => loadPhotoChineseRole(session.user.id), 0);
+    }
   });
 })();
 
