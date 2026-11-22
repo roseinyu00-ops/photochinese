@@ -2478,6 +2478,43 @@ body.dark-theme .coach-example {
   color: #ffeaf0;
 }
 
+
+/* Learning hub navigation */
+.learning-hub-intro{padding:24px 26px 12px}
+.learning-hub-kicker,.writing-trainer-kicker{font-size:11px;letter-spacing:1.8px;font-weight:800;color:#b56c88}
+.learning-hub-intro h1{margin:5px 0 7px}.learning-hub-intro h1 em{font-style:italic;color:#c66f91}
+.learning-hub-intro p{margin:0}
+.learning-subnav{display:flex;gap:9px;flex-wrap:wrap;margin:12px 0 18px;padding:7px;background:rgba(233,141,161,.10);border:1px solid var(--line);border-radius:17px}
+.learning-subtab{flex:1;min-width:130px;padding:12px 14px;border:1px solid transparent;border-radius:12px;background:transparent;color:var(--muted);font-weight:750;transition:background .2s,color .2s,box-shadow .2s}
+.learning-subtab span{margin-right:5px}
+.learning-subtab.active{background:#fff;color:#925066;border-color:#f0d5dd;box-shadow:0 4px 14px #6d34400d}
+.learning-view[hidden]{display:none!important}
+.writing-trainer-hero{background:linear-gradient(130deg,#fff 55%,#fff0f5);margin-bottom:16px}
+.writing-trainer-hero h2{font-size:25px;margin:5px 0}
+.writing-trainer-controls{max-width:420px;margin-top:18px}
+.writing-character-row{display:flex;gap:9px;align-items:center}
+.writing-character-row input{width:90px;height:54px;text-align:center;font-family:serif;font-size:32px;font-weight:700}
+.writing-character-row button{white-space:nowrap}
+.writing-practice-grid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:16px}
+.writing-step-card{display:flex;flex-direction:column;align-items:center;gap:12px}
+.writing-card-heading{width:100%;display:flex;align-items:center;justify-content:space-between}
+.writing-card-heading h3{font-size:16px;margin:3px 0}
+.writing-step-label{font-size:10px;letter-spacing:1.4px;color:#b56c88;font-weight:800}
+.writing-step-icon{font-size:24px}
+.writing-character-canvas{width:220px;height:220px;max-width:100%;display:grid;place-items:center;border:1px solid #f0dce2;border-radius:18px;background:linear-gradient(135deg,#fffafb,#fff2f6);overflow:hidden}
+.writing-character-canvas svg{max-width:100%;height:auto}
+.writing-feedback{width:100%;min-height:44px;padding:10px 12px;border-radius:11px;background:#fff4f7;color:#8d5368;font-size:13px}
+.writing-note{margin-top:16px;background:#fffafb}
+.writing-note strong{color:var(--ink)}.writing-note p{font-size:13px}
+body.dark-theme .learning-subnav{background:#382d34;border-color:#654953}
+body.dark-theme .learning-subtab{color:#d6b9c2}
+body.dark-theme .learning-subtab.active{background:#59414a;color:#ffeaf0;border-color:#805967;box-shadow:none}
+body.dark-theme .writing-trainer-hero{background:linear-gradient(130deg,#49383d,#453747);color:#fff1ed}
+body.dark-theme .writing-trainer-hero p,body.dark-theme .writing-note p{color:#e8c9d0}
+body.dark-theme .writing-character-canvas{background:linear-gradient(135deg,#49383d,#40343d);border-color:#76545d}
+body.dark-theme .writing-feedback{background:#49383d;color:#ffe1e8}
+body.dark-theme .writing-note{background:#49383d;border-color:#76545d}
+@media(max-width:650px){.learning-hub-intro{padding:16px 8px 8px}.learning-subtab{min-width:calc(50% - 6px);font-size:13px;padding:11px 8px}.writing-practice-grid{grid-template-columns:1fr}.writing-character-canvas{width:210px;height:210px}}
 </style>
 <style>
 .learning-progress-heading{display:flex;align-items:center;justify-content:space-between;gap:10px}
@@ -3447,8 +3484,8 @@ body.dark-theme #coach .coach-practice-option {
   <nav aria-label="Разделы">
     <button class="active" data-tab="learn">Изучение</button>
     <button data-tab="meme">Мемы</button>
-    <button data-tab="coach">ИИ-учитель</button>
-    <button data-tab="hsk">Уровень HSK</button>
+    <button data-tab="coach">Обучение</button>
+    <button data-tab="hsk">Тест HSK</button>
     <button data-tab="studytools">Мой словарь</button>
  <button data-tab="profile">Профиль</button>
   </nav>
@@ -3534,6 +3571,17 @@ body.dark-theme #coach .coach-practice-option {
 </section>
 
 <section id="coach" class="tab" hidden>
+  <div class="learning-hub-intro">
+    <div class="learning-hub-kicker">PHOTOCHINESE · ТВОЙ ПУТЬ В КИТАЙСКИЙ</div>
+    <h1>Обучение <em>с интересом</em></h1>
+    <p>Выбирай формат занятий и двигайся в своём темпе.</p>
+  </div>
+  <div class="learning-subnav" role="tablist" aria-label="Разделы обучения">
+    <button type="button" class="learning-subtab active" data-learning-view="course" role="tab" aria-selected="true"><span>📚</span> Курс HSK</button>
+    <button type="button" class="learning-subtab" data-learning-view="teacher" role="tab" aria-selected="false"><span>🤖</span> ИИ-учитель</button>
+    <button type="button" class="learning-subtab" data-learning-view="writing" role="tab" aria-selected="false"><span>✍️</span> Тренажёр иероглифов</button>
+  </div>
+  <div id="learningView-course" class="learning-view">
   <div class="panel section" id="coachFindPanel">
     <h2>Найти урок или слово</h2>
     <p class="small">Поиск по всем уровням HSK, названиям уроков, словам, пиньиню и переводам.</p>
@@ -3627,7 +3675,9 @@ body.dark-theme #coach .coach-practice-option {
       <div id="coachHelpAnswer" class="result" hidden></div>
     </div>
   </div>
-  <div class="panel section">
+    </div>
+  <div id="learningView-teacher" class="learning-view" hidden>
+<div class="panel section">
     <h2>Мой преподаватель</h2>
     <p class="small">Выбери стиль обратной связи — содержание уроков от этого не меняется.</p>
     <div class="teacher" id="teacherChoices">
@@ -3640,6 +3690,39 @@ body.dark-theme #coach .coach-practice-option {
     <div class="actions"><button class="primary" id="checkBtn" type="button">Разобрать с преподавателем</button></div>
     <div id="coachResult" class="result" hidden></div>
     <p class="small">Сейчас это учебный помощник на основе подготовленных уроков и правил, а не подключённая генеративная языковая модель. Свободная проверка любых фраз появится после отдельной ИИ-интеграции.</p>
+  </div>
+  </div>
+  <div id="learningView-writing" class="learning-view" hidden>
+    <div class="panel writing-trainer-hero">
+      <div class="writing-trainer-kicker">ПИШИ · ПОВТОРЯЙ · ЗАПОМИНАЙ</div>
+      <h2>Тренажёр иероглифов</h2>
+      <p>Смотри, как правильно строится иероглиф, а затем повторяй его черты на поле. Тренажёр проверяет порядок и направление написания.</p>
+      <div class="writing-trainer-controls">
+        <label for="writingCharacter">Иероглиф для практики</label>
+        <div class="writing-character-row">
+          <input id="writingCharacter" type="text" value="爱" maxlength="1" autocomplete="off" aria-label="Иероглиф для практики">
+          <button type="button" class="secondary" id="writingLoadCharacter">Выбрать</button>
+        </div>
+        <p class="small">Пока можно вводить по одному китайскому иероглифу. Доступность данных черт зависит от выбранного знака.</p>
+      </div>
+    </div>
+    <div class="writing-practice-grid">
+      <div class="panel writing-step-card">
+        <div class="writing-card-heading"><div><span class="writing-step-label">ШАГ 1</span><h3>Посмотри порядок черт</h3></div><span class="writing-step-icon">👀</span></div>
+        <div id="writingDemoCanvas" class="writing-character-canvas" aria-label="Анимация написания иероглифа"></div>
+        <button type="button" class="secondary" id="writingPlayDemo">▶ Показать написание</button>
+      </div>
+      <div class="panel writing-step-card">
+        <div class="writing-card-heading"><div><span class="writing-step-label">ШАГ 2</span><h3>Повтори самостоятельно</h3></div><span class="writing-step-icon">✍️</span></div>
+        <div id="writingQuizCanvas" class="writing-character-canvas writing-quiz-canvas" aria-label="Поле для написания иероглифа"></div>
+        <button type="button" class="primary" id="writingStartPractice">Начать практику</button>
+        <div id="writingFeedback" class="writing-feedback" role="status" aria-live="polite">Нажми «Начать практику», чтобы попробовать написать иероглиф.</div>
+      </div>
+    </div>
+    <div class="panel writing-note">
+      <strong>Как оценивается написание?</strong>
+      <p>Проверяется последовательность и направление черт по данным Hanzi Writer. Это учебная проверка, а не экспертная оценка каллиграфии: небольшие отличия почерка допустимы.</p>
+    </div>
   </div>
 </section>
 
@@ -7554,6 +7637,65 @@ window.addEventListener("keydown", function(event) {
   applyTextSize(localStorage.getItem('photoChineseTextSize')||'normal');
   applySound(localStorage.getItem('photoChineseSoundEnabled')!=='false');
   })();
+</script>
+
+<script>
+(function initLearningHub(){
+  const tabs=[...document.querySelectorAll('[data-learning-view]')];
+  function showLearningView(name){
+    tabs.forEach(tab=>{
+      const active=tab.dataset.learningView===name;
+      tab.classList.toggle('active',active);
+      tab.setAttribute('aria-selected',active?'true':'false');
+    });
+    document.querySelectorAll('.learning-view').forEach(view=>{
+      view.hidden=view.id!=='learningView-'+name;
+    });
+    if(name==='writing' && !window.photoChineseWritingReady) loadWritingCharacter();
+  }
+  tabs.forEach(tab=>tab.addEventListener('click',()=>showLearningView(tab.dataset.learningView)));
+  window.photoChineseShowLearningView=showLearningView;
+
+  let writingDemo=null, writingQuiz=null, writingCharacter='爱';
+  const input=document.getElementById('writingCharacter');
+  const demo=document.getElementById('writingDemoCanvas');
+  const quiz=document.getElementById('writingQuizCanvas');
+  const feedback=document.getElementById('writingFeedback');
+  function validCharacter(value){return [...value.trim()].length===1 && /\p{Script=Han}/u.test(value.trim());}
+  async function loadWritingCharacter(){
+    if(!validCharacter(input.value)){feedback.textContent='Введи один китайский иероглиф.';return;}
+    writingCharacter=input.value.trim();
+    demo.innerHTML='';quiz.innerHTML='';writingDemo=null;writingQuiz=null;
+    feedback.textContent='Загружаем данные о чертах…';
+    if(!window.HanziWriter){feedback.textContent='Модуль написания не загрузился. Проверь подключение к интернету.';return;}
+    const data=await loadStrokeData(writingCharacter);
+    if(!data || !data.strokes?.length){feedback.textContent='Для этого иероглифа пока не удалось найти данные о порядке черт.';return;}
+    writingDemo=HanziWriter.create('writingDemoCanvas',writingCharacter,{width:220,height:220,padding:12,showOutline:true,showCharacter:true,strokeAnimationSpeed:1,delayBetweenStrokes:260,charDataLoader:(ch,done)=>loadStrokeData(ch).then(result=>{if(result)done(result);})});
+    feedback.textContent='Готово! Сначала посмотри анимацию, затем попробуй написать знак самостоятельно.';
+    window.photoChineseWritingReady=true;
+  }
+  document.getElementById('writingLoadCharacter').addEventListener('click',loadWritingCharacter);
+  input.addEventListener('keydown',event=>{if(event.key==='Enter')loadWritingCharacter();});
+  document.getElementById('writingPlayDemo').addEventListener('click',()=>{
+    if(writingDemo){writingDemo.animateCharacter();feedback.textContent='Посмотри на порядок и направление каждой черты.';}
+    else feedback.textContent='Сначала выбери иероглиф с доступными данными.';
+  });
+  document.getElementById('writingStartPractice').addEventListener('click',async()=>{
+    if(!writingDemo){await loadWritingCharacter();if(!writingDemo)return;}
+    quiz.innerHTML='';writingQuiz=null;
+    feedback.textContent='Пиши черты по очереди. Следи за направлением и порядком.';
+    writingQuiz=HanziWriter.create('writingQuizCanvas',writingCharacter,{width:220,height:220,padding:12,showOutline:false,showCharacter:false,showHintAfterMisses:2,highlightOnComplete:true,charDataLoader:(ch,done)=>loadStrokeData(ch).then(result=>{if(result)done(result);})});
+    writingQuiz.quiz({onComplete:summary=>{
+      
+      feedback.textContent='Отлично! Ты завершила практику для '+writingCharacter+'. Правильных черт: '+summary.total+'/'+summary.total+'. Можешь повторить ещё раз или выбрать другой знак.';
+    },onMistake:(strokeData,strokeNum)=>{
+      feedback.textContent='Попробуй ещё раз: проверь направление и место начала черты.';
+    },onCorrectStroke:(strokeData,strokeNum)=>{
+      feedback.textContent='Верно! Черта '+(strokeNum+1)+' выполнена правильно.';
+    }});
+  });
+  loadWritingCharacter();
+})();
 </script>
 </body>
 </html>
