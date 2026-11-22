@@ -8223,12 +8223,35 @@ window.addEventListener("keydown", function(event) {
       const unique=new Map();combined.forEach(x=>{const key=x.zh+'|'+x.ru;if(!unique.has(key))unique.set(key,x);});
       return [...unique.values()];
     }
+    // Не повторяем уже правильно решённые фразы: прогресс хранится отдельно для каждого режима.
+    const completedPhraseStorageKey='photoChineseMiniGamesCompletedPhrases';
+    function getCompletedPhrases(){
+      try{return JSON.parse(localStorage.getItem(completedPhraseStorageKey)||'{}')||{};}catch(e){return {};}
+    }
+    function getAvailablePhrases(gameMode,pool){
+      const completed=getCompletedPhrases();
+      const done=new Set(Array.isArray(completed[gameMode])?completed[gameMode]:[]);
+      return pool.filter(item=>!done.has(item.zh));
+    }
+    function markPhraseCompleted(gameMode,phrase){
+      if(!phrase||!phrase.zh)return;
+      const completed=getCompletedPhrases();
+      const done=new Set(Array.isArray(completed[gameMode])?completed[gameMode]:[]);
+      done.add(phrase.zh);
+      completed[gameMode]=[...done];
+      try{localStorage.setItem(completedPhraseStorageKey,JSON.stringify(completed));}catch(e){}
+    }
+    function noMorePhrases(){
+      prompt.textContent='Ты прошла все фразы из этой подборки!';
+      feedbackText('Повторять уже решённые задания не будем. Выбери другой уровень или режим игры.','success');
+      next.disabled=true;
+    }
     function updateTotal(){if(totalScoreEl)totalScoreEl.textContent=total;}
     function feedbackText(text,type=''){feedback.textContent=text;feedback.className='games-feedback'+(type?' '+type:'');}
     function button(text,cls,fn){const b=document.createElement('button');b.type='button';b.className=cls;b.textContent=text;b.addEventListener('click',fn);return b;}
     function finish(correct,explanation){
       if(answered)return;answered=true;
-      if(correct){score+=10;total+=10;streak++;roundScore.textContent=score;updateTotal();try{localStorage.setItem('photoChineseMiniGamesScore',String(total));localStorage.setItem('photoChineseMiniGamesBestStreak',String(Math.max(streak,Number(localStorage.getItem('photoChineseMiniGamesBestStreak')||0))));}catch(e){}feedbackText('Верно! +10 очков · серия '+streak+'. '+(explanation||''),'success');}
+      if(correct){if(current&&(mode==='build'||mode==='order'||(mode==='missing'&&getLevel()!=='learned')))markPhraseCompleted(mode,current);score+=10;total+=10;streak++;roundScore.textContent=score;updateTotal();try{localStorage.setItem('photoChineseMiniGamesScore',String(total));localStorage.setItem('photoChineseMiniGamesBestStreak',String(Math.max(streak,Number(localStorage.getItem('photoChineseMiniGamesBestStreak')||0))));}catch(e){}feedbackText('Верно! +10 очков · серия '+streak+'. '+(explanation||''),'success');}
       else{streak=0;feedbackText('Пока не совсем. '+(explanation||'Попробуй ещё раз в следующем раунде.'),'error');}
       next.disabled=false;
       area.querySelectorAll('button').forEach(b=>b.disabled=true);
@@ -8244,7 +8267,9 @@ window.addEventListener("keydown", function(event) {
       if(mode==='order')orderTask();
     }
     function buildTask(){
-      const pool=levelPhrases();current=shuffle(pool)[0];
+      const pool=getAvailablePhrases('build',levelPhrases());
+      if(!pool.length){noMorePhrases();return;}
+      current=shuffle(pool)[0];
       prompt.textContent='Собери фразу по переводу: «'+current.ru+'»';
       const assembled=document.createElement('div');assembled.className='games-order-bank';
       const choices=document.createElement('div');choices.className='games-order-bank';choices.style.borderTop='0';choices.style.paddingTop='0';
@@ -8288,7 +8313,9 @@ window.addEventListener("keydown", function(event) {
         shuffle(options).forEach(ch=>area.appendChild(button(ch,'games-answer',()=>finish(ch===target,'Слово: '+personal.zh+' · '+personal.pinyin))));
         return;
       }
-      current=shuffle(levelPhrases())[0];
+      const available=getAvailablePhrases('missing',levelPhrases());
+      if(!available.length){noMorePhrases();return;}
+      current=shuffle(available)[0];
       const chars=[...current.zh].filter(ch=>/\p{Script=Han}/u.test(ch));const target=chars[Math.floor(Math.random()*chars.length)];
       const hidden=current.zh.replace(target,'＿');
       prompt.textContent='Какой иероглиф пропущен? Перевод: '+current.ru;
@@ -8298,7 +8325,9 @@ window.addEventListener("keydown", function(event) {
       shuffle(unique).forEach(ch=>area.appendChild(button(ch,'games-answer',()=>finish(ch===target,'Полная фраза: '+current.zh))));
     }
     function orderTask(){
-      current=shuffle(levelPhrases().filter(p=>p.parts.length>=3))[0]||shuffle(levelPhrases())[0];
+      const pool=getAvailablePhrases('order',levelPhrases());
+      if(!pool.length){noMorePhrases();return;}
+      current=shuffle(pool.filter(p=>p.parts.length>=3))[0]||shuffle(pool)[0];
       prompt.textContent='Расставь слова в правильном порядке: «'+current.ru+'»';
       const slots=document.createElement('div');slots.className='games-order-bank';const bank=document.createElement('div');bank.className='games-order-bank';bank.style.borderTop='0';bank.style.paddingTop='0';
       const chosen=[];
