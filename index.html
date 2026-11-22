@@ -2846,6 +2846,7 @@ body.profile-editing #profileAvatar::after {
     <section id="studyViewDictionary" class="study-tools-view panel" aria-label="Личный словарь">
       <h2>Все твои слова</h2>
       <p>Сюда автоматически попадают слова, отмеченные как выученные в ИИ-учителе, и сохранённые иероглифы.</p>
+      <p id="studyDictionarySyncStatus" class="study-tools-sync-note" aria-live="polite"></p>
       <label for="studyDictionarySearch">Поиск по иероглифу, пиньиню или переводу</label>
       <input id="studyDictionarySearch" class="study-tools-input" type="search" placeholder="Например, 朋友 или друг">
       <label for="studyDictionaryLevel">Уровень</label>
@@ -2912,6 +2913,7 @@ body.profile-editing #profileAvatar::after {
 </script>
 <script>
 let photoChineseUser = null;
+window.photoChineseIsLoggedIn = () => Boolean(photoChineseUser);
 
 function updateProfileAccess() {
   const profileTab = document.getElementById("profile");
