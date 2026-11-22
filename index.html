@@ -3989,19 +3989,19 @@ body.dark-theme .security-status,body.dark-theme .security-secret{background:#49
   <div class="panel hsk-diagnostic">
     <div class="hsk-kicker">PHOTOCHINESE · ДИАГНОСТИКА</div>
     <h1>Определи свой уровень HSK</h1>
-    <p>48 заданий — по 8 на каждый уровень HSK. Вопросы проверяют чтение, лексику, грамматику и понимание контекста; для подтверждения ступени нужно набрать минимум 6 из 8. В конце ты получишь ориентировочную оценку от HSK 1 до HSK 6.</p>
+    <p>72 задания — по 12 на каждый уровень HSK. Вопросы проверяют лексику, грамматику, чтение контекста, оттенки значений и устойчивые конструкции; для подтверждения ступени нужно набрать минимум 9 из 12. В конце ты получишь ориентировочную оценку от HSK 1 до HSK 6.</p>
     <div id="hskIntro" class="hsk-intro">
       <div class="hsk-intro-stats">
-        <div><strong>30</strong><span>заданий</span></div>
+        <div><strong>72</strong><span>задания</span></div>
         <div><strong>6</strong><span>ступеней сложности</span></div>
-        <div><strong>≈ 10–15</strong><span>минут</span></div>
+        <div><strong>≈ 20–30</strong><span>минут</span></div>
       </div>
       <p class="small">Отвечай самостоятельно, не пользуясь словарём. Это внутренняя диагностическая проверка PhotoChinese, а не официальный экзамен и не точная сертификация уровня.</p>
       <button class="primary" id="startHskDiagnostic" type="button">Начать тест</button>
       <div id="hskPreviousResult" class="small" aria-live="polite"></div>
     </div>
     <div id="hskTest" hidden>
-      <div class="hsk-test-top"><span id="hskQuestionNumber">Задание 1 из 48</span><span id="hskQuestionBand">HSK 1</span></div>
+      <div class="hsk-test-top"><span id="hskQuestionNumber">Задание 1 из 72</span><span id="hskQuestionBand">HSK 1</span></div>
       <div class="hsk-progress-track"><div id="hskProgressFill"></div></div>
       <div class="hsk-question-card">
         <div id="hskQuestionType" class="hsk-question-type">Лексика</div>
@@ -6631,6 +6631,32 @@ const hskDiagnosticQuestions=[
 {level:6,type:'Логика и оттенки',q:'Выбери наиболее точное продолжение: 这项研究固然重要，……',py:'',opts:['但也不能忽视实际应用。','所以毫无疑问不重要。','除非因此没有意义。','以免研究更加重要。'],a:0,why:'固然……但…… признаёт один факт, но затем вводит ограничение или противопоставление: исследование важно, однако нельзя игнорировать практическое применение.'},
 {level:6,type:'Лексика · модальность',q:'Что означает 未必 в предложении 他经验丰富，未必每次都能成功？',py:'',opts:['обязательно добьётся успеха','не обязательно; вовсе не факт, что','никогда не пытался','успел раньше остальных'],a:1,why:'未必 выражает отсутствие гарантии: даже большой опыт не означает, что успех будет каждый раз.'},
 {level:6,type:'Грамматика · уступка',q:'Какой смысл передаёт 不管条件多么困难，我们都要完成任务？',py:'',opts:['Мы выполним задачу только при лёгких условиях.','Какими бы трудными ни были условия, мы всё равно должны выполнить задачу.','Мы не знаем, трудны ли условия.','Мы выполнили задачу, потому что условия были лёгкими.'],a:1,why:'不管……都…… означает «независимо от того…, всё равно…» и подчёркивает неизменность решения.'}
+
+{level:1,type:'Счётные слова · контекст',q:'В магазине спрашивают: 你要买几___？ Речь идёт о билетах.',py:'',opts:['张','本','条','位'],a:0,why:'Для плоских предметов, в том числе билетов, используется счётное слово 张: 几张票 — сколько билетов.'},
+{level:1,type:'Порядок слов · время',q:'Выбери естественный вариант: «Моя мама сегодня дома готовит ужин».',py:'',opts:['我妈妈今天在家做晚饭。','我妈妈做晚饭今天在家。','今天我妈妈做在家晚饭。','我妈妈在家今天晚饭做。'],a:0,why:'Обстоятельство времени ставится перед сказуемым, а место действия обычно располагается перед глаголом: 今天 + 在家 + 做晚饭.'},
+{level:1,type:'Грамматика · 在 и 是',q:'Заполни пропуск: 我哥哥___医院工作，不是医生。',py:'',opts:['是','在','有','给'],a:1,why:'在医院工作 означает «работать в больнице». 是 связывает подлежащее с именной частью сказуемого, а здесь нужно обозначить место действия.'},
+{level:1,type:'Понимание вопроса',q:'Друг отвечает: 我不去了，今天有点儿不舒服。 Какой вопрос наиболее логично предшествовал бы этому ответу?',py:'',opts:['你今天为什么不去？','你昨天去哪儿了？','你身体怎么样了？','你几点到？'],a:0,why:'Ответ сообщает причину отказа идти сегодня, поэтому ему соответствует вопрос «Почему ты сегодня не идёшь?».'},
+{level:2,type:'Дополнение результата · контекст',q:'我找了半天，终于___了我的手机。',py:'',opts:['找到','找过','找着了过','找得'],a:0,why:'找到 обозначает достигнутый результат поиска — предмет найден. 找过 говорит об опыте поиска, а не о результате.'},
+{level:2,type:'Аспект · опыт',q:'Фраза 我看了这部电影 и фраза 我看过这部电影 отличаются тем, что 看过 обычно подчёркивает…',py:'',opts:['сам факт наличия такого опыта','что просмотр происходит прямо сейчас','что фильм обязательно досмотрен сегодня','что действие ещё не началось'],a:0,why:'过 после глагола обозначает пережитый опыт: «я уже смотрел(а) этот фильм». 了 чаще сообщает о конкретном завершённом действии или изменении ситуации.'},
+{level:2,type:'Сравнение · значение',q:'Что означает предложение 这家店没有那家店贵？',py:'',opts:['Этот магазин дороже того.','Этот магазин не такой дорогой, как тот.','Оба магазина стоят одинаково.','Этот магазин совсем не дорогой.'],a:1,why:'Модель A 没有 B + признак означает, что A уступает B по этому признаку: этот магазин не такой дорогой, как тот.'},
+{level:2,type:'Частицы · оттенок',q:'Выбери наиболее естественное продолжение: 你怎么___没吃饭？饭都凉了。',py:'',opts:['还','才','又','再'],a:0,why:'还没吃饭 означает «всё ещё не поел(а)». Частица подчёркивает, что ожидаемое действие до сих пор не произошло.'},
+{level:3,type:'Результативное дополнение',q:'请把窗户___，外面太吵了。',py:'',opts:['关上','关着','关过','关得'],a:0,why:'关上 обозначает результативное действие — закрыть окно. 关着 описывает уже существующее состояние «закрыто».'},
+{level:3,type:'Дополнение степени',q:'Выбери грамматически правильный вариант: «Она очень хорошо говорит по-китайски».',py:'',opts:['她汉语说得很好。','她说汉语很得好。','她汉语很好说。','她说得汉语很好。'],a:0,why:'Дополнение степени с 得 ставится после глагола: глагол + 得 + характеристика. Здесь 说得很好.'},
+{level:3,type:'Конструкция 除了',q:'Заполни пропуск: ___中文以外，他还会说日语和韩语。',py:'',opts:['除了','由于','按照','关于'],a:0,why:'除了……以外…… вводит исключение или дополнительный элемент: «помимо китайского, он ещё говорит по-японски и по-корейски».'},
+{level:3,type:'Понимание оттенка',q:'Что означает 我差点儿忘了今天有考试？',py:'',opts:['Я действительно забыл(а) об экзамене и не пришёл(ла).','Я чуть не забыл(а), что сегодня экзамен.','Я заранее отменил(а) сегодняшний экзамен.','Я вспомнил(а) об экзамене только после его окончания.'],a:1,why:'差点儿表示 действие едва не произошло, но в данном контексте не произошло: говорящий почти забыл об экзамене.'},
+{level:4,type:'Уступка · связки',q:'Заполни пропуск: ___大家都反对，他还是决定承担责任。',py:'',opts:['尽管','既然','由于','除非'],a:0,why:'尽管……还是…… выражает уступку: несмотря на возражения остальных, он всё равно решил взять ответственность на себя.'},
+{level:4,type:'Причина и следствие',q:'Выбери наиболее логичную связку: 设备突然出了故障，___会议不得不推迟。',py:'',opts:['因此','即使','反而','否则'],a:0,why:'因此 вводит следствие: оборудование неожиданно сломалось, поэтому встречу пришлось отложить.'},
+{level:4,type:'Грамматика · 既然 и 即使',q:'Какое предложение выражает уже установленный факт и вывод из него?',py:'',opts:['既然合同已经签了，我们就按约定执行。','即使合同已经签了，我们也按约定执行。','除非合同已经签了，我们也按约定执行。','与其合同已经签了，不如按约定执行。'],a:0,why:'既然……就…… связывает признанный факт с логичным решением. 即使……也…… выражает гипотетическое уступительное условие.'},
+{level:4,type:'Лексика · оттенок',q:'В предложении 他本来答应参加，临时却改变了主意 слово 却 подчёркивает…',py:'',opts:['ожидаемое подтверждение','контраст с тем, что ожидалось ранее','причину изменения решения','последовательность двух одинаковых действий'],a:1,why:'却 вводит противопоставление ожиданию: он обещал участвовать, но неожиданно передумал.'},
+{level:5,type:'Устойчивые конструкции',q:'Заполни пропуск: ___双方都愿意让步，谈判就很难取得进展。',py:'',opts:['除非','既然','即使','不但'],a:0,why:'除非……才…… или 除非……否则…… задаёт необходимое условие. Здесь смысл: если только обе стороны не готовы уступить, переговоры вряд ли продвинутся.'},
+{level:5,type:'Лексика · точность',q:'Выбери наиболее точное значение 有待 в предложении 具体方案还有待进一步讨论。',py:'',opts:['уже окончательно решено','ещё предстоит; требует дальнейшего','случайно произошло','не имеет никакого отношения'],a:1,why:'有待 означает, что вопрос ещё нуждается в рассмотрении или дальнейших действиях: конкретный план ещё предстоит обсудить.'},
+{level:5,type:'Грамматика · условие',q:'Выбери правильное продолжение: 一旦发现数据有误，……',py:'',opts:['就应该立即更正。','即使立即更正。','反而不必更正。','与其立即更正。'],a:0,why:'一旦……就…… обозначает условие, после наступления которого следует закономерное действие: как только обнаружится ошибка, её нужно исправить.'},
+{level:5,type:'Лексика · оттенок оценки',q:'Что подразумевает фраза 这个要求未免太苛刻了？',py:'',opts:['Требование, возможно, слишком суровое.','Требование оказалось неожиданно простым.','Требование обязательно нужно выполнить.','Требование уже давно отменили.'],a:0,why:'未免 часто выражает оценку чрезмерности: «это, пожалуй, слишком строго/жёстко».'},
+{level:6,type:'Книжная лексика',q:'Выбери значение 俨然 в предложении 他俨然成了这个团队的核心人物。',py:'',opts:['едва ли; почти невозможно','как будто; прямо-таки, явно принимая вид','временно; на короткое время','втайне; не привлекая внимания'],a:1,why:'俨然 описывает впечатление, что кто-то или что-то явно приобрело определённый вид или статус: он прямо-таки стал центральной фигурой команды.'},
+{level:6,type:'Логика аргументации',q:'Заполни пропуск: 证据尚不充分，___不能轻易下结论。',py:'',opts:['因而','况且','反之','何尝'],a:0,why:'因而 вводит логическое следствие: поскольку доказательств пока недостаточно, поэтому нельзя поспешно делать вывод.'},
+{level:6,type:'Лексика · ограничение',q:'Что означает 无非 в предложении 他这么做无非是想引起大家的注意？',py:'',opts:['не только; кроме того','не что иное, как; всего лишь','несмотря на это','в любом случае, без исключения'],a:1,why:'无非 сводит мотив к единственному объяснению: он сделал это всего лишь для того, чтобы привлечь внимание.'},
+{level:6,type:'Устойчивое выражение',q:'Какой смысл передаёт 事到如今，再后悔也无济于事？',py:'',opts:['Сейчас ещё можно без труда всё исправить.','На данном этапе сожаления уже ничего не изменят.','Чем позже решение, тем оно полезнее.','Нужно сначала пожалеть, а затем действовать.'],a:1,why:'无济于事 означает «не помочь делу, оказаться бесполезным». Когда всё уже дошло до нынешнего этапа, сожаления ничего не исправят.'}
+
 ];
 let hskDiagnosticIndex=0,hskDiagnosticAnswers=[],hskSuggestedLevel=1;
 function renderHskDiagnosticQuestion(){
@@ -6663,7 +6689,7 @@ function finishHskDiagnostic(){
  const scores=[0,0,0,0,0,0],totals=[0,0,0,0,0,0];
  hskDiagnosticQuestions.forEach((q,i)=>{totals[q.level-1]++;if(hskDiagnosticAnswers[i]===q.a)scores[q.level-1]++});
  let passed=0;
- for(let i=0;i<6;i++){if(scores[i]>=6)passed=i+1;else break;}
+ for(let i=0;i<6;i++){if(scores[i]>=9)passed=i+1;else break;}
  hskSuggestedLevel=Math.max(1,passed);
  const totalCorrect=scores.reduce((a,b)=>a+b,0);
  document.getElementById('hskTest').hidden=true;
@@ -6673,8 +6699,8 @@ function finishHskDiagnostic(){
  document.getElementById('hskResultDescription').textContent=passed===0?'Пока не набран порог даже на первой ступени. Это нормально: тест помогает выбрать точку старта.':'Ты уверенно справился(ась) с заданиями до HSK '+passed+'. Следующая ступень пока требует дополнительной практики.';
  document.getElementById('hskResultScore').textContent=totalCorrect+' из '+hskDiagnosticQuestions.length+' правильных ответов';
  document.getElementById('hskLevelBreakdown').innerHTML='';
- scores.forEach((score,i)=>{const row=document.createElement('div');row.className='hsk-level-row';const label=document.createElement('strong');label.textContent='HSK '+(i+1);const bar=document.createElement('div');bar.className='hsk-level-bar';const fill=document.createElement('span');fill.style.width=(score/totals[i]*100)+'%';bar.appendChild(fill);const status=document.createElement('span');status.className='hsk-level-status';status.textContent=score+'/'+totals[i]+' '+(score>=6?'· пройден':'· повторить');row.append(label,bar,status);document.getElementById('hskLevelBreakdown').appendChild(row)});
- document.getElementById('hskResultAdvice').textContent='Для подтверждения каждой ступени нужно правильно выполнить не менее 6 из 8 заданий этого уровня. В диагностике нет подсказок с пиньинем и мгновенного показа правильного ответа. Оценка приблизительная: тест проверяет чтение, лексику, грамматику и понимание контекста.';
+ scores.forEach((score,i)=>{const row=document.createElement('div');row.className='hsk-level-row';const label=document.createElement('strong');label.textContent='HSK '+(i+1);const bar=document.createElement('div');bar.className='hsk-level-bar';const fill=document.createElement('span');fill.style.width=(score/totals[i]*100)+'%';bar.appendChild(fill);const status=document.createElement('span');status.className='hsk-level-status';status.textContent=score+'/'+totals[i]+' '+(score>=9?'· пройден':'· повторить');row.append(label,bar,status);document.getElementById('hskLevelBreakdown').appendChild(row)});
+ document.getElementById('hskResultAdvice').textContent='Для подтверждения каждой ступени нужно правильно выполнить не менее 9 из 12 заданий этого уровня. В диагностике нет подсказок с пиньинем и мгновенного показа правильного ответа. Оценка приблизительная: тест проверяет чтение, лексику, грамматику и понимание контекста.';
  localStorage.setItem('photoChineseHskDiagnostic',JSON.stringify({level:hskSuggestedLevel,score:totalCorrect,total:hskDiagnosticQuestions.length,scores,at:new Date().toISOString()}));updateLearningDashboard();if(typeof updateAchievements==='function')updateAchievements();if(typeof renderCompanions==='function')renderCompanions();window.photoChineseSync?.();
  const badge=document.getElementById('profileHskBadge');if(badge)badge.textContent='HSK '+hskSuggestedLevel;
  document.getElementById('applyHskLevel').textContent='Открыть курс HSK '+hskSuggestedLevel+' в ИИ-учителе';
@@ -6685,7 +6711,7 @@ document.getElementById('quitHskDiagnostic').addEventListener('click',()=>{if(!c
 document.getElementById('retryHskDiagnostic').addEventListener('click',startHskDiagnostic);
 document.getElementById('applyHskLevel').addEventListener('click',()=>{document.getElementById('coachLevel').value=String(hskSuggestedLevel);document.getElementById('coachLessonPanel').hidden=true;document.getElementById('coachExamPanel').hidden=true;renderCoachCourse();document.querySelector('nav button[data-tab="coach"]').click();document.getElementById('coachLevelNotice').textContent='Тест предложил HSK '+hskSuggestedLevel+'. Ты можешь изменить уровень вручную в любое время.'});
 const previousHskDiagnostic=localStorage.getItem('photoChineseHskDiagnostic');
-if(previousHskDiagnostic){try{const saved=JSON.parse(previousHskDiagnostic);if(saved.level){hskSuggestedLevel=saved.level;document.getElementById('hskPreviousResult').textContent='Последний результат: HSK '+saved.level+' · '+saved.score+'/'+(saved.total||30)+'. Новый тест можно пройти повторно.';document.getElementById('profileHskBadge').textContent='HSK '+saved.level;}}catch(e){}}
+if(previousHskDiagnostic){try{const saved=JSON.parse(previousHskDiagnostic);if(saved.level){hskSuggestedLevel=saved.level;document.getElementById('hskPreviousResult').textContent='Последний результат: HSK '+saved.level+' · '+saved.score+'/'+(saved.total||48)+'. Новый тест можно пройти повторно.';document.getElementById('profileHskBadge').textContent='HSK '+saved.level;}}catch(e){}}
 document.getElementById('openHskTest').addEventListener('click',()=>{
  document.querySelector('nav button[data-tab="hsk"]').click();
  document.getElementById('hsk').scrollIntoView({behavior:'smooth',block:'start'});
