@@ -7684,8 +7684,8 @@ window.addEventListener("keydown", function(event) {
   function collectWritingWords(){
     const found=new Map();
     const add=(word,info,source)=>{
-      if(!word || !/\\p{Script=Han}/u.test(word))return;
-      const chars=[...word].filter(ch=>/\\p{Script=Han}/u.test(ch));
+      if(!word || !/\p{Script=Han}/u.test(word))return;
+      const chars=[...word].filter(ch=>/\p{Script=Han}/u.test(ch));
       if(!chars.length)return;
       const old=found.get(word);
       if(!old || (source==='Курс HSK' && old.source!=='Курс HSK'))found.set(word,{word,pinyin:info?.p||info?.pinyin||'',meaning:info?.m||info?.r||info?.meaning||info?.translation||'',source});
@@ -7714,7 +7714,7 @@ window.addEventListener("keydown", function(event) {
   }
   function selectWritingWord(word){
     selectedWord=word;wordCharacters.innerHTML='';
-    [...word].filter(ch=>/\\p{Script=Han}/u.test(ch)).forEach(ch=>{
+    [...word].filter(ch=>/\p{Script=Han}/u.test(ch)).forEach(ch=>{
       const button=document.createElement('button');button.type='button';button.className='writing-character-chip';button.textContent=ch;button.title='Тренироваться с иероглифом '+ch;
       button.addEventListener('click',()=>{
         document.querySelectorAll('.writing-character-chip').forEach(el=>el.classList.toggle('selected',el===button));
