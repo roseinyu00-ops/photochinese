@@ -8267,8 +8267,9 @@ document.getElementById("accountForm").addEventListener("submit", async function
     }
 
   } catch (error) {
-    message.textContent = "Не удалось загрузить профиль. Проверь подключение.";
-    console.error(error);
+    const detail = error && (error.message || error.code || error.details);
+    message.textContent = "Ошибка после входа: " + (detail || "неизвестная ошибка. Открой консоль браузера для подробностей.");
+    console.error("PhotoChinese login/profile error:", error);
 
   } finally {
     submit.disabled = false;
