@@ -7682,20 +7682,18 @@ window.addEventListener("keydown", function(event) {
   const wordCharacters=document.getElementById('writingWordCharacters');
   let selectedWord='';
   function collectWritingWords(){
-    const found=new Map();
-    const add=(word,info,source)=>{
-      if(!word || !/\p{Script=Han}/u.test(word))return;
-      const chars=[...word].filter(ch=>/\p{Script=Han}/u.test(ch));
-      if(!chars.length)return;
-      const old=found.get(word);
-      if(!old || (source==='Курс HSK' && old.source!=='Курс HSK'))found.set(word,{word,pinyin:info?.p||info?.pinyin||'',meaning:info?.m||info?.r||info?.meaning||info?.translation||'',source});
-    };
-    if(typeof wordDictionary!=='undefined')Object.entries(wordDictionary).forEach(([w,d])=>add(w,d,'Словарь'));
-    if(typeof databaseWordDictionary!=='undefined')Object.entries(databaseWordDictionary).forEach(([w,d])=>add(w,d,'Большой словарь'));
-    if(typeof coachCourses!=='undefined'){
-      Object.entries(coachCourses).forEach(([level,lessons])=>(lessons||[]).forEach(lesson=>(lesson.words||[]).forEach(item=>add(item[0],{p:item[1],m:item[2]},'HSK '+level))));
-    }
-    return [...found.values()].sort((a,b)=>a.word.localeCompare(b.word,'zh-Hans'));
+    // В тренажёре показываем только слова, которые пользователь сама отметила как выученные.
+    // Общие словари и весь каталог HSK здесь не используются.
+    if(typeof getLearnedCoachVocabularyRecords!=='function')return [];
+    return getLearnedCoachVocabularyRecords()
+      .filter(item=>item.hanzi && /\p{Script=Han}/u.test(item.hanzi))
+      .map(item=>({
+        word:item.hanzi,
+        pinyin:item.pinyin || '',
+        meaning:item.translation || '',
+        source:'Выучено · HSK '+item.level
+      }))
+      .sort((a,b)=>a.word.localeCompare(b.word,'zh-Hans'));
   }
   function renderWritingWordResults(){
     const query=wordSearch.value.trim().toLowerCase();
