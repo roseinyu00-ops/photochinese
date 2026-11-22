@@ -2838,6 +2838,101 @@ body.dark-theme nav button.active {
 }
 </style>
 
+<style id="photochinese-refined-motion">
+/* Softer, quieter visual hierarchy */
+.tab > .panel,
+.tab > .section {
+  border-color: var(--line);
+  box-shadow: 0 4px 16px rgba(112,67,82,.035);
+}
+.tab > .panel::before,
+.tab > .section::before { display: none; }
+.hero.panel::before,
+.coach-hero::before { display: none; }
+.coach-lesson-card,
+.coach-word,
+.coach-grammar-box,
+.coach-practice,
+.hsk-question-card,
+.hsk-result,
+.profile-section,
+.study-tools-card,
+.learning-progress-stat,
+.pc-character-card,
+.result,
+.word-of-day,
+.companion-card {
+  border-color: var(--line);
+  box-shadow: none;
+  transition: transform .32s cubic-bezier(.22,1,.36,1),
+              box-shadow .32s cubic-bezier(.22,1,.36,1),
+              border-color .32s ease;
+}
+.coach-lesson-card::before,
+.hsk-question-card::before,
+.study-tools-card::before,
+.learning-progress-stat::before,
+.pc-character-card::before { display: none; }
+.coach-grammar-box,
+.coach-practice,
+.profile-section { border-left: 1px solid var(--line); }
+.coach-word {
+  border-color: rgba(207,120,147,.22);
+  background: var(--surface, #fff);
+}
+.coach-word strong,
+.coach-example-hanzi,
+.coach-dialogue-line strong { color: var(--ink); }
+.pc-keyword {
+  color: #b65f7b;
+  background: linear-gradient(transparent 58%, rgba(238,177,194,.36) 58%);
+  border-radius: 3px;
+  padding: 0 1px;
+  font-weight: 800;
+}
+.coach-example .pc-keyword,
+.coach-dialogue-line .pc-keyword { color: #b65f7b; }
+.coach-example {
+  background: var(--surface-soft, rgba(230,170,190,.07));
+  border: 1px solid var(--line);
+  padding: 12px 14px;
+}
+.coach-lesson-card:hover,
+.coach-word:hover,
+.hsk-question-card:hover,
+.study-tools-card:hover,
+.profile-section:hover {
+  border-color: rgba(207,120,147,.55);
+  box-shadow: 0 7px 19px rgba(178,103,128,.08);
+  transform: translateY(-2px);
+}
+nav button.active {
+  color: var(--ink);
+  background: transparent;
+  box-shadow: none;
+}
+nav button.active::after {
+  height: 2px;
+  box-shadow: none;
+}
+body.dark-theme .pc-keyword {
+  color: #f0b2c4;
+  background: linear-gradient(transparent 58%, rgba(210,140,164,.25) 58%);
+}
+body.dark-theme .coach-word {
+  background: var(--surface, #49383d);
+  border-color: var(--line);
+}
+body.dark-theme .coach-word strong,
+body.dark-theme .coach-example-hanzi,
+body.dark-theme .coach-dialogue-line strong { color: var(--text); }
+@media (prefers-reduced-motion: reduce) {
+  .tab > .panel, .tab > .section, .coach-lesson-card, .coach-word {
+    transition: none !important;
+  }
+}
+</style>
+
 </head>
 <body>
 <div class="app">
@@ -3510,26 +3605,28 @@ tabs.forEach(btn => btn.addEventListener('click', () => {
     if (!reduceMotion && typeof targetTab.animate === 'function') {
       targetTab.animate(
         [
-          { opacity: 0, transform: 'translateY(22px)' },
-          { opacity: 1, transform: 'translateY(0)' }
+          { opacity: 0, transform: 'translate3d(0, 12px, 0)' },
+          { opacity: 1, transform: 'translate3d(0, 0, 0)' }
         ],
-        { duration: 560, easing: 'cubic-bezier(.16,1,.3,1)' }
+        { duration: 760, easing: 'cubic-bezier(.22,1,.36,1)' }
       );
 
-      const animatedItems = targetTab.querySelectorAll(
-        ':scope > .panel, :scope > .section, .coach-lesson-card, .coach-word, .coach-grammar-box, .coach-practice, .hsk-question-card, .hsk-result, .profile-section, .study-tools-card, .learning-progress-stat, .pc-character-card'
-      );
-      animatedItems.forEach((item, index) => {
-        if (item.hidden || typeof item.animate !== 'function') return;
+      // Анимируем только верхний уровень и несколько заметных карточек,
+      // чтобы элементы не накладывали друг на друга несколько transform-анимаций.
+      const animatedItems = Array.from(targetTab.querySelectorAll(
+        ':scope > .panel, :scope > .section, .coach-lesson-card, .coach-word, .hsk-question-card, .study-tools-card, .profile-section'
+      )).filter(item => !item.hidden);
+      animatedItems.slice(0, 12).forEach((item, index) => {
+        if (typeof item.animate !== 'function') return;
         item.animate(
           [
-            { opacity: 0, transform: 'translateY(16px) scale(.985)' },
-            { opacity: 1, transform: 'translateY(0) scale(1)' }
+            { opacity: 0, transform: 'translate3d(0, 9px, 0)' },
+            { opacity: 1, transform: 'translate3d(0, 0, 0)' }
           ],
           {
-            duration: 480,
-            delay: Math.min(index * 55, 330),
-            easing: 'cubic-bezier(.16,1,.3,1)'
+            duration: 680,
+            delay: Math.min(index * 48, 360),
+            easing: 'cubic-bezier(.22,1,.36,1)'
           }
         );
       });
@@ -5133,6 +5230,23 @@ function renderCoachPracticeQuestion(){
   });options.appendChild(b);
  });
 }
+function appendCoachHighlightedText(container, text, vocabulary){
+ container.textContent='';
+ const source=String(text||'');
+ const matchWord=(vocabulary||[])
+  .map(item=>String(item&&item[0]||''))
+  .filter(Boolean)
+  .sort((a,b)=>b.length-a.length)
+  .find(word=>source.includes(word));
+ if(!matchWord){container.textContent=source;return;}
+ const start=source.indexOf(matchWord);
+ if(start>0)container.appendChild(document.createTextNode(source.slice(0,start)));
+ const accent=document.createElement('span');
+ accent.className='pc-keyword';
+ accent.textContent=matchWord;
+ container.appendChild(accent);
+ if(start+matchWord.length<source.length)container.appendChild(document.createTextNode(source.slice(start+matchWord.length)));
+}
 function openCoachLesson(index){
  const lesson=coachCourses[currentCoachLevel()][index];if(!lesson)return;
  const supplemental=(coachSupplementalVocabulary[currentCoachLevel()]||{})[index]||{};lesson.extraWords=supplemental.words||[];lesson.extraPhrases=supplemental.phrases||[];
@@ -5145,7 +5259,7 @@ function openCoachLesson(index){
  const objectives=document.getElementById('coachLessonObjectives');objectives.innerHTML='';
  if(lesson.objectives&&lesson.objectives.length){objectives.hidden=false;const title=document.createElement('strong');title.textContent='После урока ты сможешь:';objectives.appendChild(title);const list=document.createElement('ul');lesson.objectives.forEach(item=>{const li=document.createElement('li');li.textContent=item;list.appendChild(li);});objectives.appendChild(list);}else{objectives.hidden=true;}
  const dialogue=document.getElementById('coachLessonDialogue'),dialogueLines=document.getElementById('coachDialogueLines');dialogueLines.innerHTML='';
- if(lesson.dialogue&&lesson.dialogue.length){dialogue.hidden=false;lesson.dialogue.forEach(line=>{const item=document.createElement('div');item.className='coach-dialogue-line';const hanzi=document.createElement('strong');hanzi.textContent=line[0];const pinyin=document.createElement('div');pinyin.className='coach-example-pinyin';pinyin.textContent=line[1];const translation=document.createElement('div');translation.className='coach-example-translation';translation.textContent=line[2];item.append(hanzi,pinyin,translation);dialogueLines.appendChild(item);});}else{dialogue.hidden=true;}
+ if(lesson.dialogue&&lesson.dialogue.length){dialogue.hidden=false;lesson.dialogue.forEach(line=>{const item=document.createElement('div');item.className='coach-dialogue-line';const hanzi=document.createElement('strong');appendCoachHighlightedText(hanzi,line[0],lesson.words);const pinyin=document.createElement('div');pinyin.className='coach-example-pinyin';pinyin.textContent=line[1];const translation=document.createElement('div');translation.className='coach-example-translation';translation.textContent=line[2];item.append(hanzi,pinyin,translation);dialogueLines.appendChild(item);});}else{dialogue.hidden=true;}
  document.getElementById('coachLessonGrammar').textContent=lesson.grammar;
  const grammarDetails=document.getElementById('coachLessonGrammarDetails');const detailedRule=(currentCoachLevel()===1?hsk1GrammarDetails[index]:null)||lesson.grammarDetails||'';
  const grammarPinyinByLesson={
@@ -5182,7 +5296,7 @@ function openCoachLesson(index){
  const hanzi=exampleParts[0].trim(),translation=lesson.translation||exampleParts.slice(1).join('—').trim()||'';
  const pinyin=lesson.examplePinyin||coachOriginalExamplePinyin[lesson.title]||'Пиньинь пока не добавлен';
  document.getElementById('coachLessonExample').innerHTML='<div class="coach-example-hanzi"></div><div class="coach-example-pinyin"></div><div class="coach-example-translation"></div>';
- document.querySelector('#coachLessonExample .coach-example-hanzi').textContent=hanzi;
+ appendCoachHighlightedText(document.querySelector('#coachLessonExample .coach-example-hanzi'),hanzi,lesson.words);
  document.querySelector('#coachLessonExample .coach-example-pinyin').textContent=pinyin;
  document.querySelector('#coachLessonExample .coach-example-translation').textContent=translation;
  const detail=document.getElementById('coachLessonExplanation');
