@@ -300,6 +300,10 @@
   }
 
   function speak(text, statusElement) {
+    if (localStorage.getItem("photoChineseSoundEnabled") === "false") {
+      if (statusElement) statusElement.textContent = "Озвучивание отключено в настройках PhotoChinese.";
+      return;
+    }
     const phrase = clean(text);
     if (!phrase) {
       if (statusElement) statusElement.textContent = "Нет текста для озвучивания.";
