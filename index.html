@@ -6635,14 +6635,31 @@ const saveNickname = document.getElementById("saveNickname");
 const savedNickname = localStorage.getItem("photoChineseNickname") || "dollrot";
 profileNickname.textContent = savedNickname;
 
-saveNickname.addEventListener("click", () => {
+saveNickname.addEventListener("click", async () => {
   const nickname = nicknameInput.value.trim();
-
   if (!nickname) return;
 
   localStorage.setItem("photoChineseNickname", nickname);
+  localStorage.setItem("profileNickname", nickname);
   profileNickname.textContent = nickname;
   nicknameInput.value = "";
+
+  if (window.photoChineseSupabase) {
+    const { data: { user } } = await window.photoChineseSupabase.auth.getUser();
+    if (user) {
+      const bio = localStorage.getItem("profileBio") || "";
+      const { error } = await window.photoChineseSupabase
+        .from("profiles")
+        .update({ username: nickname, bio })
+        .eq("id", user.id);
+      if (error) {
+        console.error("Не удалось сохранить ник в облако:", error);
+        alert("Ник изменён на этом устройстве, но не удалось синхронизировать его с облаком.");
+        return;
+      }
+    }
+  }
+  window.photoChineseSync?.();
 });
 </script>
   <script>
@@ -6928,7 +6945,7 @@ if (savedCharacter !== null) {
   favoriteCharacterInput.value = savedCharacter;
 }
 
-saveProfileInfo.addEventListener("click", () => {
+saveProfileInfo.addEventListener("click", async () => {
   const bio = bioInput.value.trim();
   const subtitle = subtitleInput.value.trim();
   const character = favoriteCharacterInput.value.trim();
@@ -6936,11 +6953,29 @@ saveProfileInfo.addEventListener("click", () => {
   localStorage.setItem("profileBio", bio);
   localStorage.setItem("profileSubtitle", subtitle);
   localStorage.setItem("favoriteCharacter", character || "—");
-  window.photoChineseSync?.();
 
   profileBioText.textContent = bio || "Расскажи немного о себе ♡";
   profileSubtitle.textContent = subtitle || "学习中文 ♡";
   favoriteCharacter.textContent = character || "—";
+
+  // Ник и описание хранятся в отдельных колонках profiles,
+  // а не только внутри app_data.
+  if (window.photoChineseSupabase) {
+    const { data: { user } } = await window.photoChineseSupabase.auth.getUser();
+    if (user) {
+      const nickname = localStorage.getItem("profileNickname") || localStorage.getItem("photoChineseNickname") || null;
+      const { error } = await window.photoChineseSupabase
+        .from("profiles")
+        .update({ username: nickname, bio })
+        .eq("id", user.id);
+      if (error) {
+        console.error("Не удалось сохранить описание профиля в облако:", error);
+        alert("Не удалось синхронизировать профиль. Попробуй ещё раз.");
+        return;
+      }
+    }
+  }
+  window.photoChineseSync?.();
 });
 </script>
 
