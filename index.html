@@ -3592,6 +3592,25 @@ body.dark-theme .writing-word-result:hover,body.dark-theme .writing-word-result:
 body.dark-theme .writing-word-result strong,body.dark-theme .writing-selected-word strong{color:#f0b5ca}
 body.dark-theme .writing-word-result small,body.dark-theme .writing-word-empty{color:#d8b9c5}
 body.dark-theme .writing-word-result-source,body.dark-theme .writing-selected-word span{color:#d99ab2}
+
+/* Коллекции профиля: раскрытие достижений и выбор спутника */
+.profile-expand-button{margin-top:12px;min-height:38px;padding:9px 16px;font-size:12px}
+.profile-collection-note{margin:9px 0 0;color:var(--muted,#8c7b82);font-size:11px;line-height:1.5}
+#achievementsList .achievement-extra[hidden]{display:none!important}
+#achievementsList .achievement-extra{animation:profileItemIn .22s ease both}
+@keyframes profileItemIn{from{opacity:0;transform:translateY(5px)}to{opacity:1;transform:translateY(0)}}
+.companion-gallery{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:10px;margin-top:13px}
+.companion-option{display:flex;flex-direction:column;align-items:center;gap:5px;min-width:0;padding:12px 7px;border:1px solid rgba(190,135,153,.24);border-radius:15px;background:rgba(255,248,250,.72);color:inherit;font:inherit;cursor:pointer;transition:.18s ease}
+.companion-option:disabled{cursor:default;opacity:.48}
+.companion-option.selected{border-color:#c987a0;background:rgba(246,224,234,.65);box-shadow:0 0 0 2px rgba(201,135,160,.12)}
+.companion-option:not(:disabled):active{transform:scale(.97)}
+.companion-option-emoji{font-size:30px;line-height:1.2}
+.companion-option strong{font-size:11px}
+.companion-option small{font-size:9px;color:var(--muted,#8c7b82)}
+body.dark-theme .companion-option{background:rgba(65,49,57,.65);border-color:rgba(214,162,175,.2)}
+body.dark-theme .companion-option.selected{background:rgba(113,72,91,.45);border-color:#d6a2af}
+@media(max-width:420px){.companion-gallery{grid-template-columns:repeat(2,minmax(0,1fr))}}
+
 </style>
 </head>
 <body>
@@ -4064,44 +4083,28 @@ body.dark-theme .writing-word-result-source,body.dark-theme .writing-selected-wo
       <div class="profile-divider"></div>
 
       <!-- КОМПАНЬОН -->
-      <section class="profile-section">
+      <section class="profile-section" id="companionSection">
         <h2>Мой компаньон</h2>
-        <div class="companion-card">
-          <div class="companion-picture" aria-hidden="true">🦊</div>
-          <div>
-            <h3>Мой лисёнок</h3>
-            <p>Твой маленький спутник в изучении китайского</p>
-            <span class="tag">Уровень 1</span>
-          </div>
+        <div class="companion-card" id="activeCompanionCard">
+          <div class="companion-picture" id="activeCompanionEmoji" aria-hidden="true">🦊</div>
+          <div><h3 id="activeCompanionName">Лисёнок</h3><p id="activeCompanionDescription">Твой маленький спутник в изучении китайского</p><span class="tag" id="activeCompanionLevel">HSK 1</span></div>
         </div>
+        <button type="button" class="secondary profile-expand-button" id="showAllCompanions">Все компаньоны</button>
+        <div class="companion-gallery" id="companionGallery" hidden></div>
+        <p class="profile-collection-note" id="companionGalleryNote">Новые спутники будут открываться вместе с уровнями HSK. Выбрать другого можно в режиме редактирования.</p>
       </section>
 
       
 <!-- ДОСТИЖЕНИЯ -->
 <section class="profile-section">
   <h2>Достижения</h2>
-
   <div class="profile-collection" id="achievementsList">
-
-    <div class="collection-item" data-achievement="first_steps">
-      <span class="achievement-mark" aria-hidden="true"><svg viewBox="0 0 24 24"><path d="M12 20C8 16 4 12 7 7c2-3 4-3 5-1 1-2 3-2 5 1 3 5-1 9-5 13Z"/><path d="M12 7c-1 4-1 8 0 13"/></svg></span>
-      <span>Первые шаги</span>
-      <small>Изучи первый иероглиф</small>
-    </div>
-
-    <div class="collection-item" data-achievement="curious">
-      <span class="achievement-mark" aria-hidden="true"><svg viewBox="0 0 24 24"><path d="M4 5.5c3-1.5 6-1 8 1v13c-2-2-5-2.5-8-1z"/><path d="M20 5.5c-3-1.5-6-1-8 1v13c2-2 5-2.5 8-1z"/></svg></span>
-      <span>Любознательный</span>
-      <small>Изучи 10 иероглифов</small>
-    </div>
-
-    <div class="collection-item" data-achievement="beginner">
-      <span class="achievement-mark" aria-hidden="true"><svg viewBox="0 0 24 24"><path d="m12 3 2.6 5.7 6.2.7-4.6 4.2 1.2 6.1-5.4-3.1-5.4 3.1 1.2-6.1-4.6-4.2 6.2-.7z"/></svg></span>
-      <span>Новичок</span>
-      <small>Заверши первый урок</small>
-    </div>
-
+    <div class="collection-item" data-achievement="first_steps"><span class="achievement-mark" aria-hidden="true">✿</span><span>Первые шаги</span><small>Изучи первый иероглиф</small></div>
+    <div class="collection-item" data-achievement="curious"><span class="achievement-mark" aria-hidden="true">⌑</span><span>Любознательный</span><small>Изучи 10 иероглифов</small></div>
+    <div class="collection-item" data-achievement="beginner"><span class="achievement-mark" aria-hidden="true">☆</span><span>Новичок</span><small>Заверши первый урок</small></div>
   </div>
+  <button type="button" class="secondary profile-expand-button" id="showAllAchievements">Все достижения</button>
+  <p class="profile-collection-note" id="achievementCollectionNote">Первые три достижения — начало твоего пути ♡</p>
 </section>
 
 
@@ -6769,6 +6772,7 @@ function setProfileMode(active) {
     : "✎ Редактировать профиль";
 
   document.body.classList.toggle("profile-editing", active);
+  if (typeof renderCompanions === "function") renderCompanions();
 }
 
 profileModeButton.addEventListener("click", () => {
@@ -6892,19 +6896,32 @@ function completeLesson(lessonId) {
 
 // Проверка достижений
 function updateAchievements() {
+  let activityDays = [];
+  try { activityDays = JSON.parse(localStorage.getItem("photoChineseActivityDays") || "[]"); } catch(e) {}
+  let savedChars = [];
+  try { savedChars = JSON.parse(localStorage.getItem("savedCharacters") || "[]"); } catch(e) {}
+  let hsk = 1;
+  try { hsk = Number(JSON.parse(localStorage.getItem("photoChineseHskDiagnostic") || "{}").level) || 1; } catch(e) {}
+  let learnedWords = 0;
+  try { learnedWords = getLearnedCoachVocabularyRecords().length; } catch(e) {}
   const rules = [
-    {
-      id: "first_steps",
-      condition: progress.learnedCharacters.length >= 1
-    },
-    {
-      id: "curious",
-      condition: progress.learnedCharacters.length >= 10
-    },
-    {
-      id: "beginner",
-      condition: progress.completedLessons.length >= 1
-    }
+    {id:"first_steps",condition:progress.learnedCharacters.length>=1},
+    {id:"curious",condition:progress.learnedCharacters.length>=10},
+    {id:"beginner",condition:progress.completedLessons.length>=1},
+    {id:"word_collector",condition:progress.learnedCharacters.length>=25},
+    {id:"character_master",condition:progress.learnedCharacters.length>=50},
+    {id:"lesson_rhythm",condition:progress.completedLessons.length>=5},
+    {id:"lesson_marathon",condition:progress.completedLessons.length>=15},
+    {id:"lesson_pro",condition:progress.completedLessons.length>=30},
+    {id:"saved_treasure",condition:savedChars.length>=5},
+    {id:"word_hunter",condition:learnedWords>=10},
+    {id:"week_streak",condition:activityDays.length>=7},
+    {id:"month_journey",condition:activityDays.length>=30},
+    {id:"hsk_two",condition:hsk>=2},
+    {id:"hsk_three",condition:hsk>=3},
+    {id:"hsk_four",condition:hsk>=4},
+    {id:"hsk_five",condition:hsk>=5},
+    {id:"hsk_six",condition:hsk>=6}
   ];
 
   rules.forEach(rule => {
@@ -6952,16 +6969,33 @@ document.getElementById("learningProgressOpenHsk")?.addEventListener("click", ()
 // ===== PHOTOCHINESE: ДОСТИЖЕНИЯ И КОЛЛЕКЦИЯ =====
 
 const achievementRewards = {
-  first_steps: "petal",
-  curious: "book",
-  beginner: "star"
+  first_steps:"petal", curious:"book", beginner:"star",
+  word_collector:"flower", character_master:"diamond",
+  lesson_rhythm:"tea", lesson_marathon:"lantern", lesson_pro:"medal",
+  saved_treasure:"bow", word_hunter:"scroll",
+  week_streak:"sun", month_journey:"moon",
+  hsk_two:"cloud", hsk_three:"butterfly", hsk_four:"crystal",
+  hsk_five:"lotus", hsk_six:"crown"
 };
 
 const profileIconSvgs = {
   petal: '<svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 20C8 16 4 12 7 7c2-3 4-3 5-1 1-2 3-2 5 1 3 5-1 9-5 13Z"/><path d="M12 7c-1 4-1 8 0 13"/></svg>',
   book: '<svg viewBox="0 0 24 24" aria-hidden="true"><path d="M4 5.5c3-1.5 6-1 8 1v13c-2-2-5-2.5-8-1z"/><path d="M20 5.5c-3-1.5-6-1-8 1v13c2-2 5-2.5 8-1z"/></svg>',
   star: '<svg viewBox="0 0 24 24" aria-hidden="true"><path d="m12 3 2.6 5.7 6.2.7-4.6 4.2 1.2 6.1-5.4-3.1-5.4 3.1 1.2-6.1-4.6-4.2 6.2-.7z"/></svg>',
-  bow: '<svg viewBox="0 0 32 24" aria-hidden="true"><path d="M15 11C10 4 4 3 3 6c-1 4 3 9 11 7l2-2-2-2Zm2 0c5-7 11-8 12-5 1 4-3 9-11 7l-2-2 2-2Z"/><path d="m14 12-3 10 5-5 5 5-3-10"/></svg>'
+  bow: '<svg viewBox="0 0 32 24" aria-hidden="true"><path d="M15 11C10 4 4 3 3 6c-1 4 3 9 11 7l2-2-2-2Zm2 0c5-7 11-8 12-5 1 4-3 9-11 7l-2-2 2-2Z"/><path d="m14 12-3 10 5-5 5 5-3-10"/></svg>',
+  flower:'<svg viewBox="0 0 24 24"><path d="M12 12c-5-8-10-2-4 2-6 4-1 10 4 4 5 6 10 0 4-4 6-4 1-10-4-2Z"/><circle cx="12" cy="12" r="2"/></svg>',
+  diamond:'<svg viewBox="0 0 24 24"><path d="m3 8 4-5h10l4 5-9 13L3 8Z M3 8h18M7 3l5 18 5-18"/></svg>',
+  tea:'<svg viewBox="0 0 24 24"><path d="M4 9h13v7a4 4 0 0 1-4 4H8a4 4 0 0 1-4-4V9Z M17 11h2a3 3 0 0 1 0 6h-2M8 5c-2-2 2-2 0-4m5 4c-2-2 2-2 0-4"/></svg>',
+  lantern:'<svg viewBox="0 0 24 24"><path d="M8 4h8l2 4-2 12H8L6 8l2-4Z M6 8h12M9 4V2h6v2M12 20v2"/></svg>',
+  medal:'<svg viewBox="0 0 24 24"><circle cx="12" cy="9" r="6"/><path d="m8 14-2 8 6-3 6 3-2-8M12 6v6m-3-3h6"/></svg>',
+  scroll:'<svg viewBox="0 0 24 24"><path d="M6 4h12v16H6a3 3 0 0 1 0-6h12M6 4a3 3 0 0 0 0 6h12M9 7h6m-6 4h5"/></svg>',
+  sun:'<svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="4"/><path d="M12 2v2m0 16v2M4.9 4.9l1.4 1.4m11.4 11.4 1.4 1.4M2 12h2m16 0h2M4.9 19.1l1.4-1.4M17.7 6.3l1.4-1.4"/></svg>',
+  moon:'<svg viewBox="0 0 24 24"><path d="M20 15A8 8 0 0 1 9 4a8 8 0 1 0 11 11Z"/></svg>',
+  cloud:'<svg viewBox="0 0 24 24"><path d="M7 18h10a4 4 0 0 0 0-8 6 6 0 0 0-11-1 4.5 4.5 0 0 0 1 9Z"/></svg>',
+  butterfly:'<svg viewBox="0 0 24 24"><path d="M12 12c-2-8-9-10-9-4 0 3 3 5 9 4Zm0 0c2-8 9-10 9-4 0 3-3 5-9 4Zm0 0c-2 8-8 9-8 4 0-3 3-5 8-4Zm0 0c2 8 8 9 8 4 0-3-3-5-8-4Zm0-2v12"/></svg>',
+  crystal:'<svg viewBox="0 0 24 24"><path d="m12 2 8 7-8 13L4 9l8-7Z M4 9h16M8 5l4 17 4-17"/></svg>',
+  lotus:'<svg viewBox="0 0 24 24"><path d="M12 20C5 20 2 15 3 10c4 0 7 3 9 7 2-4 5-7 9-7 1 5-2 10-9 10Zm0-3C6 12 8 6 12 3c4 3 6 9 0 14Z"/></svg>',
+  crown:'<svg viewBox="0 0 24 24"><path d="m3 7 5 4 4-7 4 7 5-4-2 13H5L3 7Z"/></svg>'
 };
 
 function profileIconMarkup(key) {
@@ -6979,30 +7013,58 @@ function updateCollection() {
   window.photoChineseSync?.();
 }
 
-// Отображение достижений
+// Каталог достижений: первые три всегда видны, остальные раскрываются отдельно.
+const achievementCatalog = [
+  ["first_steps","Первые шаги","Изучи первый иероглиф","petal"],
+  ["curious","Любознательный","Изучи 10 иероглифов","book"],
+  ["beginner","Новичок","Заверши первый урок","star"],
+  ["word_collector","Собиратель слов","Изучи 25 иероглифов","flower"],
+  ["character_master","Знаток знаков","Изучи 50 иероглифов","diamond"],
+  ["lesson_rhythm","Вошёл во вкус","Заверши 5 уроков","tea"],
+  ["lesson_marathon","Упорный ученик","Заверши 15 уроков","lantern"],
+  ["lesson_pro","Мастер занятий","Заверши 30 уроков","medal"],
+  ["saved_treasure","Хранитель коллекции","Сохрани 5 иероглифов","bow"],
+  ["word_hunter","Охотник за словами","Отметь 10 слов как выученные","scroll"],
+  ["week_streak","Неделя практики","Занимайся в 7 разных дней","sun"],
+  ["month_journey","Длинный путь","Занимайся в 30 разных дней","moon"],
+  ["hsk_two","Новая ступень","Получи результат HSK 2","cloud"],
+  ["hsk_three","Уверенный рост","Получи результат HSK 3","butterfly"],
+  ["hsk_four","Выше и выше","Получи результат HSK 4","crystal"],
+  ["hsk_five","Почти эксперт","Получи результат HSK 5","lotus"],
+  ["hsk_six","Вершина HSK","Получи результат HSK 6","crown"]
+];
 function renderAchievements() {
-  const items = document.querySelectorAll("[data-achievement]");
-
-  items.forEach(item => {
-    const id = item.dataset.achievement;
-    const unlocked = progress.achievements.includes(id);
-
-    item.classList.toggle("unlocked", unlocked);
-    item.classList.toggle("locked", !unlocked);
-
-    let status = item.querySelector(".achievement-status");
-
-    if (!status) {
-      status = document.createElement("small");
-      status.className = "achievement-status";
-      item.appendChild(status);
+  const list = document.getElementById("achievementsList");
+  if (!list) return;
+  achievementCatalog.forEach((entry,index) => {
+    const [id,name,description,reward] = entry;
+    let item = list.querySelector('[data-achievement="'+id+'"]');
+    if (!item) {
+      item = document.createElement("div");
+      item.className = "collection-item achievement-extra";
+      item.dataset.achievement = id;
+      item.innerHTML = '<span class="achievement-mark" aria-hidden="true"></span><span class="achievement-name"></span><small class="achievement-description"></small>';
+      item.querySelector(".achievement-mark").innerHTML = profileIconMarkup(reward);
+      item.querySelector(".achievement-name").textContent = name;
+      item.querySelector(".achievement-description").textContent = description;
+      list.appendChild(item);
     }
-
-    status.textContent = unlocked
-      ? "✓ Получено"
-      : "Пока закрыто";
+    const unlocked = progress.achievements.includes(id);
+    item.classList.toggle("unlocked",unlocked);
+    item.classList.toggle("locked",!unlocked);
+    item.hidden = index >= 3 && !achievementCatalogExpanded;
+    let status=item.querySelector(".achievement-status");
+    if(!status){status=document.createElement("small");status.className="achievement-status";item.appendChild(status);}
+    status.textContent=unlocked?"✓ Получено":"Пока закрыто";
   });
+  const button=document.getElementById("showAllAchievements");
+  if(button){button.hidden=achievementCatalog.length<=3;button.textContent=achievementCatalogExpanded?"Свернуть достижения":"Все достижения";}
 }
+let achievementCatalogExpanded=false;
+document.getElementById("showAllAchievements")?.addEventListener("click",()=>{
+  achievementCatalogExpanded=!achievementCatalogExpanded;
+  renderAchievements();
+});
 
 // Сохранение иероглифа из карточки разбора
 function saveCharacterToCollection(character) {
@@ -7193,6 +7255,65 @@ function renderCollection() {
     vocabularyCount.textContent = "Выучено слов: " + learnedWords.length;
   }
 }
+
+
+// ===== КОМПАНЬОНЫ ПО УРОВНЯМ HSK =====
+const companionCatalog = [
+  {level:1,id:"fox",emoji:"🦊",name:"Лисёнок",description:"Любопытный спутник, который начинает путь вместе с тобой."},
+  {level:2,id:"bunny",emoji:"🐰",name:"Зайчонок",description:"Быстрый и внимательный помощник новых открытий."},
+  {level:3,id:"cat",emoji:"🐱",name:"Котёнок",description:"Любит уют, слова и маленькие ежедневные победы."},
+  {level:4,id:"panda",emoji:"🐼",name:"Панда",description:"Спокойный компаньон для серьёзных занятий."},
+  {level:5,id:"deer",emoji:"🦌",name:"Оленёнок",description:"Изящный спутник на пути к свободному чтению."},
+  {level:6,id:"dragon",emoji:"🐉",name:"Дракончик",description:"Редкий спутник для покорителя самой высокой ступени."}
+];
+function getUnlockedCompanionLevel(){
+  try{return Math.max(1,Math.min(6,Number(JSON.parse(localStorage.getItem("photoChineseHskDiagnostic")||"{}").level)||1));}
+  catch(e){return 1;}
+}
+function renderCompanions(){
+  const unlockedLevel=getUnlockedCompanionLevel();
+  const chosen=localStorage.getItem("equippedCompanion")||"fox";
+  const active=companionCatalog.find(c=>c.id===chosen&&c.level<=unlockedLevel)||companionCatalog[0];
+  const emoji=document.getElementById("activeCompanionEmoji");
+  const name=document.getElementById("activeCompanionName");
+  const desc=document.getElementById("activeCompanionDescription");
+  const level=document.getElementById("activeCompanionLevel");
+  if(emoji)emoji.textContent=active.emoji;
+  if(name)name.textContent=active.name;
+  if(desc)desc.textContent=active.description;
+  if(level)level.textContent="HSK "+active.level;
+  const gallery=document.getElementById("companionGallery");
+  if(!gallery)return;
+  gallery.innerHTML="";
+  companionCatalog.forEach(companion=>{
+    const unlocked=companion.level<=unlockedLevel;
+    const card=document.createElement("button");
+    card.type="button";
+    card.className="companion-option"+(companion.id===active.id?" selected":"")+(unlocked?"":" locked");
+    card.disabled=!unlocked||!profileModeActive;
+    const icon=document.createElement("span");icon.className="companion-option-emoji";icon.textContent=unlocked?companion.emoji:"🔒";
+    const title=document.createElement("strong");title.textContent=companion.name;
+    const sub=document.createElement("small");sub.textContent=unlocked?"HSK "+companion.level:"Откроется на HSK "+companion.level;
+    card.append(icon,title,sub);
+    card.addEventListener("click",()=>{
+      if(!profileModeActive||!unlocked)return;
+      localStorage.setItem("equippedCompanion",companion.id);
+      window.photoChineseSync?.();
+      renderCompanions();
+    });
+    gallery.appendChild(card);
+  });
+  const note=document.getElementById("companionGalleryNote");
+  if(note)note.textContent=profileModeActive?"Выбери любого открытого компаньона. Изменения сохраняются автоматически.":"Чтобы сменить спутника, сначала нажми «Редактировать профиль».";
+  const button=document.getElementById("showAllCompanions");
+  if(button)button.textContent=gallery.hidden?"Все компаньоны":"Скрыть компаньонов";
+}
+document.getElementById("showAllCompanions")?.addEventListener("click",()=>{
+  const gallery=document.getElementById("companionGallery");
+  if(gallery)gallery.hidden=!gallery.hidden;
+  renderCompanions();
+});
+renderCompanions();
 
 // ===== УКРАШЕНИЯ ПРОФИЛЯ =====
 
