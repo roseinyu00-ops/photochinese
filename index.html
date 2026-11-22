@@ -8132,10 +8132,14 @@ async function refreshPhotoChineseMfaSettings(){
  else status.textContent="Дополнительная защита пока не подключена.";
 }
 async function requirePhotoChineseMfa(){
- const client=window.photoChineseSupabase,{data:a,error:ae}=await client.auth.mfa.getAuthenticatorAssuranceLevel();
- if(ae)throw ae;if(a.currentLevel==="aal2"||a.nextLevel!=="aal2")return true;
- const {data:factors,error:fe}=await client.auth.mfa.listFactors();if(fe)throw fe;
- const factor=(factors.totp||[]).find(f=>f.status==="verified");if(!factor)return true;
+ const client=window.photoChineseSupabase;
+ const {data:factors,error:fe}=await client.auth.mfa.listFactors();
+ if(fe)throw fe;
+ const factor=(factors.totp||[]).find(f=>f.status==="verified");
+ if(!factor)return true;
+ const {data:a,error:ae}=await client.auth.mfa.getAuthenticatorAssuranceLevel();
+ if(ae)throw ae;
+ if(a.currentLevel==="aal2")return true;
  const {data:challenge,error:ce}=await client.auth.mfa.challenge({factorId:factor.id});if(ce)throw ce;
  const modal=document.getElementById("photoChineseMfaChallenge"),input=document.getElementById("photoChineseMfaLoginCode"),verify=document.getElementById("photoChineseMfaLoginVerify"),cancel=document.getElementById("photoChineseMfaLoginCancel"),msg=document.getElementById("photoChineseMfaLoginMessage");
  modal.hidden=false;input.value="";msg.textContent="";input.focus();
@@ -8305,14 +8309,19 @@ document.getElementById("accountForm").addEventListener("submit", async function
   }
 
   client.auth.onAuthStateChange((_event, session) => {
+    const previousUserId = photoChineseUser ? photoChineseUser.id : null;
     photoChineseUser = session ? session.user : null;
     if (!session) {
       photoChineseRole = null;
       setOwnerRoleDiagnostic("Войди в аккаунт владельца, чтобы проверить права.");
       updateProfileAccess();
     } else {
+      if (previousUserId !== session.user.id) {
+        photoChineseRole = null;
+        setOwnerRoleDiagnostic("Ожидаем завершения проверки безопасности…");
+      }
+      // Роль загружается только из loadCloudProfile после успешной проверки MFA.
       updateProfileAccess();
-      setTimeout(() => loadPhotoChineseRole(session.user.id), 0);
     }
   });
 })();
