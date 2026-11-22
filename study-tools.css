@@ -55,3 +55,6 @@ body.dark-theme .study-tools-input{background:#49383d;color:#fff1ed;border-color
 .study-review-input-area .study-tools-input{margin-top:0}
 .study-review-check-result{min-height:20px;margin:4px 0;color:var(--muted);font-size:13px;line-height:1.45}
 body.dark-theme .study-review-input-area label{color:#fff1ed}
+
+.study-tools-sync-note{margin:8px 0 14px;padding:10px 12px;border:1px solid var(--line);border-radius:12px;background:var(--cream);color:var(--muted);font-size:13px;line-height:1.5}
+body.dark-theme .study-tools-sync-note{background:#49383d;border-color:#76545d;color:#ead4d7}
