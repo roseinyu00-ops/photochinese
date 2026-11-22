@@ -65,25 +65,163 @@ const families={
 };
 const make=(tag,cls,text)=>{const n=document.createElement(tag);if(cls)n.className=cls;if(text!==undefined)n.textContent=text;return n;};
 let activeGrammarTopic="all";
-function grammarTopic(g){
-const n=g[1];
-if(/Порядок слов|Связка 是|Принадлежность 的/.test(n))return "sentence";
-if(/Вопрос/.test(n))return "questions";
-if(/Отрицание/.test(n))return "negation";
-if(/Счётное слово/.test(n))return "measure";
-if(/Местонахождение/.test(n))return "place";
-if(/Опыт:/.test(n))return "experience";
-if(/Сравнение с/.test(n)||/Изменение степени/.test(n))return "comparison";
-if(/Причина и результат|Уступка|Одновременные действия/.test(n))return "complex";
-if(/Дополнение с/.test(n))return "complement";
-if(/Конструкция 把/.test(n))return "ba";
-if(/Пассивная конструкция 被/.test(n))return "bei";
-return "sentence";
-}
+const grammarTopicMap={
+"Порядок слов S + V + O":"sentence",
+"Связка 是":"sentence",
+"Принадлежность 的":"nouns",
+"Счётное слово 个":"nouns",
+"Вопрос с 吗":"questions",
+"Вопросительные слова 什么 и 谁":"questions",
+"Отрицание 不 и 没":"negative",
+"Местонахождение 在":"places",
+"Опыт: 过":"experience",
+"Сравнение с 比":"comparison",
+"Изменение степени 越来越":"comparison",
+"Причина и результат 因为…所以…":"complex",
+"Уступка 虽然…但是…":"complex",
+"Одновременные действия 一边…一边…":"complex",
+"Дополнение с 得":"complements",
+"Конструкция 把":"complements",
+"Пассивная конструкция 被":"complements"
+};
 const grammarTopics=[
-["all","Все темы"],["sentence","Порядок слов и 是"],["questions","Вопросы"],["negation","不 и 没"],["measure","Числа и счётные слова"],["place","Место и 在"],["experience","Опыт и 过"],["comparison","Сравнение"],["complex","Сложные конструкции"],["complement","Дополнение 得"],["ba","Конструкция 把"],["bei","Пассив 被"]
+{id:"all",title:"Вся грамматика",desc:"Все правила курса",mark:"文"},
+{id:"sentence",title:"Строение предложения",desc:"Порядок слов и 是",mark:"主"},
+{id:"nouns",title:"Предметы и принадлежность",desc:"的 и счётные слова",mark:"的"},
+{id:"questions",title:"Как задавать вопросы",desc:"吗, 什么 и 谁",mark:"吗"},
+{id:"negative",title:"Отрицание",desc:"Разница между 不 и 没",mark:"不"},
+{id:"places",title:"Место и расположение",desc:"Где находится предмет",mark:"在"},
+{id:"experience",title:"Опыт и события",desc:"Как говорить о своём опыте",mark:"过"},
+{id:"comparison",title:"Сравнение и изменения",desc:"比 и 越来越",mark:"比"},
+{id:"complex",title:"Связные предложения",desc:"Причина, уступка, действия",mark:"因"},
+{id:"complements",title:"Действие и его результат",desc:"得, 把 и 被",mark:"得"}
 ];
-function renderGrammarTopics(){const root=$("clGrammarTopics");if(!root)return;root.replaceChildren();grammarTopics.forEach(([id,label])=>{const btn=make("button","cl-topic-chip",label);btn.type="button";btn.classList.toggle("active",id===activeGrammarTopic);btn.addEventListener("click",()=>{activeGrammarTopic=id;renderGrammarTopics();renderGrammar();});root.append(btn);});}
+function renderGrammarTopics(){
+const root=$("clGrammarTopics");if(!root)return;root.replaceChildren();
+grammarTopics.forEach(topic=>{
+const count=topic.id==="all"?grammar.length:grammar.filter(g=>grammarTopicMap[g[1]]===topic.id).length;
+const btn=make("button","cl-topic-card");btn.type="button";btn.classList.toggle("active",topic.id===activeGrammarTopic);
+btn.append(make("span","cl-topic-card-mark",topic.mark),make("span","cl-topic-card-count",String(count).padStart(2,"0")),make("strong","",topic.title),make("small","",topic.desc));
+btn.addEventListener("click",()=>{activeGrammarTopic=topic.id;renderGrammarTopics();renderGrammar();});
+root.append(btn);
+});
+}
+function renderGrammar(){
+const root=$("clGrammarList");if(!root)return;root.replaceChildren();
+const lv=$("clGrammarLevel").value,q=$("clGrammarSearch").value.trim().toLocaleLowerCase("ru");
+const rows=grammar.filter(g=>{const hay=[g[1],g[2],g[3],g[5],g[6],...g[4].flat()].join(" ").toLocaleLowerCase("ru");return (lv==="all"||String(g[0])===lv)&&(activeGrammarTopic==="all"||grammarTopicMap[g[1]]===activeGrammarTopic)&&(!q||hay.includes(q));});
+if(!rows.length){root.append(make("div","cl-empty","Ничего не найдено. Попробуй изменить тему, уровень или запрос."));return;}
+root.append(make("p","cl-results-count","Найдено конструкций: "+rows.length));
+rows.forEach(g=>{const c=make("article","cl-grammar-card"),top=make("div","cl-grammar-top"),h=make("div");h.append(make("h3","",g[1]),make("p","cl-grammar-summary",g[2]));top.append(h,make("span","cl-level-tag","HSK "+g[0]));c.append(top,make("div","cl-formula",g[3]));const ex=make("div","cl-example-list");g[4].forEach(x=>{const e=make("div","cl-example");e.append(make("div","cl-example-zh",x[0]),make("div","cl-example-py",x[1]),make("div","cl-example-ru",x[2]));ex.append(e);});c.append(ex,make("div","cl-note","Запомни: "+g[5]));const practice=make("div","cl-exercise");practice.append(make("div","cl-exercise-title","Проверь себя"),make("p","cl-exercise-question",g[6]));const opts=make("div","cl-exercise-options"),fb=make("p","cl-exercise-feedback","Выбери один вариант ответа.");g[7].forEach((v,i)=>{const btn=make("button","cl-exercise-option",v);btn.type="button";btn.addEventListener("click",()=>{if(opts.dataset.done)return;opts.dataset.done="1";[...opts.children].forEach((n,j)=>{n.disabled=true;if(j===g[8])n.classList.add("is-correct");else if(j===i)n.classList.add("is-wrong");});fb.textContent=(i===g[8]?"Верно! ":"Не совсем. ")+g[9];});opts.append(btn);});practice.append(opts,fb);c.append(practice);root.append(c);});
+}
+let active="cafe",activeDialogueTopic="all";
+const dialogueTopics=[
+{id:"all",title:"Все ситуации",desc:"Полный разговорник",mark:"文",ids:dialogs.map(d=>d[0])},
+{id:"people",title:"Знакомство и общение",desc:"Представиться, договориться, позвонить",mark:"你好",ids:["meeting","plans","phone"]},
+{id:"study",title:"Учёба",desc:"Университет и библиотека",mark:"学",ids:["university","library"]},
+{id:"food",title:"Еда и покупки",desc:"Кафе, ресторан и магазин",mark:"吃",ids:["cafe","restaurant","shop"]},
+{id:"travel",title:"Город и поездки",desc:"Дорога, такси, аэропорт",mark:"行",ids:["travel","directions","taxi","airport"]},
+{id:"stay",title:"Проживание",desc:"Заселение и отель",mark:"住",ids:["hotel"]}
+];
+function dialogueMatches(d,q){return !q||[d[2],d[3],d[5],...d[4].flat()].join(" ").toLocaleLowerCase("ru").includes(q);}
+function renderDialogueTopics(){
+const root=$("clDialogueTopics");if(!root)return;root.replaceChildren();
+dialogueTopics.forEach(topic=>{
+const count=topic.ids.length,btn=make("button","cl-dialogue-topic-card");btn.type="button";btn.classList.toggle("active",topic.id===activeDialogueTopic);
+btn.append(make("span","cl-dialogue-topic-mark",topic.mark),make("span","cl-dialogue-topic-count",String(count).padStart(2,"0")),make("strong","",topic.title),make("small","",topic.desc));
+btn.addEventListener("click",()=>{activeDialogueTopic=topic.id;renderDialogueTopics();renderDialogs();renderDialogue();});
+root.append(btn);
+});
+}
+function renderDialogs(){
+const cats=$("clDialogueCategories");if(!cats)return;cats.replaceChildren();
+const q=($("clDialogueSearch")?.value||"").trim().toLocaleLowerCase("ru");
+const topic=dialogueTopics.find(t=>t.id===activeDialogueTopic)||dialogueTopics[0];
+const shown=dialogs.filter(d=>topic.ids.includes(d[0])&&dialogueMatches(d,q));
+if(!shown.length){cats.append(make("div","cl-empty","Ничего не найдено. Попробуй другое слово или выбери другую тему."));return;}
+if(!shown.some(d=>d[0]===active))active=shown[0][0];
+shown.forEach(d=>{
+const btn=make("button","cl-category-button");btn.type="button";btn.classList.toggle("active",d[0]===active);
+btn.append(make("span","cl-category-number",String(dialogs.indexOf(d)+1).padStart(2,"0")),make("strong","",d[2]),make("small","",d[3]));
+btn.addEventListener("click",()=>{active=d[0];renderDialogs();renderDialogue();});
+cats.append(btn);
+});
+}
+function speak(text){if(!("speechSynthesis"in window))return;speechSynthesis.cancel();const u=new SpeechSynthesisUtterance(text);u.lang="zh-CN";u.rate=.88;speechSynthesis.speak(u);}
+function renderDialogue(){const root=$("clDialogueContent"),d=dialogs.find(x=>x[0]===active);if(!root)return;root.replaceChildren();const q=($("clDialogueSearch")?.value||"").trim().toLocaleLowerCase("ru");if(!d||!dialogueMatches(d,q)){root.append(make("div","cl-empty","Выбери ситуацию из списка выше."));return;}root.append(make("span","cl-kicker","РАЗГОВОРНАЯ СИТУАЦИЯ"),make("h3","",d[2]),make("p","cl-dialogue-intro",d[3]));d[4].forEach(line=>{const row=make("div","cl-dialogue-line"),speaker=make("span","cl-speaker",line[0]),body=make("div"),audio=make("button","cl-audio-button","Слушать");body.append(make("div","cl-dialogue-zh",line[1]),make("div","cl-dialogue-pinyin",line[2]),make("div","cl-dialogue-translation",line[3]));audio.type="button";audio.addEventListener("click",()=>speak(line[1]));row.append(speaker,body,audio);root.append(row);});root.append(make("div","cl-dialogue-footer","Полезные выражения: "+d[5]),make("p","small","Нажми «Слушать», чтобы услышать китайское произношение."));}
+function learned(){
+const chars=new Set();
+try{const a=JSON.parse(localStorage.getItem("learnedCharacters")||"[]");if(Array.isArray(a))a.forEach(x=>[...String(x)].forEach(ch=>{if(/\p{Script=Han}/u.test(ch))chars.add(ch);}));}catch(e){}
+try{if(typeof getLearnedCoachVocabularyRecords==="function")getLearnedCoachVocabularyRecords().forEach(x=>[...(x.hanzi||"")].forEach(ch=>{if(/\p{Script=Han}/u.test(ch))chars.add(ch);}));}catch(e){}
+return [...chars];
+}
+function renderChips(){
+const root=$("clLearnedCharacterChips");if(!root)return;root.replaceChildren();const chars=learned(),all=[...new Set([...Object.keys(families),...chars])];
+root.append(make("div","cl-character-group-label","ТВОИ ИЗУЧЕННЫЕ"));
+if(!chars.length)root.append(make("p","cl-character-empty","Пока нет отмеченных знаков — начни с популярных ниже."));else{const row=make("div","cl-character-chip-row");chars.slice(0,40).forEach(ch=>{const btn=make("button","cl-character-chip",ch);btn.type="button";btn.addEventListener("click",()=>select(ch));row.append(btn);});root.append(row);}
+root.append(make("div","cl-character-group-label","ПОПУЛЯРНЫЕ ИЕРОГЛИФЫ"));const starter=make("div","cl-character-chip-row");all.forEach(ch=>{const btn=make("button","cl-character-chip",ch);btn.type="button";btn.addEventListener("click",()=>select(ch));starter.append(btn);});root.append(starter);
+}
+function showWords(ch){
+const root=$("clWordBuildingResults"),hint=$("clCharacterHint");root.replaceChildren();
+const entries=new Map();
+const add=(word,pinyin,translation)=>{
+if(!word||!word.includes(ch)||[...word].length<2||!translation)return;
+entries.set(word,{word,pinyin:pinyin||"",translation});
+};
+const preset=families[ch];
+if(preset)(preset[2]||[]).forEach(w=>add(w[0],w[1],w[2]));
+try{if(typeof wordDictionary!=="undefined")Object.entries(wordDictionary).forEach(([word,e])=>add(word,e.p,e.m));}catch(e){}
+try{if(typeof databaseWordDictionary!=="undefined")Object.entries(databaseWordDictionary).forEach(([word,e])=>add(word,e.p,e.m));}catch(e){}
+const words=[...entries.values()].sort((a,b)=>[...a.word].length-[...b.word].length||a.word.localeCompare(b.word,"zh"));
+const charInfo=preset||((typeof databaseCharDictionary!=="undefined"&&databaseCharDictionary[ch])?[databaseCharDictionary[ch].p,databaseCharDictionary[ch].m]:null);
+if(!words.length){
+hint.textContent="В доступном словаре пока не нашлось слов с этим иероглифом.";
+root.append(make("div","cl-empty","Для «"+ch+"» пока нет подходящей подборки. Большой словарь может ещё загружаться — попробуй немного позже или выбери другой знак."));
+return;
+}
+hint.textContent="Найдено слов: "+words.length+". Показаны сочетания из словаря PhotoChinese.";
+const card=make("section","cl-word-result-card"),head=make("div","cl-word-result-heading"),info=make("div");
+head.append(make("strong","cl-word-result-character",ch));info.append(make("h3","",ch+" · слова с этим иероглифом"),make("p","small",(charInfo?(charInfo[0]+" · "+charInfo[1]):"Иероглиф встречается в следующих словах.")));head.append(info);card.append(head);
+const grid=make("div","cl-word-grid");
+words.slice(0,120).forEach(w=>{const item=make("div","cl-word-item");item.append(make("strong","",w.word),make("small","",w.pinyin),make("span","",w.translation));grid.append(item);});
+card.append(grid);root.append(card);
+}
+function select(ch){$("clCharacterInput").value=ch;document.querySelectorAll(".cl-character-chip").forEach(b=>b.classList.toggle("active",b.textContent===ch));showWords(ch);}
+$("clGrammarLevel")?.addEventListener("change",renderGrammar);
+$("clDialogueSearch")?.addEventListener("input",()=>{renderDialogs();renderDialogue();syncSearchClear("clDialogueSearch");});
+$("clGrammarSearch")?.addEventListener("input",()=>{renderGrammar();syncSearchClear("clGrammarSearch");});
+function syncSearchClear(id){const input=$(id),btn=$(id+"Clear");if(btn)btn.hidden=!input.value;}
+["clGrammarSearch","clDialogueSearch"].forEach(id=>{const input=$(id),btn=$(id+"Clear");if(!input||!btn)return;btn.addEventListener("click",()=>{input.value="";input.dispatchEvent(new Event("input",{bubbles:true}));input.focus();});syncSearchClear(id);});
+$("clCharacterSearch")?.addEventListener("click",()=>{const ch=$("clCharacterInput").value.trim();if(ch)select([...ch][0]);else $("clCharacterHint").textContent="Сначала введи один китайский иероглиф.";});
+$("clCharacterInput")?.addEventListener("keydown",e=>{if(e.key==="Enter")$("clCharacterSearch").click();});
+$("clCharacterInput")?.addEventListener("input",e=>{const chars=[...e.target.value.trim()];if(chars.length>1)e.target.value=chars[0];});
+window.addEventListener("storage",renderChips);
+window.addEventListener("photoChineseDataLoaded",renderChips);
+window.addEventListener("photoChineseDictionaryReady",()=>{renderChips();const ch=$("clCharacterInput").value.trim();if(ch)showWords([...ch][0]);});
+renderGrammarTopics();renderGrammar();renderDialogueTopics();renderDialogs();renderDialogue();renderChips();
+if(!$("clCharacterInput").value.trim())select("学");
+})();const grammarTopics=[
+{id:"all",title:"Вся грамматика",desc:"Все правила курса",mark:"文"},
+{id:"sentence",title:"Строение предложения",desc:"Порядок слов и 是",mark:"主"},
+{id:"nouns",title:"Предметы и принадлежность",desc:"的 и счётные слова",mark:"的"},
+{id:"questions",title:"Как задавать вопросы",desc:"吗, 什么 и 谁",mark:"吗"},
+{id:"negative",title:"Отрицание",desc:"Разница между 不 и 没",mark:"不"},
+{id:"places",title:"Место и расположение",desc:"Где находится предмет",mark:"在"},
+{id:"experience",title:"Опыт и события",desc:"Как говорить о своём опыте",mark:"过"},
+{id:"comparison",title:"Сравнение и изменения",desc:"比 и 越来越",mark:"比"},
+{id:"complex",title:"Связные предложения",desc:"Причина, уступка, действия",mark:"因"},
+{id:"complements",title:"Действие и его результат",desc:"得, 把 и 被",mark:"得"}
+];
+function renderGrammarTopics(){
+const root=$("clGrammarTopics");if(!root)return;root.replaceChildren();
+grammarTopics.forEach(topic=>{
+const count=topic.id==="all"?grammar.length:grammar.filter(g=>grammarTopicMap[g[1]]===topic.id).length;
+const btn=make("button","cl-topic-card");btn.type="button";btn.classList.toggle("active",topic.id===activeGrammarTopic);
+btn.append(make("span","cl-topic-card-mark",topic.mark),make("span","cl-topic-card-count",String(count).padStart(2,"0")),make("strong","",topic.title),make("small","",topic.desc));
+btn.addEventListener("click",()=>{activeGrammarTopic=topic.id;renderGrammarTopics();renderGrammar();});
+root.append(btn);
+});
+}
 function renderGrammar(){
 const root=$("clGrammarList");if(!root)return;root.replaceChildren();
 const lv=$("clGrammarLevel").value,q=$("clGrammarSearch").value.trim().toLocaleLowerCase("ru");
