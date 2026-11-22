@@ -3245,7 +3245,50 @@ body.dark-theme #profile .collection-item:hover{
   #profile .profile-name-line{gap:6px}
   #profile .profile-name-line h2{font-size:clamp(17px,5.1vw,21px)}
   #profile #equippedDecoration{font-size:19px}
-}</style>
+}
+/* FIX: награда всегда в одной строке с ником */
+#profile .profile-identity{display:block!important;min-width:0}
+#profile .profile-name-line{
+  display:inline-flex!important;
+  flex-direction:row!important;
+  flex-wrap:nowrap!important;
+  align-items:center!important;
+  justify-content:flex-start!important;
+  vertical-align:middle;
+  width:auto!important;
+  max-width:100%;
+  gap:8px!important;
+}
+#profile .profile-name-line h2{
+  display:inline-block!important;
+  flex:0 1 auto!important;
+  width:auto!important;
+  margin:0!important;
+  white-space:nowrap!important;
+}
+#profile .profile-name-line #equippedDecoration{
+  position:static!important;
+  display:inline-flex!important;
+  flex:0 0 21px!important;
+  width:21px!important;
+  min-width:21px!important;
+  height:21px!important;
+  margin:0!important;
+  vertical-align:middle!important;
+  align-self:center!important;
+}
+#profile .profile-name-line #equippedDecoration svg{
+  display:block!important;
+  width:100%!important;
+  height:100%!important;
+}
+@media(max-width:560px){
+  #profile .profile-name-line{gap:6px!important}
+  #profile .profile-name-line #equippedDecoration{
+    flex-basis:19px!important;width:19px!important;min-width:19px!important;height:19px!important;
+  }
+}
+</style>
 </head>
 <body>
 <div class="app">
