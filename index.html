@@ -2495,6 +2495,11 @@ body.dark-theme .writing-word-result small{color:#e0bdc9}
 body.dark-theme .writing-character-chip{background:#49383d;color:#ffe1e8;border-color:#76545d}
 body.dark-theme .writing-character-chip.selected{background:#694653;border-color:#d18ca8}
 /* Minimal PhotoChinese line icons */
+.companion-picture{color:#b66f89}
+.companion-picture svg{width:52px;height:52px;fill:none;stroke:currentColor;stroke-width:1.55;stroke-linecap:round;stroke-linejoin:round}
+.pc-status-lock{width:16px;height:16px;vertical-align:middle;fill:none;stroke:currentColor;stroke-width:1.7;stroke-linecap:round;stroke-linejoin:round}
+body.dark-theme .companion-picture{color:#e2a8bd}
+
 .pc-nav-icon,.pc-teacher-icon,.pc-button-icon{display:inline-flex;align-items:center;justify-content:center;color:#b66f89;vertical-align:middle}
 .pc-nav-icon{width:19px;height:19px;margin-right:5px}
 .pc-teacher-icon{width:27px;height:27px;margin:0 auto 2px}
@@ -3781,7 +3786,7 @@ body.dark-theme .writing-word-result-source,body.dark-theme .writing-selected-wo
         <button type="button" class="secondary" id="writingPlayDemo"><span class="pc-button-icon" aria-hidden="true"><svg viewBox="0 0 24 24"><path d="m9 6 10 6-10 6z"/></svg></span> Показать написание</button>
       </div>
       <div class="panel writing-step-card">
-        <div class="writing-card-heading"><div><span class="writing-step-label">ШАГ 2</span><h3>Повтори самостоятельно</h3></div><span class="writing-step-icon">✍️</span></div>
+        <div class="writing-card-heading"><div><span class="writing-step-label">ШАГ 2</span><h3>Повтори самостоятельно</h3></div><span class="writing-step-icon" aria-hidden="true"><svg viewBox="0 0 24 24"><path d="m4 20 4.5-1L19.3 8.2a2.1 2.1 0 0 0-3-3L5.5 16zM14.8 6.2l3 3M4 20h16"/></svg></span></div>
         <div id="writingQuizCanvas" class="writing-character-canvas writing-quiz-canvas" aria-label="Поле для написания иероглифа"></div>
         <button type="button" class="primary" id="writingStartPractice">Начать практику</button>
         <div id="writingFeedback" class="writing-feedback" role="status" aria-live="polite">Нажми «Начать практику», чтобы попробовать написать иероглиф.</div>
@@ -3968,7 +3973,7 @@ body.dark-theme .writing-word-result-source,body.dark-theme .writing-selected-wo
       <section class="profile-section">
         <h2>Мой компаньон</h2>
         <div class="companion-card">
-          <div class="companion-picture">🦊</div>
+          <div class="companion-picture" aria-hidden="true"><svg viewBox="0 0 48 48"><path d="M8 20 7 7l12 7a17 17 0 0 1 10 0l12-7-1 13a17 17 0 1 1-32 0Z"/><path d="M17 25h.01M31 25h.01M20 32q4 3 8 0"/></svg></div>
           <div>
             <h3>Мой лисёнок</h3>
             <p>Твой маленький спутник в изучении китайского</p>
@@ -5793,7 +5798,7 @@ function renderCoachCourse(){
   const phraseCount=(supplemental.phrases||[]).length;
   const row=document.createElement('div');row.className='coach-lesson-row';
   const b=document.createElement('button');b.type='button';b.className='coach-lesson-card';b.disabled=locked;
-  b.innerHTML='<span class="coach-lesson-number">'+(isDone?'✓':index+1)+'</span><span><strong>'+lesson.title+'</strong><span class="coach-lesson-meta">'+(isDone?'Урок завершён':locked?'Сначала пройди предыдущий урок':'Урок · '+wordCount+' слов · '+phraseCount+' фраз · грамматика и практика')+'</span></span><span class="coach-lesson-status">'+(locked?'🔒':'›')+'</span>';
+  b.innerHTML='<span class="coach-lesson-number">'+(isDone?'✓':index+1)+'</span><span><strong>'+lesson.title+'</strong><span class="coach-lesson-meta">'+(isDone?'Урок завершён':locked?'Сначала пройди предыдущий урок':'Урок · '+wordCount+' слов · '+phraseCount+' фраз · грамматика и практика')+'</span></span><span class="coach-lesson-status">'+(locked?'<svg class="pc-status-lock" viewBox="0 0 24 24" aria-label="Закрыто"><rect x="5" y="10" width="14" height="11" rx="2"/><path d="M8 10V7a4 4 0 0 1 8 0v3"/></svg>':'›')+'</span>';
   b.addEventListener('click',()=>openCoachLesson(index));
   const favorites=readFavoriteLessons(),lessonId=level+':'+index;
   const star=document.createElement('button');star.type='button';star.className='coach-favorite-button';star.textContent=favorites.includes(lessonId)?'★':'☆';star.setAttribute('aria-label',favorites.includes(lessonId)?'Убрать из избранного':'Добавить в избранное');star.title=star.getAttribute('aria-label');
