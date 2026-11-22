@@ -3485,6 +3485,39 @@ body.dark-theme #coach .coach-practice-option {
   color: #fff1ed !important;
   border-color: #76545d !important;
 }
+
+/* Refined learned-word search for the writing trainer */
+.writing-word-picker{position:relative;padding:19px;border-radius:20px;background:linear-gradient(135deg,rgba(255,246,250,.98),rgba(250,237,244,.88));border-color:#ebcfdb;box-shadow:0 10px 28px rgba(164,91,121,.08)}
+.writing-word-picker>label{font-size:14px;color:#75465b;margin-bottom:10px}
+.writing-search-wrap{position:relative}
+.writing-search-icon{position:absolute;left:15px;top:50%;transform:translateY(-50%);font-size:25px;line-height:1;color:#bd7894;pointer-events:none}
+.writing-search-wrap input{width:100%;box-sizing:border-box;padding:14px 15px 14px 45px;border:1.5px solid #e6c3d2;border-radius:15px;background:#fff;color:#654353;font-size:14px;box-shadow:inset 0 1px 2px rgba(100,50,70,.03);transition:border-color .2s,box-shadow .2s}
+.writing-search-wrap input:focus{outline:none;border-color:#c77e9b;box-shadow:0 0 0 4px rgba(199,126,155,.15)}
+.writing-search-wrap input::placeholder{color:#b596a3}
+.writing-search-hint{margin:8px 2px 0;font-size:11px;color:#a17b8b}
+.writing-word-results{position:absolute;z-index:20;left:19px;right:19px;top:calc(100% - 13px);max-height:250px;overflow:auto;margin:0;padding:7px;border:1px solid #e9cbd7;border-radius:15px;background:#fffafd;box-shadow:0 14px 32px rgba(100,48,70,.16)}
+.writing-word-results:empty{display:none}
+.writing-word-result{position:relative;display:grid;grid-template-columns:auto 1fr;align-items:center;gap:2px 12px;padding:11px 12px;border:1px solid transparent;border-radius:10px;background:transparent;color:#704b5b;transition:background .15s,border-color .15s}
+.writing-word-result:hover,.writing-word-result:focus-visible{background:#fff0f5;border-color:#efd1dd;transform:none;outline:none}
+.writing-word-result-main{display:flex;align-items:center;gap:10px;grid-row:span 2}
+.writing-word-result strong{font-size:22px;color:#a95779}
+.writing-word-result small{font-size:12px;color:#866b78}
+.writing-word-result-source{font-size:10px;color:#bd829a;letter-spacing:.3px}
+.writing-word-empty{padding:13px;color:#987987;font-size:12px}
+.writing-selected-word{display:flex;align-items:center;gap:10px;width:100%;padding:5px 2px 3px;color:#8d6375}
+.writing-selected-word span{font-size:9px;letter-spacing:1.2px;font-weight:800;color:#bd7894}
+.writing-selected-word strong{font-size:19px;color:#a95779}
+body.dark-theme .writing-word-picker{background:linear-gradient(135deg,#44343e,#392f37);border-color:#76545f;box-shadow:0 10px 28px rgba(0,0,0,.16)}
+body.dark-theme .writing-word-picker>label{color:#f2c6d5}
+body.dark-theme .writing-search-wrap input{background:#302830;border-color:#76545f;color:#fff0f5}
+body.dark-theme .writing-search-wrap input::placeholder,body.dark-theme .writing-search-hint{color:#c5a2b0}
+body.dark-theme .writing-search-icon{color:#e1a4bb}
+body.dark-theme .writing-word-results{background:#352b33;border-color:#76545f;box-shadow:0 14px 32px rgba(0,0,0,.35)}
+body.dark-theme .writing-word-result{background:transparent;color:#fff0f5}
+body.dark-theme .writing-word-result:hover,body.dark-theme .writing-word-result:focus-visible{background:#503943;border-color:#8d6272}
+body.dark-theme .writing-word-result strong,body.dark-theme .writing-selected-word strong{color:#f0b5ca}
+body.dark-theme .writing-word-result small,body.dark-theme .writing-word-empty{color:#d8b9c5}
+body.dark-theme .writing-word-result-source,body.dark-theme .writing-selected-word span{color:#d99ab2}
 </style>
 </head>
 <body>
@@ -3712,11 +3745,12 @@ body.dark-theme #coach .coach-practice-option {
       <h2>Тренажёр иероглифов</h2>
       <p>Смотри, как правильно строится иероглиф, а затем повторяй его черты на поле. Тренажёр проверяет порядок и направление написания.</p>
       <div class="writing-word-picker">
-        <label for="writingWordSearch">Или выбери слово из словаря и курса</label>
-        <input id="writingWordSearch" type="search" placeholder="Например, 你好, 学习, 朋友…" autocomplete="off">
+        <label for="writingWordSearch">Найди слово, которое уже выучила</label>
+        <div class="writing-search-wrap"><span class="writing-search-icon" aria-hidden="true">⌕</span><input id="writingWordSearch" type="search" placeholder="Поиск по иероглифам, пиньиню или переводу…" autocomplete="off"></div>
+        <p class="writing-search-hint">Начни вводить слово — покажу совпадения из твоей коллекции.</p>
         <div id="writingWordResults" class="writing-word-results" aria-live="polite"></div>
         <div id="writingWordCharacters" class="writing-word-characters" aria-label="Иероглифы выбранного слова"></div>
-        <p class="small">Выбери слово в результатах, затем нажми на отдельный иероглиф — например, в 你好 можно отдельно выбрать 你 или 好.</p>
+        <p class="small">После выбора слова нажми на нужный иероглиф, чтобы потренировать его отдельно.</p>
       </div>
       <div class="writing-trainer-controls">
         <label for="writingCharacter">Иероглиф для практики</label>
@@ -7697,21 +7731,33 @@ window.addEventListener("keydown", function(event) {
   }
   function renderWritingWordResults(){
     const query=wordSearch.value.trim().toLowerCase();
-    const words=collectWritingWords().filter(item=>!query || item.word.includes(query) || item.pinyin.toLowerCase().includes(query) || item.meaning.toLowerCase().includes(query));
-    const shown=words.slice(0,30);
     wordResults.innerHTML='';
-    if(!shown.length){wordResults.innerHTML='<div class="writing-word-empty">Ничего не найдено. Попробуй другое слово или введи иероглиф вручную ниже.</div>';return;}
+    // До ввода запроса ничего не показываем: слова выбираются через поиск.
+    if(!query)return;
+    const words=collectWritingWords().filter(item=>item.word.includes(query) || item.pinyin.toLowerCase().includes(query) || item.meaning.toLowerCase().includes(query));
+    const shown=words.slice(0,30);
+    if(!shown.length){wordResults.innerHTML='<div class="writing-word-empty">Не нашла такое слово среди выученных. Попробуй другой запрос.</div>';return;}
     shown.forEach(item=>{
       const button=document.createElement('button');button.type='button';button.className='writing-word-result';
-      const left=document.createElement('span');const hanzi=document.createElement('strong');hanzi.textContent=item.word;left.appendChild(hanzi);
-      const right=document.createElement('small');right.textContent=[item.pinyin,item.meaning,item.source].filter(Boolean).join(' · ');
-      button.append(left,right);
+      const left=document.createElement('span');left.className='writing-word-result-main';
+      const hanzi=document.createElement('strong');hanzi.textContent=item.word;left.appendChild(hanzi);
+      const right=document.createElement('small');right.textContent=[item.pinyin,item.meaning].filter(Boolean).join(' · ');
+      const source=document.createElement('span');source.className='writing-word-result-source';source.textContent=item.source;
+      button.append(left,right,source);
       button.addEventListener('click',()=>selectWritingWord(item.word));
       wordResults.appendChild(button);
     });
   }
   function selectWritingWord(word){
-    selectedWord=word;wordCharacters.innerHTML='';
+    selectedWord=word;
+    wordSearch.value='';
+    wordResults.innerHTML='';
+    wordCharacters.innerHTML='';
+    const selectedLabel=document.createElement('div');
+    selectedLabel.className='writing-selected-word';
+    selectedLabel.innerHTML='<span>ВЫБРАНО СЛОВО</span><strong></strong>';
+    selectedLabel.querySelector('strong').textContent=word;
+    wordCharacters.appendChild(selectedLabel);
     [...word].filter(ch=>/\p{Script=Han}/u.test(ch)).forEach(ch=>{
       const button=document.createElement('button');button.type='button';button.className='writing-character-chip';button.textContent=ch;button.title='Тренироваться с иероглифом '+ch;
       button.addEventListener('click',()=>{
