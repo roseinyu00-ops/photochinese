@@ -5034,6 +5034,7 @@ async function loadLargeDictionary(){
    count++;
   }
   dictionaryReady=true;
+  window.dispatchEvent(new Event('photoChineseDictionaryReady'));
   console.info('PhotoChinese: загружено записей словаря:',count);
   const status=document.getElementById('dictionaryStatus');
   if(status) status.textContent='Большой словарь загружен · '+count.toLocaleString('ru-RU')+' записей';
