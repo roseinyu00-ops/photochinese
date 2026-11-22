@@ -108,7 +108,7 @@
     return descriptions[error.name] || ((error.name || "Ошибка") + (error.message ? ": " + error.message : ""));
   }
 
-  function speakWithBrowser(text, statusElement, requestId, failures) {
+  function speakWithBrowser(text, statusElement, requestId, failures, onFailure) {
     const synth = window.speechSynthesis;
     if (!synth || typeof window.SpeechSynthesisUtterance !== "function") {
       if (statusElement && requestId === speechRequestId) {
@@ -143,6 +143,7 @@
         if (!statusElement || requestId !== speechRequestId) return;
         if (event.error === "interrupted" || event.error === "canceled") return;
         statusElement.textContent = failures.join("\n") + "\nСистемный голос: ошибка " + (event.error || "unknown") + ". Доступные китайские голоса: " + voiceSummary + ".";
+        if (typeof onFailure === "function") onFailure("ошибка " + (event.error || "unknown"));
       };
       synth.resume();
       synth.speak(utterance);
@@ -151,6 +152,7 @@
         startTimer = setTimeout(() => {
           if (requestId === speechRequestId) {
             statusElement.textContent = failures.join("\n") + "\nСистемный голос: событие запуска не пришло за 6 секунд. Доступные китайские голоса: " + voiceSummary + ".";
+            if (typeof onFailure === "function") onFailure("не пришло событие запуска");
           }
         }, 6000);
       }
@@ -158,6 +160,62 @@
       if (statusElement && requestId === speechRequestId) {
         statusElement.textContent = failures.join("\n") + "\nСистемный голос: не удалось запустить — " + playErrorDescription(error) + ".";
       }
+    }
+  }
+
+  function playOnlineSpeech(phrase, statusElement, requestId) {
+    const encoded = encodeURIComponent(phrase);
+    const sources = [
+      // tw-ob обычно отдаёт MP3, в отличие от некоторых ответов gtx,
+      // которые отдельные браузеры Android определяют как неизвестный формат.
+      {label:"Google audio (tw-ob)", url:"https://translate.google.com/translate_tts?ie=UTF-8&client=tw-ob&tl=zh-CN&q=" + encoded},
+      {label:"Google audio (gtx)", url:"https://translate.googleapis.com/translate_tts?ie=UTF-8&client=gtx&tl=zh-CN&q=" + encoded}
+    ];
+    const failures = [];
+    const tryAudio = index => {
+      if (requestId !== speechRequestId) return;
+      if (index >= sources.length) {
+        if (statusElement) statusElement.textContent = failures.join("\\n") + "\\nОнлайн-озвучка тоже не запустилась.";
+        return;
+      }
+      const source = sources[index];
+      let settled = false;
+      const audio = new Audio();
+      activeAudio = audio;
+      audio.preload = "auto";
+      let audioAttemptTimer = setTimeout(() => fail("тайм-аут (readyState=" + audio.readyState + ", networkState=" + audio.networkState + ")"), 8000);
+      const clearAttempt = () => { if (audioAttemptTimer) clearTimeout(audioAttemptTimer); };
+      const fail = reason => {
+        if (settled || requestId !== speechRequestId) return;
+        settled = true;
+        clearAttempt();
+        failures.push(source.label + ": " + reason);
+        if (activeAudio === audio) activeAudio = null;
+        try { audio.pause(); } catch (_) {}
+        tryAudio(index + 1);
+      };
+      audio.onplaying = () => {
+        if (requestId !== speechRequestId) return;
+        settled = true;
+        clearAttempt();
+        if (statusElement) statusElement.textContent = "▶ Китайская аудиозапись воспроизводится (" + source.label + ").";
+      };
+      audio.onended = () => {
+        clearAttempt();
+        if (requestId === speechRequestId) {
+          activeAudio = null;
+          if (statusElement) statusElement.textContent = "Воспроизведение завершено.";
+        }
+      };
+      audio.onerror = () => fail(mediaErrorDescription(audio));
+      audio.src = source.url;
+      const result = audio.play();
+      if (result && typeof result.catch === "function") result.catch(error => fail(playErrorDescription(error)));
+      if (statusElement && requestId === speechRequestId) statusElement.textContent = "Проверяю онлайн-озвучку " + (index + 1) + "/" + sources.length + "…";
+    };
+    try { tryAudio(0); }
+    catch (error) {
+      if (statusElement) statusElement.textContent = "Не удалось запустить онлайн-озвучку: " + playErrorDescription(error);
     }
   }
 
@@ -180,64 +238,18 @@
     // может потерять разрешение на запуск речи по действию пользователя.
     const voices = refreshChineseVoices();
     if (voices.length && synth && typeof window.SpeechSynthesisUtterance === "function") {
-      speakWithBrowser(phrase, statusElement, requestId, []);
+      // Наличие голоса в списке ещё не означает, что Android действительно
+      // запустит его. Если системная озвучка зависнет или выдаст ошибку,
+      // автоматически переключаемся на сетевое аудио.
+      speakWithBrowser(phrase, statusElement, requestId, [], reason => {
+        if (requestId !== speechRequestId || activeAudio) return;
+        if (statusElement) statusElement.textContent = "Системный голос не запустился (" + reason + "). Переключаюсь на онлайн-озвучку…";
+        playOnlineSpeech(phrase, statusElement, requestId);
+      });
       return;
     }
 
-    // Если системного китайского голоса нет, пробуем онлайн-источники.
-    const encoded = encodeURIComponent(phrase);
-    const sources = [
-      {label:"Google audio 1 (translate.googleapis.com)", url:"https://translate.googleapis.com/translate_tts?ie=UTF-8&client=gtx&tl=zh-CN&q=" + encoded},
-      {label:"Google audio 2 (translate.google.com)", url:"https://translate.google.com/translate_tts?ie=UTF-8&client=gtx&tl=zh-CN&q=" + encoded}
-    ];
-    const failures = [];
-    const tryAudio = index => {
-      if (requestId !== speechRequestId) return;
-      if (index >= sources.length) {
-        if (statusElement) statusElement.textContent = failures.join("\\n") + "\\nСистемный голос не найден. Проверяю резервную системную озвучку…";
-        speakWithBrowser(phrase, statusElement, requestId, failures);
-        return;
-      }
-      const source = sources[index];
-      let settled = false;
-      const audio = new Audio();
-      activeAudio = audio;
-      audio.preload = "auto";
-      const clearAttempt = () => { if (audioAttemptTimer) clearTimeout(audioAttemptTimer); };
-      const fail = reason => {
-        if (settled || requestId !== speechRequestId) return;
-        settled = true;
-        clearAttempt();
-        failures.push(source.label + ": " + reason);
-        if (activeAudio === audio) activeAudio = null;
-        try { audio.pause(); } catch (_) {}
-        tryAudio(index + 1);
-      };
-      let audioAttemptTimer = setTimeout(() => fail("тайм-аут ожидания (readyState=" + audio.readyState + ", networkState=" + audio.networkState + ")"), 8000);
-      audio.onplaying = () => {
-        if (requestId !== speechRequestId) return;
-        settled = true;
-        clearAttempt();
-        if (statusElement) statusElement.textContent = "▶ Китайская аудиозапись воспроизводится (" + source.label + ").";
-      };
-      audio.onended = () => {
-        clearAttempt();
-        if (requestId === speechRequestId) {
-          activeAudio = null;
-          if (statusElement) statusElement.textContent = "Воспроизведение завершено.";
-        }
-      };
-      audio.onerror = () => fail(mediaErrorDescription(audio));
-      audio.src = source.url;
-      const result = audio.play();
-      if (result && typeof result.catch === "function") result.catch(error => fail(playErrorDescription(error)));
-      if (statusElement && requestId === speechRequestId) statusElement.textContent = "Проверяю онлайн-источник " + (index + 1) + "/2…";
-    };
-    try { tryAudio(0); }
-    catch (error) {
-      failures.push("Онлайн-аудио: " + playErrorDescription(error));
-      speakWithBrowser(phrase, statusElement, requestId, failures);
-    }
+    playOnlineSpeech(phrase, statusElement, requestId);
   }
   function renderReview() {
     const words = getWords();
