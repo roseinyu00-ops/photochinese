@@ -7983,7 +7983,8 @@ window.addEventListener("keydown", function(event) {
       current=shuffle(phrases)[0];const chars=[...current.zh].filter(ch=>/\p{Script=Han}/u.test(ch));const target=chars[Math.floor(Math.random()*chars.length)];
       const hidden=current.zh.replace(target,'＿');
       prompt.textContent='Какой иероглиф пропущен? Перевод: '+current.ru;
-      const options=shuffle([target,...shuffle([...new Set(pairs.map(p=>p[0].split(''))).flat().filter(ch=>/\p{Script=Han}/u.test(ch)&&ch!==target)]).slice(0,3)]);
+      const distractors=[...new Set(pairs.flatMap(pair=>[...pair[0]]).filter(ch=>/\p{Script=Han}/u.test(ch)&&ch!==target))];
+      const options=shuffle([target,...shuffle(distractors).slice(0,3)]);
       const unique=options.slice(0,4);if(!unique.includes(target))unique[0]=target;
       const shown=document.createElement('div');shown.className='games-order-slot';shown.style.fontSize='25px';shown.textContent=hidden;area.appendChild(shown);
       shuffle(unique).forEach(ch=>area.appendChild(button(ch,'games-answer',()=>finish(ch===target,'Полная фраза: '+current.zh))));
@@ -7993,7 +7994,7 @@ window.addEventListener("keydown", function(event) {
       const slots=document.createElement('div');slots.className='games-order-bank';const bank=document.createElement('div');bank.className='games-order-bank';bank.style.borderTop='0';bank.style.paddingTop='0';
       const chosen=[];
       function drawSlots(){slots.innerHTML='';if(!chosen.length){const hint=document.createElement('span');hint.className='games-order-slot';hint.textContent='Нажимай на слова ниже';slots.appendChild(hint);}chosen.forEach((part,i)=>slots.appendChild(button(part,'games-order-slot',()=>{if(answered)return;chosen.splice(i,1);drawSlots();drawBank();})));}
-      function drawBank(){bank.innerHTML='';shuffle(current.parts.filter((part,i)=>!chosen.some((x,j)=>x===part&&current.parts.indexOf(x)===current.parts.indexOf(part)&&j<i))).forEach(()=>{});current.parts.forEach((part,i)=>{if(chosen.filter(x=>x===part).length>=current.parts.slice(0,i+1).filter(x=>x===part).length)return;const b=button(part,'games-answer',()=>{if(answered)return;chosen.push(part);drawSlots();drawBank();});bank.appendChild(b);});}
+      function drawBank(){bank.innerHTML='';const used={};current.parts.forEach(part=>{used[part]=(used[part]||0)+1;const already=chosen.filter(x=>x===part).length;if(already>=used[part])return;const b=button(part,'games-answer',()=>{if(answered)return;chosen.push(part);drawSlots();drawBank();});bank.appendChild(b);});}
       const check=button('Проверить порядок','primary',()=>finish(chosen.join('')===current.parts.join(''),'Верный порядок: '+current.parts.join(' ')));check.style.marginTop='8px';
       area.append(slots,bank,check);drawSlots();drawBank();
     }
