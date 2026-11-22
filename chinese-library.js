@@ -109,7 +109,7 @@ root.append(btn);
 function renderGrammar(){
 const root=$("clGrammarList");if(!root)return;root.replaceChildren();
 const lv=$("clGrammarLevel").value,q=$("clGrammarSearch").value.trim().toLocaleLowerCase("ru");
-const rows=grammar.filter(g=>{const hay=[g[1],g[2],g[3],g[5],g[6],...g[4].flat()].join(" ").toLocaleLowerCase("ru");return (lv==="all"||String(g[0])===lv)&&(activeGrammarTopic==="all"||grammarTopicMap[g[1]]===activeGrammarTopic)&&(!q||hay.includes(q));});
+const rows=grammar.filter(g=>{const hay=[g[1],g[2],g[3],g[5],g[6],...g[4].flat()].join(" ").toLocaleLowerCase("ru");return (lv==="all"||String(g[0])===lv)&&(q||activeGrammarTopic==="all"||grammarTopicMap[g[1]]===activeGrammarTopic)&&(!q||hay.includes(q));});
 if(!rows.length){root.append(make("div","cl-empty","Ничего не найдено. Попробуй изменить тему, уровень или запрос."));return;}
 root.append(make("p","cl-results-count","Найдено конструкций: "+rows.length));
 rows.forEach(g=>{const c=make("article","cl-grammar-card"),top=make("div","cl-grammar-top"),h=make("div");h.append(make("h3","",g[1]),make("p","cl-grammar-summary",g[2]));top.append(h,make("span","cl-level-tag","HSK "+g[0]));c.append(top,make("div","cl-formula",g[3]));const ex=make("div","cl-example-list");g[4].forEach(x=>{const e=make("div","cl-example");e.append(make("div","cl-example-zh",x[0]),make("div","cl-example-py",x[1]),make("div","cl-example-ru",x[2]));ex.append(e);});c.append(ex,make("div","cl-note","Запомни: "+g[5]));const practice=make("div","cl-exercise");practice.append(make("div","cl-exercise-title","Проверь себя"),make("p","cl-exercise-question",g[6]));const opts=make("div","cl-exercise-options"),fb=make("p","cl-exercise-feedback","Выбери один вариант ответа.");g[7].forEach((v,i)=>{const btn=make("button","cl-exercise-option",v);btn.type="button";btn.addEventListener("click",()=>{if(opts.dataset.done)return;opts.dataset.done="1";[...opts.children].forEach((n,j)=>{n.disabled=true;if(j===g[8])n.classList.add("is-correct");else if(j===i)n.classList.add("is-wrong");});fb.textContent=(i===g[8]?"Верно! ":"Не совсем. ")+g[9];});opts.append(btn);});practice.append(opts,fb);c.append(practice);root.append(c);});
@@ -137,7 +137,7 @@ function renderDialogs(){
 const cats=$("clDialogueCategories");if(!cats)return;cats.replaceChildren();
 const q=($("clDialogueSearch")?.value||"").trim().toLocaleLowerCase("ru");
 const topic=dialogueTopics.find(t=>t.id===activeDialogueTopic)||dialogueTopics[0];
-const shown=dialogs.filter(d=>topic.ids.includes(d[0])&&dialogueMatches(d,q));
+const shown=dialogs.filter(d=>(q||topic.ids.includes(d[0]))&&dialogueMatches(d,q));
 if(!shown.length){cats.append(make("div","cl-empty","Ничего не найдено. Попробуй другое слово или выбери другую тему."));return;}
 if(!shown.some(d=>d[0]===active))active=shown[0][0];
 shown.forEach(d=>{
