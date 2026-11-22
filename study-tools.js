@@ -18,6 +18,7 @@
   const day = ms => new Date(ms).toLocaleDateString("ru-RU", {day:"numeric",month:"short"});
   let activeView = "dictionary";
   let currentReviewId = null;
+  let currentReviewCheck = null;
   let currentSpeakId = null;
   let recognition = null;
 
@@ -325,6 +326,7 @@
     $("studyReviewPinyinInput").value = "";
     $("studyReviewMeaningInput").value = "";
     $("studyReviewCheckResult").textContent = "";
+    currentReviewCheck = null;
     $("studyReviewReveal").disabled = false;
     $("studyReviewReveal").hidden = false;
     $("studyReviewRatings").hidden = true;
@@ -368,6 +370,7 @@
     const pinyinCorrect = !!correctPinyin && typedPinyin === correctPinyin;
     const meaningCorrect = !!correctMeaning && typedMeaning === correctMeaning;
     const score = (pinyinCorrect ? 1 : 0) + (meaningCorrect ? 1 : 0);
+    currentReviewCheck = {pinyinCorrect, meaningCorrect, checkedAt:Date.now()};
     $("studyReviewCheckResult").textContent = score === 2
       ? "✓ Всё верно! И произношение, и значение совпали."
       : score === 1
@@ -407,12 +410,84 @@
     const state = safeRead(REVIEW_KEY,{});
     const old = state[currentReviewId] || {interval:0,ease:2.5,reps:0};
     const next = calculateNextReview(rating,old);
-    state[currentReviewId] = {...next,due:Date.now()+next.interval*86400000,lastReviewed:Date.now()};
+    const stats = {...(old.stats || {})};
+    stats.attempts = (stats.attempts || 0) + 1;
+    stats.hardCount = (stats.hardCount || 0) + (rating === "hard" ? 1 : 0);
+    stats.againCount = (stats.againCount || 0) + (rating === "again" ? 1 : 0);
+    if (currentReviewCheck) {
+      stats.pinyinErrors = (stats.pinyinErrors || 0) + (currentReviewCheck.pinyinCorrect ? 0 : 1);
+      stats.meaningErrors = (stats.meaningErrors || 0) + (currentReviewCheck.meaningCorrect ? 0 : 1);
+      stats.lastCheck = currentReviewCheck;
+    }
+    stats.lastRating = rating;
+    state[currentReviewId] = {...next,stats,due:Date.now()+next.interval*86400000,lastReviewed:Date.now()};
     safeWrite(REVIEW_KEY,state);
+    currentReviewCheck = null;
     renderReview();
+    renderRecommendations();
+  }
+
+  function renderRecommendations() {
+    const container = $("studyRecommendationsList");
+    if (!container) return;
+    const words = getWords();
+    const state = getReviewState(words);
+    const now = Date.now();
+    const due = words.filter(word => (state[word.id]?.due || 0) <= now);
+    const needsWork = words.map(word => {
+      const stats = state[word.id]?.stats || {};
+      const trouble = (stats.hardCount || 0) + (stats.againCount || 0);
+      const errors = (stats.pinyinErrors || 0) + (stats.meaningErrors || 0);
+      return {...word, trouble, errors, stats};
+    }).filter(word => word.trouble >= 2 || word.errors >= 2)
+      .sort((a,b) => (b.trouble + b.errors) - (a.trouble + a.errors))
+      .slice(0,3);
+    const cards = [];
+    const addCard = (icon,title,description,action,label,tone) => cards.push({icon,title,description,action,label,tone});
+    if (!words.length) {
+      addCard("📚","Собери свой первый словарь","Отметь слова как выученные в ИИ-учителе или добавь их вручную — тогда рекомендации станут персональными.",null,"Открыть словарь","neutral");
+    } else if (due.length) {
+      addCard("⏰","Есть слова для повторения",due.length + " " + (due.length === 1 ? "слово уже ждёт повторения" : due.length < 5 ? "слова уже ждут повторения" : "слов уже ждут повторения") + ". Лучше закрепить их сейчас, пока материал свежий.","review","Перейти к повторению","focus");
+    } else {
+      const nextDue = Math.min(...words.map(word => state[word.id]?.due || now));
+      const nextDate = new Date(nextDue).toLocaleString("ru-RU",{day:"numeric",month:"long",hour:"2-digit",minute:"2-digit"});
+      addCard("🌱","На сегодня повторение выполнено","Следующее запланированное повторение: " + nextDate + ". Можно спокойно изучать новые слова.","review","Посмотреть повторение","calm");
+    }
+    if (needsWork.length) {
+      const examples = needsWork.map(word => word.hanzi).join("、");
+      const details = needsWork.map(word => {
+        const reasons = [];
+        if ((word.stats.hardCount || 0) + (word.stats.againCount || 0) >= 2) reasons.push("часто оценивается как сложное");
+        if ((word.stats.pinyinErrors || 0) >= 2) reasons.push("есть ошибки в пиньине");
+        if ((word.stats.meaningErrors || 0) >= 2) reasons.push("есть ошибки в переводе");
+        return word.hanzi + ": " + reasons.join(", ");
+      });
+      addCard("🧩","Стоит уделить внимание отдельным словам", "По твоим ответам и оценкам стоит дополнительно повторить: " + examples + ". " + details.join("; ") + ".","review","Повторить слова","focus");
+    }
+    if (words.length && !due.length && !needsWork.length && words.every(word => !(state[word.id]?.stats?.attempts))) {
+      addCard("✨","Давай познакомим систему с твоими знаниями","Пока ещё нет оценённых попыток повторения. После нескольких ответов рекомендации начнут учитывать, что даётся легко, а что требует практики.","review","Начать повторение","neutral");
+    }
+    container.innerHTML = "";
+    cards.forEach(card => {
+      const item = document.createElement("article");
+      item.className = "study-recommendation-card" + (card.tone === "focus" ? " is-focus" : "");
+      const icon = document.createElement("span"); icon.className = "study-recommendation-card-icon"; icon.textContent = card.icon;
+      const body = document.createElement("div"); body.className = "study-recommendation-card-body";
+      const title = document.createElement("strong"); title.textContent = card.title;
+      const description = document.createElement("p"); description.textContent = card.description;
+      body.append(title,description);
+      item.append(icon,body);
+      if (card.action) {
+        const button = document.createElement("button"); button.type = "button"; button.className = "study-recommendation-action"; button.textContent = card.label;
+        button.addEventListener("click",() => setView(card.action));
+        item.appendChild(button);
+      }
+      container.appendChild(item);
+    });
   }
 
   function renderDictionary() {
+    renderRecommendations();
     const words = getWords();
     const query = clean($("studyDictionarySearch").value).toLowerCase();
     const level = $("studyDictionaryLevel").value;
@@ -535,6 +610,7 @@
     $("studyReviewAudio").addEventListener("click",()=>{const w=getWords().find(x=>x.id===currentReviewId);if(w)speak(w.hanzi, $("studyReviewAudioStatus"));});
     $("studySpeakMic").addEventListener("click",startRecognition);
     setView("dictionary");
+    renderRecommendations();
     // При переходе в раздел словаря обновляем данные: пользователь мог
     // отметить новые слова в ИИ-учителе после первоначальной загрузки.
     const studySection = $("studytools");
