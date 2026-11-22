@@ -7367,7 +7367,7 @@ function renderCompanions(){
   if(emoji)emoji.textContent=active.emoji;
   if(name)name.textContent=active.name;
   if(desc)desc.textContent=active.description;
-  if(level)level.textContent="HSK "+active.level;
+  if(level)level.textContent=active.level?"HSK "+active.level:"✦ Легендарный компаньон";
   const gallery=document.getElementById("companionGallery");
   if(!gallery)return;
   gallery.innerHTML="";
