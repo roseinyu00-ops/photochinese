@@ -225,38 +225,69 @@
   function playRecordedSpeech(text, statusElement, requestId) {
     const phrase = clean(text).replace(/[\\s，。！？、,.!?]+/g, "");
     if (!phrase) return;
-    const audio = new Audio();
-    activeAudio = audio;
-    audio.preload = "auto";
-    let settled = false;
-    const finish = () => {
-      if (activeAudio === audio) activeAudio = null;
-    };
-    audio.onplaying = () => {
+
+    // Сначала пробуем цельную запись слова/фразы. Если её нет в каталоге,
+    // последовательно воспроизводим записи отдельных иероглифов.
+    const candidates = [phrase];
+    if ([...phrase].length > 1) candidates.push(...[...phrase]);
+    let candidateIndex = 0;
+    let currentAudio = null;
+
+    const playNext = () => {
       if (requestId !== speechRequestId) return;
-      settled = true;
-      if (statusElement) statusElement.textContent = "▶ Воспроизводится готовая запись китайского произношения.";
-    };
-    audio.onended = () => {
-      finish();
-      if (requestId === speechRequestId && statusElement) statusElement.textContent = "Воспроизведение завершено.";
-    };
-    audio.onerror = () => {
-      finish();
-      if (requestId === speechRequestId && statusElement) {
-        statusElement.textContent = "Для «" + phrase + "» в открытой библиотеке пока не нашлась готовая запись. Попробуй отдельные слова или иероглифы.";
+      if (candidateIndex >= candidates.length) {
+        if (statusElement) {
+          statusElement.textContent = "Для «" + phrase + "» не нашлось готовой записи — ни целой фразы, ни одного из её иероглифов.";
+        }
+        if (activeAudio === currentAudio) activeAudio = null;
+        return;
+      }
+
+      const candidate = candidates[candidateIndex++];
+      const audio = new Audio();
+      currentAudio = audio;
+      activeAudio = audio;
+      audio.preload = "auto";
+      let started = false;
+
+      audio.onplaying = () => {
+        if (requestId !== speechRequestId) return;
+        started = true;
+        if (statusElement) {
+          statusElement.textContent = candidate === phrase
+            ? "▶ Воспроизводится готовая запись слова."
+            : "▶ Нет общей записи — произношу иероглифы по отдельности.";
+        }
+      };
+      audio.onended = () => {
+        if (requestId !== speechRequestId) return;
+        if (candidate !== phrase && candidateIndex < candidates.length) {
+          playNext();
+          return;
+        }
+        if (activeAudio === audio) activeAudio = null;
+        if (statusElement) statusElement.textContent = "Воспроизведение завершено.";
+      };
+      audio.onerror = () => {
+        if (requestId !== speechRequestId) return;
+        if (!started) {
+          playNext();
+        } else {
+          if (activeAudio === audio) activeAudio = null;
+          if (statusElement) statusElement.textContent = "Воспроизведение записи прервалось.";
+        }
+      };
+
+      audio.src = RECORDED_AUDIO_BASE + encodeURIComponent(candidate) + ".mp3";
+      const result = audio.play();
+      if (result && typeof result.catch === "function") {
+        result.catch(() => {
+          if (requestId === speechRequestId && !started) playNext();
+        });
       }
     };
-    audio.src = RECORDED_AUDIO_BASE + encodeURIComponent(phrase) + ".mp3";
-    const result = audio.play();
-    if (result && typeof result.catch === "function") {
-      result.catch(error => {
-        finish();
-        if (requestId === speechRequestId && statusElement) {
-          statusElement.textContent = "Не удалось воспроизвести готовую запись: " + playErrorDescription(error) + ".";
-        }
-      });
-    }
+
+    playNext();
   }
 
   function speak(text, statusElement) {
