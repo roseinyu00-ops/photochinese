@@ -8162,6 +8162,7 @@ async function requirePhotoChineseMfa(){
   };
  });
 }
+document.addEventListener("DOMContentLoaded",()=>{
 document.getElementById("securityMfaStart").addEventListener("click",async()=>{
  const b=document.getElementById("securityMfaStart"),msg=document.getElementById("securityMfaMessage");b.disabled=true;msg.textContent="Создаём настройку…";
  try{const {data,error}=await window.photoChineseSupabase.auth.mfa.enroll({factorType:"totp",friendlyName:"PhotoChinese Authenticator"});if(error)throw error;
@@ -8187,6 +8188,8 @@ document.getElementById("securityMfaRemove").addEventListener("click",async()=>{
   const {error:re}=await window.photoChineseSupabase.auth.mfa.unenroll({factorId:factor.id});if(re)throw re;
   msg.textContent="Двухэтапная проверка отключена.";await refreshPhotoChineseMfaSettings();
  }catch(e){msg.textContent="Не удалось отключить MFA: "+(e.message||"ошибка");}finally{b.disabled=false;}
+});
+
 });
 
 // Выход из аккаунта
