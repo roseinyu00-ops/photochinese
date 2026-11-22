@@ -345,6 +345,12 @@
       return matches && (level === "all" || String(w.level||0) === level);
     });
     $("studyDictionaryCount").textContent = "Найдено: " + filtered.length + " из " + words.length;
+    const syncNote = $("studyDictionarySyncStatus");
+    if (syncNote) {
+      syncNote.textContent = window.photoChineseIsLoggedIn?.()
+        ? "☁️ Ты вошла в аккаунт. Словарь и интервалы повторения сохраняются в облако и будут доступны после входа в тот же аккаунт на другом браузере."
+        : "☁️ Сейчас слова хранятся только в этом браузере. Чтобы перенести их, войди в свой аккаунт в разделе «Профиль» — затем войди в него же в другом браузере.";
+    }
     const list = $("studyDictionaryList"); list.innerHTML = "";
     if (!filtered.length) {
       const empty = document.createElement("div"); empty.className = "study-tools-empty";
