@@ -5263,7 +5263,7 @@ renderQ();
   <script>
 if ("serviceWorker" in navigator) {
   window.addEventListener("load", () => {
-    navigator.serviceWorker.register("./service-worker.js?v=9", { updateViaCache: "none" })
+    navigator.serviceWorker.register("./service-worker.js?v=10", { updateViaCache: "none" })
       .then(() => console.log("PhotoChinese PWA ready!"))
       .catch(error => console.error("PWA error:", error));
   });
