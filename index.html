@@ -2947,6 +2947,142 @@ body.dark-theme #meme .meme-expression p.small{border-color:#76545d}
 body.dark-theme #meme .meme-token:hover{background:rgba(210,140,164,.1)}
 @media(prefers-reduced-motion:reduce){#meme .meme-upload,#meme .meme-token,#meme #translateBtn,#meme #memeText{transition:none}}
 
+
+
+/* PHOTOCHINESE · дополнительные акценты для всех разделов (добавочный слой) */
+.tab>.panel,.tab>.section,.tab>.study-tools-view,.profile-section{
+  transition:transform .38s cubic-bezier(.2,.75,.25,1),box-shadow .38s ease,border-color .38s ease,background .38s ease
+}
+.tab>.panel:hover,.tab>.section:hover,.tab>.study-tools-view:hover{
+  border-color:rgba(207,120,147,.28);
+  box-shadow:0 9px 26px rgba(164,91,119,.065)
+}
+.tab h1,.tab h2,.profile-section>h2{
+  text-wrap:balance
+}
+.tab h1{
+  background:linear-gradient(105deg,#9e526d 0%,#d17e9c 48%,#9b79b8 100%);
+  -webkit-background-clip:text;background-clip:text;color:transparent;
+  letter-spacing:-.045em
+}
+.tab h1 em,.tab h1 i{color:#bd7591}
+.tab h2{letter-spacing:-.025em}
+.tab h2::after{
+  width:clamp(48px,9vw,82px);
+  background:linear-gradient(90deg,#df91aa 0%,#c5a0d8 72%,rgba(197,160,216,0) 100%)
+}
+.tab p:not(.small){line-height:1.72}
+.tab .small{line-height:1.6}
+.tab label{font-weight:650}
+.tab input:not([type="checkbox"]):not([type="radio"]),
+.tab textarea,.tab select{
+  transition:border-color .25s ease,box-shadow .25s ease,background .25s ease
+}
+.tab input:focus,.tab textarea:focus,.tab select:focus{
+  border-color:#d391a8;box-shadow:0 0 0 3px rgba(211,145,168,.13);outline:0
+}
+.tab .primary{background-image:linear-gradient(110deg,rgba(255,255,255,.13),transparent 52%)}
+.tab .primary:not(:disabled):hover{box-shadow:0 7px 20px rgba(178,103,128,.17)}
+.tab .secondary:hover{border-color:rgba(207,120,147,.5)}
+/* Главная: фото-анализ, словарь и результаты */
+#learn>.hero{background-image:radial-gradient(ellipse at 92% 8%,rgba(205,169,222,.13),transparent 34%),radial-gradient(ellipse at 5% 95%,rgba(235,174,194,.13),transparent 38%)}
+#learn>.hero h1{line-height:1.12}
+#learn>.hero>p{max-width:650px;font-size:1.04em}
+#learn .ocr-locked-card{
+  border:1px solid rgba(207,120,147,.28);
+  background:linear-gradient(112deg,rgba(248,226,235,.55),rgba(239,230,248,.42));
+  border-radius:16px
+}
+#learn .ocr-locked-note{font-style:italic;color:#a45d73}
+#learn #analysisPanel{background-image:linear-gradient(145deg,rgba(255,249,251,.65),rgba(248,243,251,.4))}
+#learn #analysisInput{border-radius:15px;background:linear-gradient(180deg,#fff,#fffafd)}
+#learn #analysisResults>.result,#learn #analysisResults .result{border-left:3px solid #d99aae}
+#learn #strokeSection{border:1px dashed rgba(207,120,147,.42);border-radius:16px;padding:15px;background:linear-gradient(135deg,rgba(248,228,235,.2),rgba(239,230,248,.2))}
+/* Мемы: градиент именно на названии раздела */
+#meme>.panel>h1{
+  display:inline-block;
+  background:linear-gradient(100deg,#a65370 0%,#df8ca8 48%,#a78ac5 100%);
+  -webkit-background-clip:text;background-clip:text;color:transparent;
+  font-style:italic;letter-spacing:-.055em
+}
+#meme>.panel>h1::after{width:100%;height:4px;background:linear-gradient(90deg,#e6a1b6,#c6a7df,#f0c5d1)}
+#meme>.panel>h1::before{content:"✦";position:absolute;right:-25px;top:-7px;font-size:.38em;color:#c18aaa}
+#meme #translateBtn{background-image:linear-gradient(105deg,#d98fa8,#b99acb);color:#fff}
+/* ИИ-учитель: поиск, уроки, диалоги */
+#coach #coachFindPanel{background-image:radial-gradient(ellipse at 100% 0,rgba(201,168,220,.12),transparent 42%)}
+#coach .coach-search-shell{border:1px solid rgba(207,120,147,.22);border-radius:14px;padding:4px;background:rgba(255,250,252,.55)}
+#coach .coach-search-result{border-left:3px solid #d99aae!important;border-radius:10px}
+#coach .coach-hero{background-image:radial-gradient(ellipse at 90% 0,rgba(201,168,220,.16),transparent 40%),linear-gradient(120deg,rgba(255,248,251,.55),transparent)}
+#coach .coach-progress-ring{box-shadow:0 0 0 5px rgba(217,154,174,.1),0 0 0 10px rgba(198,167,223,.07)}
+#coach .coach-progress-track,#coach .coach-exam-timer{border-radius:999px}
+#coach .coach-final-exam{margin-top:20px;padding:18px;border:1px solid rgba(207,120,147,.24);border-radius:16px;background:linear-gradient(120deg,rgba(248,228,235,.3),rgba(239,230,248,.3))}
+#coach .coach-lesson-top{padding-bottom:12px;border-bottom:1px solid rgba(207,120,147,.18)}
+#coach #coachLessonTag,#coach #coachExamTag{font-style:italic;color:#a45d73}
+#coach .coach-lesson-card{background-image:linear-gradient(120deg,rgba(255,255,255,.38),transparent)}
+/* HSK: диагностика как отдельное событие */
+#hsk .hsk-diagnostic{background-image:radial-gradient(ellipse at 95% 4%,rgba(198,167,223,.17),transparent 38%),radial-gradient(ellipse at 0 100%,rgba(238,190,204,.18),transparent 38%)}
+#hsk .hsk-kicker{letter-spacing:2px;font-weight:850;color:#a45d73}
+#hsk .hsk-intro-stats>div{border:1px solid rgba(207,120,147,.2);border-radius:15px;background:linear-gradient(145deg,rgba(255,255,255,.7),rgba(248,228,235,.34));padding:13px}
+#hsk .hsk-intro-stats strong{display:block;background:linear-gradient(100deg,#b65f7d,#a78ac5);-webkit-background-clip:text;background-clip:text;color:transparent;font-size:1.55em}
+#hsk .hsk-question-card{border-top:3px solid transparent;border-image:linear-gradient(90deg,#e6a1b6,#c6a7df) 1}
+#hsk .hsk-question-type{font-style:italic;font-weight:750;color:#a45d73}
+#hsk .hsk-test-top{font-weight:750}
+#hsk .hsk-result-score{background:linear-gradient(135deg,rgba(238,190,204,.25),rgba(201,168,220,.22));border:1px solid rgba(207,120,147,.2);border-radius:18px}
+/* Профиль: личное пространство */
+#profile .profile-banner{position:relative;isolation:isolate}
+#profile .profile-banner::after{content:"";position:absolute;inset:auto 0 0;height:48%;background:linear-gradient(0deg,rgba(44,30,39,.24),transparent);pointer-events:none;z-index:-0}
+#profile .profile-name-line h2{background:linear-gradient(100deg,#a65370,#c47d9c 58%,#a78ac5);-webkit-background-clip:text;background-clip:text;color:transparent}
+#profile .profile-bio{border-left:3px solid #d99aae;padding:10px 14px;background:linear-gradient(90deg,rgba(238,190,204,.13),transparent);border-radius:0 12px 12px 0}
+#profile .profile-facts{display:inline-flex;padding:8px 12px;border-radius:12px;background:linear-gradient(110deg,rgba(248,228,235,.6),rgba(239,230,248,.45));border:1px solid rgba(207,120,147,.2)}
+#profile .profile-section{position:relative;padding-top:18px}
+#profile .profile-section>h2{font-style:italic}
+#profile .companion-card{background:linear-gradient(115deg,rgba(248,228,235,.48),rgba(239,230,248,.45));border-color:rgba(207,120,147,.24)}
+#profile .companion-picture{filter:drop-shadow(0 5px 8px rgba(178,103,128,.14))}
+#profile .collection-item{transition:transform .25s ease,border-color .25s ease,box-shadow .25s ease}
+#profile .collection-item:hover{transform:translateY(-3px);border-color:rgba(207,120,147,.45);box-shadow:0 7px 18px rgba(178,103,128,.08)}
+/* Словарь и инструменты */
+#studytools .study-tools-hero{background-image:radial-gradient(ellipse at 95% 0,rgba(201,168,220,.17),transparent 40%),linear-gradient(110deg,rgba(255,248,251,.55),transparent)}
+#studytools .study-tools-tabs{padding:5px;border:1px solid rgba(207,120,147,.2);border-radius:15px;background:rgba(248,228,235,.25)}
+#studytools .study-tools-tabs button{border-radius:11px;transition:background .25s ease,box-shadow .25s ease,transform .25s ease}
+#studytools .study-tools-tabs button.active{background:linear-gradient(105deg,#e9bdca,#d5c0e5);color:#654252;box-shadow:0 4px 12px rgba(178,103,128,.12)}
+#studytools .study-tools-card{border-top:3px solid #d99aae;background-image:linear-gradient(135deg,rgba(248,228,235,.28),rgba(239,230,248,.24))}
+#studytools .study-tools-hanzi{background:linear-gradient(100deg,#a65370,#a78ac5);-webkit-background-clip:text;background-clip:text;color:transparent}
+#studytools .study-recommendations{border:1px solid rgba(207,120,147,.23);border-radius:16px;background:linear-gradient(120deg,rgba(248,228,235,.32),rgba(239,230,248,.3));padding:15px}
+#studytools .study-recommendations-heading h3{color:#a65370}
+#studytools .study-tools-note{border-left:3px solid #c6a7df;padding:10px 13px;background:rgba(239,230,248,.25);border-radius:0 10px 10px 0;font-style:italic}
+/* Боковая панель прогресса — визуально связана с основными вкладками */
+#learningSidebar .learning-progress-panel{background-image:radial-gradient(ellipse at 100% 0,rgba(201,168,220,.15),transparent 38%)}
+#learningSidebar .learning-progress-heading h2{font-style:italic}
+#learningSidebar .learning-progress-mark{color:#c18aaa;text-shadow:0 2px 10px rgba(193,138,170,.25)}
+#learningSidebar .learning-progress-stat{border-color:rgba(207,120,147,.2);background:linear-gradient(145deg,rgba(255,255,255,.52),rgba(248,228,235,.25))}
+#learningSidebar .learning-progress-stat strong{background:linear-gradient(100deg,#b65f7d,#a78ac5);-webkit-background-clip:text;background-clip:text;color:transparent}
+/* Светлая и тёмная темы */
+body.dark-theme .tab h1,body.dark-theme #profile .profile-name-line h2{background-image:linear-gradient(100deg,#f0b2c4,#d8b6e8 70%,#e9c2d0)}
+body.dark-theme #meme>.panel>h1{background-image:linear-gradient(100deg,#f0b2c4,#d8b6e8 70%,#e9c2d0)}
+body.dark-theme #meme>.panel>h1::before{color:#e1b3ce}
+body.dark-theme #learn .ocr-locked-card,body.dark-theme #learn #analysisInput,
+body.dark-theme #coach .coach-final-exam,body.dark-theme #hsk .hsk-intro-stats>div,
+body.dark-theme #profile .profile-facts,body.dark-theme #profile .companion-card,
+body.dark-theme #studytools .study-recommendations,body.dark-theme #studytools .study-tools-note,
+body.dark-theme #learningSidebar .learning-progress-stat{
+  background-image:linear-gradient(120deg,rgba(117,76,91,.25),rgba(100,79,119,.22));border-color:#76545d;color:var(--ink)
+}
+body.dark-theme #coach .coach-search-shell{background:rgba(64,52,56,.65);border-color:#76545d}
+body.dark-theme #hsk .hsk-kicker,body.dark-theme #hsk .hsk-question-type,
+body.dark-theme #studytools .study-recommendations-heading h3{color:#f0b2c4}
+body.dark-theme #studytools .study-tools-tabs{background:rgba(117,76,91,.18);border-color:#76545d}
+body.dark-theme #studytools .study-tools-tabs button.active{background:linear-gradient(105deg,#76505e,#665274);color:#fff1f5}
+body.dark-theme #studytools .study-tools-hanzi{background-image:linear-gradient(100deg,#f0b2c4,#d8b6e8)}
+body.dark-theme #learn #analysisInput{background-color:#403438;color:var(--ink)}
+body.dark-theme #profile .profile-bio{background:linear-gradient(90deg,rgba(117,76,91,.25),transparent)}
+@media(hover:hover) and (pointer:fine){
+  #profile .profile-section:hover,#studytools .study-tools-card:hover{transform:translateY(-2px)}
+}
+@media(prefers-reduced-motion:reduce){
+  .tab>.panel,.tab>.section,.tab>.study-tools-view,.profile-section,
+  #profile .collection-item{transition:none!important}
+}
+
 </style>
 
 </head>
@@ -5673,7 +5809,7 @@ renderQ();
   <script>
 if ("serviceWorker" in navigator) {
   window.addEventListener("load", () => {
-    navigator.serviceWorker.register("./service-worker.js?v=18", { updateViaCache: "none" })
+    navigator.serviceWorker.register("./service-worker.js?v=19", { updateViaCache: "none" })
       .then(() => console.log("PhotoChinese PWA ready!"))
       .catch(error => console.error("PWA error:", error));
   });
