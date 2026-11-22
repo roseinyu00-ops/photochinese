@@ -54,24 +54,23 @@ const families={
 "爱":["ài","любить; любовь",[["爱好","àihào","увлечение"],["爱情","àiqíng","любовь"],["可爱","kě'ài","милый"],["爱人","àirén","любимый человек; супруг(а)"],["热爱","rè'ài","горячо любить"]]]
 };
 const make=(tag,cls,text)=>{const n=document.createElement(tag);if(cls)n.className=cls;if(text!==undefined)n.textContent=text;return n;};
+let activeGrammarTopic="all";
+function grammarTopic(g){const n=g[1];if(/вопрос|什么|谁|吗/.test(n))return "questions";if(/отрицание/.test(n))return "negative";if(/порядок слов|связка|принадлежность|счётное слово|местонахождение/.test(n))return "basics";if(/сравнение|причина|уступка|одновременные|изменение степени/.test(n))return "complex";return "particles";}
+const grammarTopics=[["all","Все темы"],["basics","Строение предложения"],["questions","Вопросы"],["negative","Отрицание"],["particles","Частицы и дополнения"],["complex","Связь и сравнение"]];
+function renderGrammarTopics(){const root=$("clGrammarTopics");if(!root)return;root.replaceChildren();grammarTopics.forEach(([id,label])=>{const btn=make("button","cl-topic-chip",label);btn.type="button";btn.classList.toggle("active",id===activeGrammarTopic);btn.addEventListener("click",()=>{activeGrammarTopic=id;renderGrammarTopics();renderGrammar();});root.append(btn);});}
 function renderGrammar(){
 const root=$("clGrammarList");if(!root)return;root.replaceChildren();
-const lv=$("clGrammarLevel").value,q=$("clGrammarSearch").value.trim().toLowerCase();
-const rows=grammar.filter(g=>(lv==="all"||String(g[0])===lv)&&(!q||(g[1]+g[2]+g[3]).toLowerCase().includes(q)));
-if(!rows.length){root.append(make("div","cl-empty","По этому запросу ничего не найдено. Попробуй другой запрос."));return;}
-rows.forEach(g=>{const c=make("article","cl-grammar-card"),top=make("div","cl-grammar-top"),h=make("div");h.append(make("h3","",g[1]),make("p","cl-grammar-summary",g[2]));top.append(h,make("span","cl-level-tag","HSK "+g[0]));c.append(top,make("div","cl-formula",g[3]));const ex=make("div","cl-example-list");g[4].forEach(x=>{const e=make("div","cl-example");e.append(make("div","cl-example-zh",x[0]),make("div","cl-example-py",x[1]),make("div","cl-example-ru",x[2]));ex.append(e);});c.append(ex,make("div","cl-note","Запомни: "+g[5]));const practice=make("div","cl-exercise");practice.append(make("div","cl-exercise-title","Проверь себя"),make("p","cl-exercise-question",g[6]));const opts=make("div","cl-exercise-options"),fb=make("p","cl-exercise-feedback","Выбери один вариант ответа.");g[7].forEach((v,i)=>{const b=make("button","cl-exercise-option",v);b.type="button";b.addEventListener("click",()=>{if(opts.dataset.done)return;opts.dataset.done="1";[...opts.children].forEach((n,j)=>{n.disabled=true;if(j===g[8])n.classList.add("is-correct");else if(j===i)n.classList.add("is-wrong");});fb.textContent=(i===g[8]?"Верно! ":"Не совсем. ")+g[9];});opts.append(b);});practice.append(opts,fb);c.append(practice);root.append(c);});
+const lv=$("clGrammarLevel").value,q=$("clGrammarSearch").value.trim().toLocaleLowerCase("ru");
+const rows=grammar.filter(g=>{const hay=[g[1],g[2],g[3],g[5],g[6],...g[4].flat()].join(" ").toLocaleLowerCase("ru");return (lv==="all"||String(g[0])===lv)&&(activeGrammarTopic==="all"||grammarTopic(g)===activeGrammarTopic)&&(!q||hay.includes(q));});
+if(!rows.length){root.append(make("div","cl-empty","Ничего не найдено. Попробуй изменить тему, уровень или запрос."));return;}
+root.append(make("p","cl-results-count","Найдено конструкций: "+rows.length));
+rows.forEach(g=>{const c=make("article","cl-grammar-card"),top=make("div","cl-grammar-top"),h=make("div");h.append(make("h3","",g[1]),make("p","cl-grammar-summary",g[2]));top.append(h,make("span","cl-level-tag","HSK "+g[0]));c.append(top,make("div","cl-formula",g[3]));const ex=make("div","cl-example-list");g[4].forEach(x=>{const e=make("div","cl-example");e.append(make("div","cl-example-zh",x[0]),make("div","cl-example-py",x[1]),make("div","cl-example-ru",x[2]));ex.append(e);});c.append(ex,make("div","cl-note","Запомни: "+g[5]));const practice=make("div","cl-exercise");practice.append(make("div","cl-exercise-title","Проверь себя"),make("p","cl-exercise-question",g[6]));const opts=make("div","cl-exercise-options"),fb=make("p","cl-exercise-feedback","Выбери один вариант ответа.");g[7].forEach((v,i)=>{const btn=make("button","cl-exercise-option",v);btn.type="button";btn.addEventListener("click",()=>{if(opts.dataset.done)return;opts.dataset.done="1";[...opts.children].forEach((n,j)=>{n.disabled=true;if(j===g[8])n.classList.add("is-correct");else if(j===i)n.classList.add("is-wrong");});fb.textContent=(i===g[8]?"Верно! ":"Не совсем. ")+g[9];});opts.append(btn);});practice.append(opts,fb);c.append(practice);root.append(c);});
 }
 let active="cafe";
-function renderDialogs(){
-const cats=$("clDialogueCategories");cats.replaceChildren();
-dialogs.forEach(d=>{const b=make("button","cl-category-button");b.type="button";b.classList.toggle("active",d[0]===active);b.append(make("span","cl-category-icon",d[1]),make("strong","",d[2]),make("small","",d[3]));b.addEventListener("click",()=>{active=d[0];renderDialogs();renderDialogue();});cats.append(b);});
-}
-function speak(text){if(!("speechSynthesis"in window)){return;}speechSynthesis.cancel();const u=new SpeechSynthesisUtterance(text);u.lang="zh-CN";u.rate=.88;speechSynthesis.speak(u);}
-function renderDialogue(){
-const root=$("clDialogueContent"),d=dialogs.find(x=>x[0]===active);root.replaceChildren();root.append(make("span","cl-kicker","РАЗГОВОРНАЯ СИТУАЦИЯ"),make("h3","",d[2]),make("p","cl-dialogue-intro",d[3]));
-d[4].forEach(line=>{const row=make("div","cl-dialogue-line"),speaker=make("span","cl-speaker",line[0]),body=make("div"),audio=make("button","cl-audio-button","▶ Прослушать");body.append(make("div","cl-dialogue-zh",line[1]),make("div","cl-dialogue-pinyin",line[2]),make("div","cl-dialogue-translation",line[3]));audio.type="button";audio.addEventListener("click",()=>speak(line[1]));row.append(speaker,body,audio);root.append(row);});
-root.append(make("div","cl-dialogue-footer","Полезные выражения: "+d[5]),make("p","small","Нажми «Прослушать» рядом с репликой, чтобы услышать китайское произношение."));
-}
+function dialogueMatches(d,q){return !q||[d[2],d[3],d[5],...d[4].flat()].join(" ").toLocaleLowerCase("ru").includes(q);}
+function renderDialogs(){const cats=$("clDialogueCategories");cats.replaceChildren();const q=($("clDialogueSearch")?.value||"").trim().toLocaleLowerCase("ru");const shown=dialogs.filter(d=>dialogueMatches(d,q));if(!shown.length){cats.append(make("div","cl-empty","По этому запросу ситуаций не найдено."));return;}if(!shown.some(d=>d[0]===active))active=shown[0][0];shown.forEach(d=>{const btn=make("button","cl-category-button");btn.type="button";btn.classList.toggle("active",d[0]===active);btn.append(make("span","cl-category-number",String(dialogs.indexOf(d)+1).padStart(2,"0")),make("strong","",d[2]),make("small","",d[3]));btn.addEventListener("click",()=>{active=d[0];renderDialogs();renderDialogue();});cats.append(btn);});}
+function speak(text){if(!("speechSynthesis"in window))return;speechSynthesis.cancel();const u=new SpeechSynthesisUtterance(text);u.lang="zh-CN";u.rate=.88;speechSynthesis.speak(u);}
+function renderDialogue(){const root=$("clDialogueContent"),d=dialogs.find(x=>x[0]===active);if(!root)return;root.replaceChildren();const q=($("clDialogueSearch")?.value||"").trim().toLocaleLowerCase("ru");if(!d||!dialogueMatches(d,q)){root.append(make("div","cl-empty","Выбери ситуацию из списка выше."));return;}root.append(make("span","cl-kicker","РАЗГОВОРНАЯ СИТУАЦИЯ"),make("h3","",d[2]),make("p","cl-dialogue-intro",d[3]));d[4].forEach(line=>{const row=make("div","cl-dialogue-line"),speaker=make("span","cl-speaker",line[0]),body=make("div"),audio=make("button","cl-audio-button","Слушать");body.append(make("div","cl-dialogue-zh",line[1]),make("div","cl-dialogue-pinyin",line[2]),make("div","cl-dialogue-translation",line[3]));audio.type="button";audio.addEventListener("click",()=>speak(line[1]));row.append(speaker,body,audio);root.append(row);});root.append(make("div","cl-dialogue-footer","Полезные выражения: "+d[5]),make("p","small","Нажми «Слушать», чтобы услышать китайское произношение."));}
 function learned(){
 const chars=new Set();
 try{const a=JSON.parse(localStorage.getItem("learnedCharacters")||"[]");if(Array.isArray(a))a.forEach(x=>[...String(x)].forEach(ch=>{if(/\p{Script=Han}/u.test(ch))chars.add(ch);}));}catch(e){}
@@ -79,9 +78,10 @@ try{if(typeof getLearnedCoachVocabularyRecords==="function")getLearnedCoachVocab
 return [...chars];
 }
 function renderChips(){
-const root=$("clLearnedCharacterChips");root.replaceChildren();const chars=learned();
-if(!chars.length){root.append(make("span","small","Пока нет отмеченных иероглифов. Введи любой знак ниже."));return;}
-chars.slice(0,40).forEach(ch=>{const b=make("button","cl-character-chip",ch);b.type="button";b.addEventListener("click",()=>select(ch));root.append(b);});
+const root=$("clLearnedCharacterChips");if(!root)return;root.replaceChildren();const chars=learned(),all=[...new Set([...Object.keys(families),...chars])];
+root.append(make("div","cl-character-group-label","ТВОИ ИЗУЧЕННЫЕ"));
+if(!chars.length)root.append(make("p","cl-character-empty","Пока нет отмеченных знаков — начни с популярных ниже."));else{const row=make("div","cl-character-chip-row");chars.slice(0,40).forEach(ch=>{const btn=make("button","cl-character-chip",ch);btn.type="button";btn.addEventListener("click",()=>select(ch));row.append(btn);});root.append(row);}
+root.append(make("div","cl-character-group-label","ПОПУЛЯРНЫЕ ИЕРОГЛИФЫ"));const starter=make("div","cl-character-chip-row");all.forEach(ch=>{const btn=make("button","cl-character-chip",ch);btn.type="button";btn.addEventListener("click",()=>select(ch));starter.append(btn);});root.append(starter);
 }
 function showWords(ch){
 const root=$("clWordBuildingResults"),hint=$("clCharacterHint");root.replaceChildren();
@@ -110,11 +110,13 @@ card.append(grid);root.append(card);
 }
 function select(ch){$("clCharacterInput").value=ch;document.querySelectorAll(".cl-character-chip").forEach(b=>b.classList.toggle("active",b.textContent===ch));showWords(ch);}
 $("clGrammarLevel")?.addEventListener("change",renderGrammar);$("clGrammarSearch")?.addEventListener("input",renderGrammar);
+$("clDialogueSearch")?.addEventListener("input",()=>{renderDialogs();renderDialogue();});
 $("clCharacterSearch")?.addEventListener("click",()=>{const ch=$("clCharacterInput").value.trim();if(ch)select([...ch][0]);else $("clCharacterHint").textContent="Сначала введи один китайский иероглиф.";});
 $("clCharacterInput")?.addEventListener("keydown",e=>{if(e.key==="Enter")$("clCharacterSearch").click();});
 $("clCharacterInput")?.addEventListener("input",e=>{const chars=[...e.target.value.trim()];if(chars.length>1)e.target.value=chars[0];});
 window.addEventListener("storage",renderChips);
 window.addEventListener("photoChineseDataLoaded",renderChips);
 window.addEventListener("photoChineseDictionaryReady",()=>{renderChips();const ch=$("clCharacterInput").value.trim();if(ch)showWords([...ch][0]);});
-renderGrammar();renderDialogs();renderDialogue();renderChips();
+renderGrammarTopics();renderGrammar();renderDialogs();renderDialogue();renderChips();
+if(!$("clCharacterInput").value.trim())select("学");
 })();
