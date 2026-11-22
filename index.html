@@ -2495,6 +2495,52 @@ body.dark-theme .writing-word-result small{color:#e0bdc9}
 body.dark-theme .writing-character-chip{background:#49383d;color:#ffe1e8;border-color:#76545d}
 body.dark-theme .writing-character-chip.selected{background:#694653;border-color:#d18ca8}
 /* Minimal PhotoChinese line icons */
+/* Mini-games */
+.games-hero{position:relative;overflow:hidden;margin:0 0 16px;padding:24px;border:1px solid #f0dce2;border-radius:20px;background:linear-gradient(125deg,#fffafb 0%,#fff0f5 58%,#f5efff 100%)}
+.games-kicker{font-size:10px;letter-spacing:1.8px;font-weight:850;color:#b56c88}
+.games-hero h2{margin:6px 0;font-size:25px}.games-hero h2 em{font-style:italic;color:#c66f91}
+.games-hero p{max-width:620px;margin:0;color:#856979;font-size:13px}
+.games-total{display:inline-flex;align-items:center;gap:10px;margin-top:17px;padding:9px 14px;border:1px solid #efd7e0;border-radius:13px;background:#ffffffb8;color:#9d5e78}
+.games-total-icon{font-size:20px}.games-total strong,.games-total small{display:block}.games-total strong{font-size:19px;line-height:1.1}.games-total small{font-size:10px;color:#987b87}
+.games-mode-grid{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:10px;margin-bottom:16px}
+.games-mode-card{position:relative;display:flex;flex-direction:column;align-items:flex-start;gap:7px;min-height:150px;padding:15px;border:1px solid var(--line);border-radius:16px;background:var(--card,white);color:var(--ink);text-align:left;cursor:pointer;transition:transform .18s,border-color .18s,background .18s}
+.games-mode-card.active{border-color:#cf8da7;background:linear-gradient(145deg,#fff8fb,#f9edf4);box-shadow:0 5px 16px #9c5a7114}
+.games-mode-number{font-size:10px;letter-spacing:1.5px;font-weight:850;color:#c18aa0}
+.games-mode-icon{display:inline-flex;width:27px;height:27px;color:#b66f89}.games-mode-icon svg{width:100%;height:100%;fill:none;stroke:currentColor;stroke-width:1.6;stroke-linecap:round;stroke-linejoin:round}
+.games-mode-card strong{font-size:13px;line-height:1.35}.games-mode-card small{font-size:11px;line-height:1.45;color:var(--muted)}
+.games-play-panel{padding:20px}.games-play-top{display:flex;justify-content:space-between;align-items:center;gap:12px}
+.games-round-label{font-size:10px;letter-spacing:1.4px;font-weight:850;color:#b56c88}.games-play-top h3{margin:4px 0;font-size:19px}
+.games-score-chip{padding:6px 10px;border-radius:99px;background:#f9e9ef;color:#a45e78;font-size:12px}.games-prompt{margin:14px 0;color:var(--muted);font-size:14px}
+.games-task-area{display:flex;flex-wrap:wrap;gap:9px;min-height:92px;align-items:center;padding:15px;border:1px dashed #e8cbd5;border-radius:15px;background:#fffafb}
+.games-answer{padding:11px 14px;border:1px solid #e8cbd5;border-radius:12px;background:#fff;color:#744b5c;font-size:16px;font-weight:700;cursor:pointer}
+.games-answer:disabled{opacity:.65;cursor:default}.games-answer.correct{border-color:#91bda5;background:#eef8f1;color:#397451}.games-answer.wrong{border-color:#d99aa7;background:#fff0f2;color:#a54f63}
+.games-feedback{min-height:42px;margin-top:12px;padding:11px 13px;border-radius:11px;background:#fff3f6;color:#8d5368;font-size:13px}
+.games-feedback.success{background:#edf7f0;color:#397451}.games-feedback.error{background:#fff0f2;color:#a54f63}
+.games-actions{display:flex;flex-wrap:wrap;gap:9px;margin-top:12px}.games-actions button{min-height:40px}.games-next:disabled{opacity:.5}
+.games-reset{padding:9px 13px;border:1px solid var(--line);border-radius:11px;background:transparent;color:var(--muted)}
+.games-footnote{margin:12px 3px;color:var(--muted);font-size:11px}
+.games-pair-card{flex:1 1 42%;min-width:105px;min-height:58px;padding:10px;border:1px solid #e8cbd5;border-radius:12px;background:#fff;color:#744b5c;font-weight:700}
+.games-pair-card.selected{border-color:#bd7894;background:#faeaf0;box-shadow:0 0 0 2px #f2dce5}
+.games-pair-card.matched{border-color:#a9cbb5;background:#edf7f0;color:#397451;opacity:.75}
+.games-order-slot{display:inline-flex;align-items:center;justify-content:center;min-width:42px;min-height:44px;padding:7px 11px;border:1px dashed #d9b8c5;border-radius:10px;background:#fff;color:#8d5368;font-size:18px}
+.games-order-bank{display:flex;flex-wrap:wrap;gap:8px;width:100%;padding-top:10px;border-top:1px solid var(--line)}
+body.dark-theme .games-hero{background:linear-gradient(125deg,#49383d,#453747);border-color:#76545d;color:#fff1ed}
+body.dark-theme .games-hero p{color:#e0bdc9}
+body.dark-theme .games-total{background:#59414a;border-color:#805967;color:#f5c8d8}
+body.dark-theme .games-total small{color:#e0bdc9}
+body.dark-theme .games-mode-card{background:#40343d;border-color:#76545d;color:#fff1ed}
+body.dark-theme .games-mode-card.active{background:linear-gradient(145deg,#59414a,#493747);border-color:#d18ca8}
+body.dark-theme .games-task-area{background:#382d34;border-color:#76545d}
+body.dark-theme .games-answer,body.dark-theme .games-pair-card,body.dark-theme .games-order-slot{background:#49383d;border-color:#76545d;color:#ffeaf0}
+body.dark-theme .games-answer.correct,body.dark-theme .games-pair-card.matched{background:#294638;color:#c7efd6;border-color:#56866b}
+body.dark-theme .games-answer.wrong{background:#512f3b;color:#ffd9e0;border-color:#a65e73}
+body.dark-theme .games-feedback{background:#49383d;color:#f1cbd7}
+body.dark-theme .games-feedback.success{background:#294638;color:#c7efd6}
+body.dark-theme .games-feedback.error{background:#512f3b;color:#ffd9e0}
+body.dark-theme .games-reset{color:#e0bdc9;border-color:#76545d}
+@media(max-width:720px){.games-mode-grid{grid-template-columns:repeat(2,minmax(0,1fr))}.games-mode-card{min-height:135px}}
+@media(max-width:390px){.games-mode-card{padding:11px}.games-mode-card strong{font-size:12px}.games-play-panel{padding:14px}}
+
 .companion-picture{color:#b66f89}
 .companion-picture svg{width:52px;height:52px;fill:none;stroke:currentColor;stroke-width:1.55;stroke-linecap:round;stroke-linejoin:round}
 .pc-status-lock{width:16px;height:16px;vertical-align:middle;fill:none;stroke:currentColor;stroke-width:1.7;stroke-linecap:round;stroke-linejoin:round}
@@ -3645,6 +3691,7 @@ body.dark-theme .writing-word-result-source,body.dark-theme .writing-selected-wo
     <button type="button" class="learning-subtab active" data-learning-view="course" role="tab" aria-selected="true"><span class="pc-nav-icon" aria-hidden="true"><svg viewBox="0 0 24 24"><path d="M4 5.5A2.5 2.5 0 0 1 6.5 3H20v16H6.5A2.5 2.5 0 0 0 4 21z"/><path d="M4 5.5v13A2.5 2.5 0 0 1 6.5 16H20M8 7h8M8 10h7"/></svg></span> Курс HSK</button>
     <button type="button" class="learning-subtab" data-learning-view="teacher" role="tab" aria-selected="false"><span class="pc-nav-icon" aria-hidden="true"><svg viewBox="0 0 24 24"><rect x="4" y="7" width="16" height="13" rx="4"/><path d="M12 3v4M9 12h.01M15 12h.01M9 16h6M2 12h2M20 12h2"/></svg></span> ИИ-учитель</button>
     <button type="button" class="learning-subtab" data-learning-view="writing" role="tab" aria-selected="false"><span class="pc-nav-icon" aria-hidden="true"><svg viewBox="0 0 24 24"><path d="m4 20 4.5-1 10.8-10.8a2.1 2.1 0 0 0-3-3L5.5 16zM14.8 6.2l3 3"/></svg></span> Тренажёр иероглифов</button>
+    <button type="button" class="learning-subtab" data-learning-view="games" role="tab" aria-selected="false"><span class="pc-nav-icon" aria-hidden="true"><svg viewBox="0 0 24 24"><rect x="3" y="5" width="18" height="14" rx="3"/><path d="M8 9v6M5 12h6M16 10h.01M18 14h.01"/></svg></span> Мини-игры</button>
   </div>
   <div id="learningView-course" class="learning-view">
   <div class="panel section" id="coachFindPanel">
@@ -3795,6 +3842,29 @@ body.dark-theme .writing-word-result-source,body.dark-theme .writing-selected-wo
     <div class="panel writing-note">
       <strong>Как оценивается написание?</strong>
       <p>Проверяется последовательность и направление черт по данным Hanzi Writer. Это учебная проверка, а не экспертная оценка каллиграфии: небольшие отличия почерка допустимы.</p>
+    </div>
+  </div>
+    <div id="learningView-games" class="learning-view" hidden>
+      <div class="games-hero">
+        <div class="games-kicker">PHOTOCHINESE · УЧЁБА МОЖЕТ БЫТЬ ИГРОЙ</div>
+        <h2>Мини-игры <em>для практики</em></h2>
+        <p>Закрепляй слова и грамматику в коротких заданиях. За правильные ответы получай очки и постепенно улучшай результат.</p>
+        <div class="games-total"><span class="games-total-icon">✦</span><span><strong id="gamesTotalScore">0</strong><small>очков набрано</small></span></div>
+      </div>
+      <div class="games-mode-grid">
+        <button type="button" class="games-mode-card active" data-game-mode="build"><span class="games-mode-number">01</span><span class="games-mode-icon"><svg viewBox="0 0 24 24"><path d="M4 5h16v4H4zM4 11h10v4H4zM4 17h16v3H4z"/></svg></span><strong>Собери предложение</strong><small>Выбери правильный перевод на китайском</small></button>
+        <button type="button" class="games-mode-card" data-game-mode="pairs"><span class="games-mode-number">02</span><span class="games-mode-icon"><svg viewBox="0 0 24 24"><rect x="3" y="4" width="8" height="7" rx="2"/><rect x="13" y="13" width="8" height="7" rx="2"/><path d="M13 7h3a3 3 0 0 1 3 3v3M11 17H8a3 3 0 0 1-3-3v-3"/></svg></span><strong>Найди пару</strong><small>Соедини слово с его переводом</small></button>
+        <button type="button" class="games-mode-card" data-game-mode="missing"><span class="games-mode-number">03</span><span class="games-mode-icon"><svg viewBox="0 0 24 24"><path d="M4 5h16v14H4zM8 9h2M14 9h2M8 15h8"/></svg></span><strong>Угадай пропущенный иероглиф</strong><small>Восстанови слово или короткую фразу</small></button>
+        <button type="button" class="games-mode-card" data-game-mode="order"><span class="games-mode-number">04</span><span class="games-mode-icon"><svg viewBox="0 0 24 24"><path d="M4 6h5M4 12h9M4 18h13M16 4l4 2-4 2M18 10l-4 2 4 2M20 16l-4 2 4 2"/></svg></span><strong>Расставь слова</strong><small>Составь китайское предложение в верном порядке</small></button>
+      </div>
+      <div class="panel games-play-panel">
+        <div class="games-play-top"><div><span class="games-round-label" id="gamesRoundLabel">ИГРА 01 · ЗАДАНИЕ 1</span><h3 id="gamesTaskTitle">Собери предложение</h3></div><span class="games-score-chip">+<strong id="gamesRoundScore">0</strong></span></div>
+        <p class="games-prompt" id="gamesPrompt">Как сказать по-китайски?</p>
+        <div id="gamesTaskArea" class="games-task-area"></div>
+        <div id="gamesFeedback" class="games-feedback" role="status" aria-live="polite">Выбери ответ, чтобы проверить себя.</div>
+        <div class="games-actions"><button type="button" class="secondary" id="gamesNext" disabled>Следующее задание</button><button type="button" class="games-reset" id="gamesReset">Начать заново</button></div>
+      </div>
+      <p class="games-footnote">Задания составлены по базовой лексике и грамматике курса HSK. Результат сохраняется на этом устройстве.</p>
     </div>
   </div>
 </section>
@@ -7842,6 +7912,96 @@ window.addEventListener("keydown", function(event) {
       feedback.textContent='Верно! Черта '+(strokeNum+1)+' выполнена правильно.';
     }});
   });
+  // Мини-игры PhotoChinese
+  (function initMiniGames(){
+    const area=document.getElementById('gamesTaskArea');
+    if(!area)return;
+    const modes=[...document.querySelectorAll('[data-game-mode]')];
+    const title=document.getElementById('gamesTaskTitle');
+    const prompt=document.getElementById('gamesPrompt');
+    const feedback=document.getElementById('gamesFeedback');
+    const next=document.getElementById('gamesNext');
+    const roundLabel=document.getElementById('gamesRoundLabel');
+    const roundScore=document.getElementById('gamesRoundScore');
+    const totalScoreEl=document.getElementById('gamesTotalScore');
+    const names={build:'Собери предложение',pairs:'Найди пару',missing:'Угадай пропущенный иероглиф',order:'Расставь слова'};
+    const phrases=[
+      {ru:'Меня зовут Ли.',zh:'我叫李。',parts:['我','叫','李。']},
+      {ru:'Я студент.',zh:'我是学生。',parts:['我','是','学生。']},
+      {ru:'Она учитель.',zh:'她是老师。',parts:['她','是','老师。']},
+      {ru:'Мне восемнадцать лет.',zh:'我十八岁。',parts:['我','十八','岁。']},
+      {ru:'Как тебя зовут?',zh:'你叫什么名字？',parts:['你','叫','什么','名字？']},
+      {ru:'Привет! Как ты?',zh:'你好！你好吗？',parts:['你好！','你','好吗？']}
+    ];
+    const pairs=[
+      ['你好','привет'],['谢谢','спасибо'],['再见','до свидания'],['我','я'],['你','ты'],['他','он'],['她','она'],['老师','учитель'],['学生','студент'],['名字','имя'],['朋友','друг'],['喜欢','нравиться; любить'],['学习','учиться'],['水','вода'],['茶','чай'],['书','книга'],['猫','кошка'],['家','дом'],['爱','любовь; любить'],['是','быть; являться']
+    ];
+    let mode='build',round=0,score=0,selectedPair=null,matched=new Set(),orderChosen=[],current=null,answered=false;
+    let total=0;try{total=Number(localStorage.getItem('photoChineseMiniGamesScore')||0)||0;}catch(e){}
+    function updateTotal(){totalScoreEl.textContent=total;}
+    function shuffle(items){const a=[...items];for(let i=a.length-1;i>0;i--){const j=Math.floor(Math.random()*(i+1));[a[i],a[j]]=[a[j],a[i]];}return a;}
+    function feedbackText(text,type=''){feedback.textContent=text;feedback.className='games-feedback'+(type?' '+type:'');}
+    function button(text,cls,fn){const b=document.createElement('button');b.type='button';b.className=cls;b.textContent=text;b.addEventListener('click',fn);return b;}
+    function finish(correct,explanation){
+      if(answered)return;answered=true;
+      if(correct){score+=10;total+=10;roundScore.textContent=score;totalScoreEl.textContent=total;try{localStorage.setItem('photoChineseMiniGamesScore',String(total));}catch(e){}feedbackText('Верно! +10 очков. '+(explanation||''),'success');}
+      else feedbackText('Пока не совсем. '+(explanation||'Попробуй ещё раз в следующем раунде.'),'error');
+      next.disabled=false;
+      area.querySelectorAll('button').forEach(b=>{if(!b.classList.contains('games-reset'))b.disabled=true;});
+    }
+    function start(nextMode=mode){
+      mode=nextMode;round++;answered=false;selectedPair=null;matched=new Set();orderChosen=[];current=null;
+      title.textContent=names[mode];roundLabel.textContent='ИГРА 0'+(modes.findIndex(m=>m.dataset.gameMode===mode)+1)+' · ЗАДАНИЕ '+round;
+      roundScore.textContent=score;next.disabled=true;area.innerHTML='';
+      feedbackText('Выбери ответ, чтобы проверить себя.');
+      if(mode==='build')buildTask();
+      if(mode==='pairs')pairsTask();
+      if(mode==='missing')missingTask();
+      if(mode==='order')orderTask();
+    }
+    function buildTask(){
+      current=shuffle(phrases)[0];prompt.textContent='Как по-китайски сказать: «'+current.ru+'»';
+      const wrong=shuffle(phrases.filter(p=>p.zh!==current.zh)).slice(0,2).map(p=>p.zh);
+      shuffle([current.zh,...wrong]).forEach(answer=>area.appendChild(button(answer,'games-answer',()=>finish(answer===current.zh,'Правильный вариант: '+current.zh))));
+    }
+    function pairsTask(){
+      prompt.textContent='Найди пары: китайское слово и его перевод. Нажми сначала на слово, затем на перевод.';
+      const chosen=shuffle(pairs).slice(0,4);const cards=shuffle(chosen.flatMap((p,i)=>[{id:i,side:'zh',text:p[0]},{id:i,side:'ru',text:p[1]}]));
+      cards.forEach(item=>{const b=button(item.text,'games-pair-card',()=>{
+        if(answered||matched.has(item.id)||b.classList.contains('matched'))return;
+        if(!selectedPair){selectedPair={...item,button:b};b.classList.add('selected');return;}
+        if(selectedPair.id===item.id&&selectedPair.side!==item.side){
+          b.classList.remove('selected');b.classList.add('matched');selectedPair.button.classList.remove('selected');selectedPair.button.classList.add('matched');matched.add(item.id);selectedPair=null;
+          if(matched.size===chosen.length)finish(true,'Все четыре пары собраны.');
+        }else{
+          const previous=selectedPair.button;previous.classList.remove('selected');b.classList.add('selected');selectedPair={...item,button:b};
+          feedbackText('Эти карточки не совпали. Попробуй найти другую пару.');
+        }
+      });b.dataset.id=item.id;b.dataset.side=item.side;area.appendChild(b);});
+    }
+    function missingTask(){
+      current=shuffle(phrases)[0];const chars=[...current.zh].filter(ch=>/\p{Script=Han}/u.test(ch));const target=chars[Math.floor(Math.random()*chars.length)];
+      const hidden=current.zh.replace(target,'＿');
+      prompt.textContent='Какой иероглиф пропущен? Перевод: '+current.ru;
+      const options=shuffle([target,...shuffle([...new Set(pairs.map(p=>p[0].split(''))).flat().filter(ch=>/\p{Script=Han}/u.test(ch)&&ch!==target)]).slice(0,3)]);
+      const unique=options.slice(0,4);if(!unique.includes(target))unique[0]=target;
+      const shown=document.createElement('div');shown.className='games-order-slot';shown.style.fontSize='25px';shown.textContent=hidden;area.appendChild(shown);
+      shuffle(unique).forEach(ch=>area.appendChild(button(ch,'games-answer',()=>finish(ch===target,'Полная фраза: '+current.zh))));
+    }
+    function orderTask(){
+      current=shuffle(phrases).filter(p=>p.parts.length>=3)[0];prompt.textContent='Расставь слова в правильном порядке: «'+current.ru+'»';
+      const slots=document.createElement('div');slots.className='games-order-bank';const bank=document.createElement('div');bank.className='games-order-bank';bank.style.borderTop='0';bank.style.paddingTop='0';
+      const chosen=[];
+      function drawSlots(){slots.innerHTML='';if(!chosen.length){const hint=document.createElement('span');hint.className='games-order-slot';hint.textContent='Нажимай на слова ниже';slots.appendChild(hint);}chosen.forEach((part,i)=>slots.appendChild(button(part,'games-order-slot',()=>{if(answered)return;chosen.splice(i,1);drawSlots();drawBank();})));}
+      function drawBank(){bank.innerHTML='';shuffle(current.parts.filter((part,i)=>!chosen.some((x,j)=>x===part&&current.parts.indexOf(x)===current.parts.indexOf(part)&&j<i))).forEach(()=>{});current.parts.forEach((part,i)=>{if(chosen.filter(x=>x===part).length>=current.parts.slice(0,i+1).filter(x=>x===part).length)return;const b=button(part,'games-answer',()=>{if(answered)return;chosen.push(part);drawSlots();drawBank();});bank.appendChild(b);});}
+      const check=button('Проверить порядок','primary',()=>finish(chosen.join('')===current.parts.join(''),'Верный порядок: '+current.parts.join(' ')));check.style.marginTop='8px';
+      area.append(slots,bank,check);drawSlots();drawBank();
+    }
+    modes.forEach(m=>m.addEventListener('click',()=>{modes.forEach(x=>x.classList.toggle('active',x===m));score=0;start(m.dataset.gameMode);}));
+    next.addEventListener('click',()=>start(mode));
+    document.getElementById('gamesReset').addEventListener('click',()=>{score=0;start(mode);});
+    updateTotal();start('build');
+  })();
   loadWritingCharacter();
 })();
 </script>
