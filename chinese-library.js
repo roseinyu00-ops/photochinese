@@ -108,8 +108,12 @@ root.append(btn);
 }
 function renderGrammar(){
 const root=$("clGrammarList");if(!root)return;root.replaceChildren();
-const lv=$("clGrammarLevel").value,q=$("clGrammarSearch").value.trim().toLocaleLowerCase("ru");
-const rows=grammar.filter(g=>{const hay=[g[1],g[2],g[3],g[5],g[6],...g[4].flat()].join(" ").toLocaleLowerCase("ru");return (lv==="all"||String(g[0])===lv)&&(q||activeGrammarTopic==="all"||grammarTopicMap[g[1]]===activeGrammarTopic)&&(!q||hay.includes(q));});
+const lv=$("clGrammarLevel").value,q=normalizeLibrarySearch($("clGrammarSearch").value);
+const rows=grammar.filter(g=>{
+const hay=normalizeLibrarySearch([g[1],g[2],g[3],g[5],g[6],...g[4].flat()].join(" "));
+const topicOk=activeGrammarTopic==="all"||grammarTopicMap[g[1]]===activeGrammarTopic;
+return (lv==="all"||String(g[0])===lv)&&topicOk&&(!q||hay.includes(q));
+});
 if(!rows.length){root.append(make("div","cl-empty","Ничего не найдено. Попробуй изменить тему, уровень или запрос."));return;}
 root.append(make("p","cl-results-count","Найдено конструкций: "+rows.length));
 rows.forEach(g=>{const c=make("article","cl-grammar-card"),top=make("div","cl-grammar-top"),h=make("div");h.append(make("h3","",g[1]),make("p","cl-grammar-summary",g[2]));top.append(h,make("span","cl-level-tag","HSK "+g[0]));c.append(top,make("div","cl-formula",g[3]));const ex=make("div","cl-example-list");g[4].forEach(x=>{const e=make("div","cl-example");e.append(make("div","cl-example-zh",x[0]),make("div","cl-example-py",x[1]),make("div","cl-example-ru",x[2]));ex.append(e);});c.append(ex,make("div","cl-note","Запомни: "+g[5]));const practice=make("div","cl-exercise");practice.append(make("div","cl-exercise-title","Проверь себя"),make("p","cl-exercise-question",g[6]));const opts=make("div","cl-exercise-options"),fb=make("p","cl-exercise-feedback","Выбери один вариант ответа.");g[7].forEach((v,i)=>{const btn=make("button","cl-exercise-option",v);btn.type="button";btn.addEventListener("click",()=>{if(opts.dataset.done)return;opts.dataset.done="1";[...opts.children].forEach((n,j)=>{n.disabled=true;if(j===g[8])n.classList.add("is-correct");else if(j===i)n.classList.add("is-wrong");});fb.textContent=(i===g[8]?"Верно! ":"Не совсем. ")+g[9];});opts.append(btn);});practice.append(opts,fb);c.append(practice);root.append(c);});
@@ -119,11 +123,13 @@ const dialogueTopics=[
 {id:"all",title:"Все ситуации",desc:"Полный разговорник",mark:"文",ids:dialogs.map(d=>d[0])},
 {id:"people",title:"Знакомство и общение",desc:"Представиться, договориться, позвонить",mark:"你好",ids:["meeting","plans","phone"]},
 {id:"study",title:"Учёба",desc:"Университет и библиотека",mark:"学",ids:["university","library"]},
-{id:"food",title:"Еда и покупки",desc:"Кафе, ресторан и магазин",mark:"吃",ids:["cafe","restaurant","shop"]},
-{id:"travel",title:"Город и поездки",desc:"Дорога, такси, аэропорт",mark:"行",ids:["travel","directions","taxi","airport"]},
-{id:"stay",title:"Проживание",desc:"Заселение и отель",mark:"住",ids:["hotel"]}
+{id:"food",title:"Кафе и рестораны",desc:"Заказ еды, меню и оплата",mark:"吃",ids:["cafe","restaurant"]},
+{id:"shopping",title:"Покупки",desc:"Цена, размер и оплата",mark:"买",ids:["shop"]},
+{id:"travel",title:"Город и транспорт",desc:"Дорога, такси и аэропорт",mark:"行",ids:["travel","directions","taxi","airport"]},
+{id:"stay",title:"Отель и проживание",desc:"Заселение и номер",mark:"住",ids:["hotel"]}
 ];
-function dialogueMatches(d,q){return !q||[d[2],d[3],d[5],...d[4].flat()].join(" ").toLocaleLowerCase("ru").includes(q);}
+function normalizeLibrarySearch(value){return String(value||"").toLocaleLowerCase("ru").normalize("NFD").replace(/[\u0300-\u036f]/g,"").replace(/ё/g,"е").replace(/\s+/g," ").trim();}
+function dialogueMatches(d,q){return !q||normalizeLibrarySearch([d[2],d[3],d[5],...d[4].flat()].join(" ")).includes(q);}
 function renderDialogueTopics(){
 const root=$("clDialogueTopics");if(!root)return;root.replaceChildren();
 dialogueTopics.forEach(topic=>{
@@ -135,9 +141,9 @@ root.append(btn);
 }
 function renderDialogs(){
 const cats=$("clDialogueCategories");if(!cats)return;cats.replaceChildren();
-const q=($("clDialogueSearch")?.value||"").trim().toLocaleLowerCase("ru");
+const q=normalizeLibrarySearch($("clDialogueSearch")?.value||"");
 const topic=dialogueTopics.find(t=>t.id===activeDialogueTopic)||dialogueTopics[0];
-const shown=dialogs.filter(d=>(q||topic.ids.includes(d[0]))&&dialogueMatches(d,q));
+const shown=dialogs.filter(d=>topic.ids.includes(d[0])&&dialogueMatches(d,q));
 if(!shown.length){cats.append(make("div","cl-empty","Ничего не найдено. Попробуй другое слово или выбери другую тему."));return;}
 if(!shown.some(d=>d[0]===active))active=shown[0][0];
 shown.forEach(d=>{
@@ -187,10 +193,6 @@ words.slice(0,120).forEach(w=>{const item=make("div","cl-word-item");item.append
 card.append(grid);root.append(card);
 }
 function select(ch){$("clCharacterInput").value=ch;document.querySelectorAll(".cl-character-chip").forEach(b=>b.classList.toggle("active",b.textContent===ch));showWords(ch);}
-$("clGrammarLevel")?.addEventListener("change",renderGrammar);
-$("clDialogueSearch")?.addEventListener("input",()=>{renderDialogs();renderDialogue();syncSearchClear("clDialogueSearch");});
-$("clGrammarSearch")?.addEventListener("input",()=>{renderGrammar();syncSearchClear("clGrammarSearch");});
-
 $("clGrammarLevel")?.addEventListener("change",renderGrammar);
 $("clGrammarSearch")?.addEventListener("input",()=>{renderGrammar();syncSearchClear("clGrammarSearch");});
 $("clDialogueSearch")?.addEventListener("input",()=>{renderDialogs();renderDialogue();syncSearchClear("clDialogueSearch");});
