@@ -3246,46 +3246,61 @@ body.dark-theme #profile .collection-item:hover{
   #profile .profile-name-line h2{font-size:clamp(17px,5.1vw,21px)}
   #profile #equippedDecoration{font-size:19px}
 }
-/* FIX: награда всегда в одной строке с ником */
-#profile .profile-identity{display:block!important;min-width:0}
+/* FIX v2: ник и награда — единый неразрывный ряд */
+#profile .profile-identity{
+  display:block!important;
+  flex:0 0 auto!important;
+  width:max-content!important;
+  max-width:calc(100vw - 145px)!important;
+  min-width:0!important;
+  overflow:visible!important;
+}
 #profile .profile-name-line{
-  display:inline-flex!important;
-  flex-direction:row!important;
-  flex-wrap:nowrap!important;
+  display:grid!important;
+  grid-template-columns:max-content max-content!important;
+  grid-auto-flow:column!important;
   align-items:center!important;
-  justify-content:flex-start!important;
-  vertical-align:middle;
-  width:auto!important;
-  max-width:100%;
-  gap:8px!important;
+  justify-content:start!important;
+  justify-items:start!important;
+  column-gap:8px!important;
+  width:max-content!important;
+  max-width:none!important;
+  min-width:max-content!important;
+  white-space:nowrap!important;
+  overflow:visible!important;
 }
 #profile .profile-name-line h2{
-  display:inline-block!important;
-  flex:0 1 auto!important;
-  width:auto!important;
+  display:block!important;
+  width:max-content!important;
+  min-width:max-content!important;
+  max-width:none!important;
+  flex:none!important;
   margin:0!important;
   white-space:nowrap!important;
+  overflow:visible!important;
 }
 #profile .profile-name-line #equippedDecoration{
   position:static!important;
-  display:inline-flex!important;
-  flex:0 0 21px!important;
+  display:flex!important;
+  grid-column:2!important;
+  grid-row:1!important;
+  align-items:center!important;
+  justify-content:center!important;
   width:21px!important;
   min-width:21px!important;
   height:21px!important;
   margin:0!important;
-  vertical-align:middle!important;
-  align-self:center!important;
+  transform:none!important;
 }
 #profile .profile-name-line #equippedDecoration svg{
-  display:block!important;
-  width:100%!important;
-  height:100%!important;
+  display:block!important;width:100%!important;height:100%!important;
 }
 @media(max-width:560px){
-  #profile .profile-name-line{gap:6px!important}
+  #profile .profile-identity{max-width:calc(100vw - 130px)!important}
+  #profile .profile-name-line{column-gap:6px!important}
+  #profile .profile-name-line h2{font-size:clamp(17px,5.1vw,21px)!important}
   #profile .profile-name-line #equippedDecoration{
-    flex-basis:19px!important;width:19px!important;min-width:19px!important;height:19px!important;
+    width:19px!important;min-width:19px!important;height:19px!important;
   }
 }
 </style>
