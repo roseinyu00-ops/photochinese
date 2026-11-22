@@ -4052,7 +4052,7 @@ body.dark-theme .security-status,body.dark-theme .security-secret{background:#49
   <input
     type="file"
     id="bannerUpload"
-    accept="image/*,video/mp4,video/webm"
+    accept=".jpg,.jpeg,.png,.webp,.gif,.mp4,.webm,image/jpeg,image/png,image/webp,image/gif,video/mp4,video/webm"
     hidden
   >
 </div>
@@ -6806,6 +6806,60 @@ const bannerPlaceholder = document.getElementById("bannerPlaceholder");
 
 let bannerObjectUrl = null;
 
+// Разрешённые форматы и ограничения баннера.
+// Эти проверки дополняют, но не заменяют ограничения Supabase Storage.
+const BANNER_FORMATS = {
+  "image/jpeg": { extension: "jpg", maxSize: 10 * 1024 * 1024 },
+  "image/png":  { extension: "png", maxSize: 10 * 1024 * 1024 },
+  "image/webp": { extension: "webp", maxSize: 10 * 1024 * 1024 },
+  "image/gif":  { extension: "gif", maxSize: 10 * 1024 * 1024 },
+  "video/mp4":  { extension: "mp4", maxSize: 25 * 1024 * 1024 },
+  "video/webm": { extension: "webm", maxSize: 25 * 1024 * 1024 }
+};
+
+async function validateBannerFile(file) {
+  if (!file || typeof file.slice !== "function") {
+    throw new Error("Не удалось прочитать выбранный файл.");
+  }
+
+  const format = BANNER_FORMATS[file.type];
+  if (!format) {
+    throw new Error("Формат не поддерживается. Используй JPG, PNG, WebP, GIF, MP4 или WebM.");
+  }
+
+  if (file.size <= 0 || file.size > format.maxSize) {
+    const limit = format.maxSize / (1024 * 1024);
+    throw new Error("Файл слишком большой или пустой. Максимальный размер для этого формата — " + limit + " МБ.");
+  }
+
+  const bytes = new Uint8Array(await file.slice(0, 16).arrayBuffer());
+  const startsWith = (...signature) => signature.every((value, index) => bytes[index] === value);
+  let validSignature = false;
+
+  if (file.type === "image/jpeg") {
+    validSignature = startsWith(0xff, 0xd8, 0xff);
+  } else if (file.type === "image/png") {
+    validSignature = startsWith(0x89, 0x50, 0x4e, 0x47, 0x0d, 0x0a, 0x1a, 0x0a);
+  } else if (file.type === "image/gif") {
+    validSignature = startsWith(0x47, 0x49, 0x46, 0x38, 0x37, 0x61) ||
+      startsWith(0x47, 0x49, 0x46, 0x38, 0x39, 0x61);
+  } else if (file.type === "image/webp") {
+    validSignature = startsWith(0x52, 0x49, 0x46, 0x46) &&
+      bytes[8] === 0x57 && bytes[9] === 0x45 && bytes[10] === 0x42 && bytes[11] === 0x50;
+  } else if (file.type === "video/mp4") {
+    validSignature = bytes[4] === 0x66 && bytes[5] === 0x74 &&
+      bytes[6] === 0x79 && bytes[7] === 0x70;
+  } else if (file.type === "video/webm") {
+    validSignature = startsWith(0x1a, 0x45, 0xdf, 0xa3);
+  }
+
+  if (!validSignature) {
+    throw new Error("Содержимое файла не соответствует заявленному формату.");
+  }
+
+  return format;
+}
+
 // Открываем базу для хранения баннера
 function openBannerDB() {
   return new Promise((resolve, reject) => {
@@ -6908,22 +6962,15 @@ bannerUpload.addEventListener("change", async () => {
 
   if (!file) return;
 
-  if (
-    !file.type.startsWith("image/") &&
-    !file.type.startsWith("video/")
-  ) {
-    alert("Выбери фотографию, GIF или видео.");
-    return;
-  }
-
   try {
+    await validateBannerFile(file);
     await saveBannerFile(file);
     showBanner(file);
     window.photoChineseBannerDirty = true;
     window.photoChineseSync?.();
   } catch (error) {
-    console.error(error);
-    alert("Не удалось сохранить баннер. Попробуй файл поменьше.");
+    console.error("Баннер не прошёл проверку:", error);
+    alert(error.message || "Не удалось сохранить баннер.");
   }
 });
 
@@ -7960,12 +8007,15 @@ function savePhotoChineseDataNow() {
     if (window.photoChineseBannerDirty) {
       const bannerFile = await getSavedBanner();
       if (bannerFile) {
-        const extension = (bannerFile.name || "").split(".").pop().toLowerCase();
-        const safeExtension = /^[a-z0-9]{2,5}$/.test(extension) ? extension : (bannerFile.type === "video/webm" ? "webm" : bannerFile.type === "video/mp4" ? "mp4" : "jpg");
-        const path = userId + "/banner." + safeExtension;
+        const bannerFormat = await validateBannerFile(bannerFile);
+        const path = userId + "/banner." + bannerFormat.extension;
         const { error: uploadError } = await window.photoChineseSupabase.storage
           .from("profile-media")
-          .upload(path, bannerFile, { upsert: true, contentType: bannerFile.type || "application/octet-stream" });
+          .upload(path, bannerFile, {
+            upsert: true,
+            contentType: bannerFile.type,
+            cacheControl: "3600"
+          });
         if (uploadError) throw uploadError;
         payload.bannerPath = path;
         localStorage.setItem("profileBannerPath", path);
