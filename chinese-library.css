@@ -54,3 +54,46 @@ body.dark-theme .cl-character-chip{background:#49383d;border-color:#76545d;color
 body.dark-theme .cl-audio-button{background:#49383d;border-color:#76545d;color:#f0b2c4}body.dark-theme .cl-empty{border-color:#76545d;color:#e0bdc9}
 @media(max-width:760px){.cl-category-grid{grid-template-columns:repeat(3,minmax(0,1fr))}}
 @media(max-width:520px){.cl-filter-row{grid-template-columns:1fr}.cl-filter-row input{grid-column:auto}.cl-category-grid{grid-template-columns:repeat(2,minmax(0,1fr))}.cl-dialogue-line{grid-template-columns:32px minmax(0,1fr)}.cl-audio-button{grid-column:2;justify-self:start}.cl-grammar-card{padding:14px}.cl-word-grid{grid-template-columns:repeat(2,minmax(0,1fr))}}
+
+
+/* Topic navigation and stable search layouts */
+.cl-library-controls,.cl-phrasebook-controls{margin:14px 0;padding:15px 16px;border:1px solid var(--line);border-radius:16px;background:var(--card,white)}
+.cl-topic-heading{display:flex;justify-content:space-between;align-items:center;gap:10px;margin-bottom:10px;color:var(--ink)}
+.cl-topic-heading span,.cl-results-count{font-size:12px;color:var(--muted)}
+.cl-topic-row{display:flex;flex-wrap:wrap;gap:8px;margin-bottom:13px}
+.cl-topic-chip{padding:9px 13px;border:1px solid var(--line);border-radius:999px;background:var(--card,white);color:var(--ink);font-size:12px;font-weight:700;transition:background .18s,border-color .18s}
+.cl-topic-chip.active{background:linear-gradient(120deg,#f9e4eb,#f2e9f5);border-color:#d89aaf;color:#98536b;box-shadow:0 2px 9px rgba(180,112,139,.12)}
+.cl-library-controls .cl-filter-row{grid-template-columns:110px minmax(0,1fr);margin:0}
+.cl-library-controls .cl-filter-row input{grid-column:1/-1;width:100%;min-width:0}
+.cl-phrasebook-controls label{display:block;margin:0 0 7px;font-size:12px;font-weight:750;color:var(--ink)}
+.cl-phrasebook-controls input{width:100%;min-width:0}
+.cl-results-count{margin:0 0 2px 3px}
+.cl-category-grid{grid-template-columns:repeat(auto-fit,minmax(155px,1fr));align-items:stretch}
+.cl-category-button{min-height:112px;padding:14px;text-align:left;justify-content:flex-start}
+.cl-category-number{display:grid;place-items:center;width:30px;height:25px;border-radius:8px;background:#fff0f4;color:#a45d73;font-size:10px;font-weight:850;letter-spacing:.6px}
+.cl-category-button strong{font-size:14px}
+.cl-category-button small{font-size:11px;line-height:1.45}
+.cl-character-chips{display:grid;gap:8px}
+.cl-character-group-label{font-size:10px;letter-spacing:1px;font-weight:850;color:var(--muted);margin-top:7px}
+.cl-character-chip-row{display:flex;flex-wrap:wrap;gap:7px}
+.cl-character-empty{margin:0;color:var(--muted);font-size:12px}
+.cl-character-chip{min-width:42px;min-height:42px}
+.cl-word-search-panel label{display:block;margin:12px 0 7px;font-size:12px;font-weight:750}
+.cl-character-input-row{display:grid;grid-template-columns:minmax(72px,100px) minmax(0,1fr)}
+.cl-character-input-row input{width:100%;max-width:none;min-width:0}
+.cl-character-input-row button{min-width:0}
+body.dark-theme .cl-library-controls,body.dark-theme .cl-phrasebook-controls{background:#40343d;border-color:#76545d}
+body.dark-theme .cl-topic-heading,body.dark-theme .cl-phrasebook-controls label,body.dark-theme .cl-word-search-panel label{color:#fff1ed}
+body.dark-theme .cl-topic-chip{background:#49383d;border-color:#76545d;color:#f4dce3}
+body.dark-theme .cl-topic-chip.active{background:linear-gradient(120deg,#62434c,#514052);border-color:#d99ab0;color:#ffe1e8}
+body.dark-theme .cl-category-number{background:#62434c;color:#ffe1e8}
+@media(max-width:520px){
+ .cl-library-controls,.cl-phrasebook-controls{padding:12px}
+ .cl-topic-heading{align-items:flex-start;flex-direction:column;gap:3px}
+ .cl-library-controls .cl-filter-row{grid-template-columns:1fr}
+ .cl-library-controls .cl-filter-row input{grid-column:auto}
+ .cl-category-grid{grid-template-columns:repeat(2,minmax(0,1fr))}
+ .cl-category-button{min-height:120px;padding:11px}
+ .cl-character-input-row{grid-template-columns:76px minmax(0,1fr)}
+ .cl-word-grid{grid-template-columns:repeat(2,minmax(0,1fr))}
+}
