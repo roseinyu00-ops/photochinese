@@ -114,5 +114,7 @@ $("clCharacterSearch")?.addEventListener("click",()=>{const ch=$("clCharacterInp
 $("clCharacterInput")?.addEventListener("keydown",e=>{if(e.key==="Enter")$("clCharacterSearch").click();});
 $("clCharacterInput")?.addEventListener("input",e=>{const chars=[...e.target.value.trim()];if(chars.length>1)e.target.value=chars[0];});
 window.addEventListener("storage",renderChips);
+window.addEventListener("photoChineseDataLoaded",renderChips);
+window.addEventListener("photoChineseDictionaryReady",()=>{renderChips();const ch=$("clCharacterInput").value.trim();if(ch)showWords([...ch][0]);});
 renderGrammar();renderDialogs();renderDialogue();renderChips();
 })();
