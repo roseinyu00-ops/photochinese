@@ -2902,7 +2902,52 @@ nav button.active::after{height:2px;box-shadow:none}
  body.dark-theme .coach-dialogue-line:nth-child(odd){background:rgba(210,140,164,.08)}
  @media(hover:hover) and (pointer:fine){.primary:not(:disabled):hover,.secondary:not(:disabled):hover{filter:brightness(1.025);box-shadow:0 5px 14px rgba(178,103,128,.12)}.coach-grammar-rule:hover,.coach-phrase-item:hover{transform:translateY(-2px);border-color:#d99aae}}
  @media(prefers-reduced-motion:reduce){.tab.is-entering{animation:pc-tab-shell-enter 360ms ease-out both!important;animation-duration:360ms!important}.tab.is-entering>.panel,.tab.is-entering>.section,.tab.is-entering>.side{animation:none!important}}
- </style>
+ 
+/* Extra visual personality for the Memes section — additive, existing styles preserved. */
+#meme>.panel{position:relative;overflow:hidden}
+#meme>.panel>h1{position:relative;display:inline-block;padding-bottom:10px}
+#meme>.panel>h1::after{content:"";position:absolute;left:0;bottom:0;width:76%;height:4px;border-radius:9px;background:linear-gradient(90deg,#e6a1b6,#c6a7df,transparent)}
+#meme>.panel>p:first-of-type{max-width:760px;padding:13px 16px;border-left:3px solid #d99aae;border-radius:0 12px 12px 0;background:linear-gradient(90deg,rgba(238,190,204,.16),rgba(238,190,204,0));line-height:1.65}
+#meme .meme-upload{position:relative;overflow:hidden;border-style:dashed;border-width:2px;background:linear-gradient(135deg,#fffafb 0%,#fff2f6 58%,#f8f1fc 100%);transition:border-color .25s ease,transform .25s ease,box-shadow .25s ease}
+#meme .meme-upload::before{content:"ШАГ 1 · ДОБАВЬ ИЗОБРАЖЕНИЕ";display:block;margin-bottom:12px;color:#a45d73;font-size:11px;font-weight:800;letter-spacing:1.15px}
+#meme .meme-upload::after{content:"Можно загрузить картинку с мемом — или сразу перейти к тексту ниже";display:block;margin-top:12px;color:var(--muted);font-size:12px;line-height:1.5}
+#meme .meme-upload:focus-within{border-color:#d58da5;box-shadow:0 0 0 4px rgba(213,141,165,.12)}
+#meme .meme-upload label.primary{padding:11px 16px;border-radius:12px;box-shadow:0 5px 14px rgba(180,103,129,.13);transition:transform .2s ease,box-shadow .2s ease}
+#meme .meme-upload label.primary:active{transform:scale(.97)}
+#meme label[for="memeText"]{display:flex;align-items:center;gap:8px;margin:18px 0 8px;font-weight:750;color:var(--ink)}
+#meme label[for="memeText"]::before{content:"02";display:grid;place-items:center;width:25px;height:25px;border-radius:8px;background:#f7dfe7;color:#98536b;font-size:11px;font-weight:800}
+#meme #memeText{border:1px solid #e8c5d0;border-radius:14px;background:linear-gradient(180deg,#fff 0%,#fffafd 100%);transition:border-color .2s ease,box-shadow .2s ease;line-height:1.7}
+#meme #memeText:focus{border-color:#d58da5;box-shadow:0 0 0 4px rgba(213,141,165,.12);outline:0}
+#meme #translateBtn{position:relative;overflow:hidden;box-shadow:0 6px 16px rgba(180,103,129,.16);transition:transform .2s ease,box-shadow .2s ease}
+#meme #translateBtn:active{transform:translateY(1px) scale(.985)}
+#meme .result{margin-top:20px}
+#meme .meme-analysis-card{position:relative;overflow:hidden;padding:17px 18px;background:linear-gradient(145deg,#fffdfd,#fff5f8);box-shadow:0 5px 18px rgba(174,111,133,.055)}
+#meme .meme-analysis-card>h3{display:flex;align-items:center;gap:8px;margin:0 0 11px;color:#98536b;font-size:15px}
+#meme .meme-analysis-card>h3::before{content:"";width:7px;height:18px;border-radius:6px;background:linear-gradient(#e6a1b6,#c6a7df)}
+#meme .meme-token{border-radius:10px;padding:10px 9px;transition:background .2s ease,transform .2s ease}
+#meme .meme-token:hover{background:rgba(238,190,204,.14);transform:translateX(2px)}
+#meme .meme-token b{display:inline-grid;place-items:center;min-width:38px;min-height:38px;padding:3px 8px;border-radius:10px;background:#f8e4eb;color:#98536b}
+#meme .meme-token span:nth-child(2){color:#a45d73;font-weight:700}
+#meme .meme-expression{position:relative;margin-top:10px;padding:14px 15px 13px 17px;border:1px solid #efd4dd;border-radius:13px;background:linear-gradient(110deg,rgba(248,228,235,.62),rgba(248,241,252,.55))}
+#meme .meme-expression::before{content:"";position:absolute;left:0;top:12px;bottom:12px;width:3px;border-radius:4px;background:linear-gradient(#e6a1b6,#c6a7df)}
+#meme .meme-expression>b{display:inline-block;margin-bottom:5px;color:#98536b;font-size:16px}
+#meme .meme-expression p{margin:5px 0;line-height:1.55}
+#meme .meme-expression p:nth-of-type(1){font-weight:650;color:var(--ink)}
+#meme .meme-expression p.small{padding-top:6px;border-top:1px dashed #e8c5d0;color:var(--muted)}
+#meme .meme-analysis-note{display:flex;align-items:flex-start;gap:8px;border:1px solid #efd4dd}
+#meme .meme-analysis-note::before{content:"✦";color:#c27b96;font-size:16px;line-height:1}
+body.dark-theme #meme>.panel>p:first-of-type{background:linear-gradient(90deg,rgba(210,140,164,.13),transparent);border-left-color:#d99aaa}
+body.dark-theme #meme .meme-upload{background:linear-gradient(135deg,#49383d,#4c3b50);border-color:#76545d}
+body.dark-theme #meme .meme-upload::before,body.dark-theme #meme .meme-analysis-card>h3,body.dark-theme #meme .meme-expression>b{color:#f0b2c4}
+body.dark-theme #meme label[for="memeText"]::before,body.dark-theme #meme .meme-token b{background:#62434c;color:#ffe1e8}
+body.dark-theme #meme #memeText{background:#403438;border-color:#76545d;color:#fff1ed}
+body.dark-theme #meme .meme-analysis-card{background:linear-gradient(145deg,#49383d,#443640)}
+body.dark-theme #meme .meme-expression{background:linear-gradient(110deg,rgba(117,76,91,.28),rgba(100,79,119,.22));border-color:#76545d}
+body.dark-theme #meme .meme-expression p.small{border-color:#76545d}
+body.dark-theme #meme .meme-token:hover{background:rgba(210,140,164,.1)}
+@media(prefers-reduced-motion:reduce){#meme .meme-upload,#meme .meme-token,#meme #translateBtn,#meme #memeText{transition:none}}
+
+</style>
 
 </head>
 <body>
@@ -5628,7 +5673,7 @@ renderQ();
   <script>
 if ("serviceWorker" in navigator) {
   window.addEventListener("load", () => {
-    navigator.serviceWorker.register("./service-worker.js?v=17", { updateViaCache: "none" })
+    navigator.serviceWorker.register("./service-worker.js?v=18", { updateViaCache: "none" })
       .then(() => console.log("PhotoChinese PWA ready!"))
       .catch(error => console.error("PWA error:", error));
   });
