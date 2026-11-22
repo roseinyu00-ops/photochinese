@@ -2275,6 +2275,125 @@ body.profile-editing #profileAvatar::after {
 .hsk-level-bar span{display:block;height:100%;background:var(--accent);border-radius:99px}
 .hsk-level-status{font-size:12px;color:var(--muted);min-width:66px;text-align:right}
 @media(max-width:480px){.hsk-intro-stats{gap:6px}.hsk-intro-stats>div{padding:12px 5px}.hsk-intro-stats strong{font-size:20px}.hsk-test-actions button{flex:1}.hsk-level-row{grid-template-columns:55px 1fr auto;gap:7px}}
+
+/* PHOTOCHINESE — мягкая динамика интерфейса */
+:root {
+  --motion-fast: 160ms;
+  --motion-medium: 260ms;
+  --motion-slow: 420ms;
+}
+nav button,
+button,
+.coach-word,
+.coach-phrase-item,
+.coach-grammar-rule,
+.info,
+.tag,
+.word {
+  transition:
+    color var(--motion-fast) ease,
+    background-color var(--motion-fast) ease,
+    border-color var(--motion-fast) ease,
+    box-shadow var(--motion-medium) ease,
+    transform var(--motion-medium) cubic-bezier(.2,.75,.25,1);
+}
+nav button {
+  position: relative;
+  overflow: hidden;
+}
+nav button::after {
+  content: "";
+  position: absolute;
+  left: 18%;
+  right: 18%;
+  bottom: 4px;
+  height: 2px;
+  border-radius: 3px;
+  background: var(--pink);
+  transform: scaleX(0);
+  transform-origin: center;
+  transition: transform var(--motion-medium) ease;
+}
+nav button.active::after { transform: scaleX(1); }
+nav button:not(.active):hover {
+  color: var(--ink);
+  border-color: #e9bdc8;
+  transform: translateY(-1px);
+}
+nav button.active { box-shadow: 0 5px 16px #60464d1a; }
+button:not(:disabled):active { transform: scale(.97); }
+button:focus-visible,
+a:focus-visible,
+input:focus-visible,
+textarea:focus-visible,
+select:focus-visible {
+  outline: 3px solid #e98da177;
+  outline-offset: 3px;
+}
+.tab.is-entering {
+  animation: pcTabEnter 360ms cubic-bezier(.2,.7,.25,1) both;
+}
+.tab.is-entering > .panel,
+.tab.is-entering > main,
+.tab.is-entering .profile-page {
+  animation: pcPanelReveal 420ms cubic-bezier(.2,.7,.25,1) both;
+}
+.tab.is-entering > .panel:nth-child(2),
+.tab.is-entering > main:nth-child(2) { animation-delay: 45ms; }
+@keyframes pcTabEnter {
+  from { opacity: 0; transform: translateY(9px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+@keyframes pcPanelReveal {
+  from { opacity: 0; transform: translateY(12px) scale(.992); }
+  to { opacity: 1; transform: translateY(0) scale(1); }
+}
+.coach-lesson-card:hover,
+.coach-search-result:hover,
+.coach-word:hover,
+.coach-phrase-item:hover,
+.coach-grammar-rule:hover,
+.info:hover {
+  border-color: #e7b5c1;
+  box-shadow: 0 7px 20px #60464d10;
+  transform: translateY(-2px);
+}
+.coach-word strong,
+.coach-example-hanzi,
+.coach-dialogue-line strong,
+.coach-phrase-item strong {
+  transition: color var(--motion-medium) ease;
+}
+.coach-word:hover strong,
+.coach-phrase-item:hover strong { color: #bd6d83; }
+.tag,
+.word {
+  transition: background-color var(--motion-fast) ease, transform var(--motion-fast) ease;
+}
+.tag:hover,
+.word:hover { background: #f8dce3; transform: translateY(-1px); }
+.primary,
+.secondary,
+.theme-toggle,
+.settings-icon-button {
+  transition: transform var(--motion-fast) ease, box-shadow var(--motion-medium) ease, background-color var(--motion-medium) ease;
+}
+.primary:not(:disabled):hover,
+.secondary:not(:disabled):hover {
+  box-shadow: 0 6px 16px #60464d16;
+  transform: translateY(-2px);
+}
+.coach-progress-track > div { transition: width 650ms cubic-bezier(.2,.75,.25,1); }
+@media (prefers-reduced-motion: reduce) {
+  *, *::before, *::after {
+    scroll-behavior: auto !important;
+    animation-duration: .01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: .01ms !important;
+  }
+  .tab.is-entering { animation: none !important; }
+}
+
 </style>
 <style>
 .learning-progress-heading{display:flex;align-items:center;justify-content:space-between;gap:10px}
@@ -3121,8 +3240,13 @@ function updateProfileAccess() {
 
 const tabs = document.querySelectorAll('nav button');
 tabs.forEach(btn => btn.addEventListener('click', () => {
+  const targetTab = document.getElementById(btn.dataset.tab);
+  const alreadyActive = btn.classList.contains('active');
   tabs.forEach(b => b.classList.toggle('active', b === btn));
-  document.querySelectorAll('.tab').forEach(s => s.hidden = s.id !== btn.dataset.tab);
+  document.querySelectorAll('.tab').forEach(section => {
+    section.hidden = section.id !== btn.dataset.tab;
+    section.classList.remove('is-entering');
+  });
 
   // Прогресс скрываем только в разделах HSK и личного словаря.
   const learningSidebar = document.getElementById("learningSidebar");
@@ -3132,6 +3256,12 @@ tabs.forEach(btn => btn.addEventListener('click', () => {
 
   document.body.classList.toggle("profile-open", btn.dataset.tab === "profile");
   if (btn.dataset.tab === "profile") updateProfileAccess();
+
+  // Повторное нажатие на текущий раздел не перезапускает анимацию.
+  if (targetTab && !alreadyActive) {
+    void targetTab.offsetWidth;
+    targetTab.classList.add('is-entering');
+  }
 }));
 const photo = document.getElementById('photo');
 const cameraPhoto = document.getElementById('cameraPhoto');
