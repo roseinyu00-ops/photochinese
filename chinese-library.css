@@ -149,3 +149,26 @@ body.dark-theme .cl-topic-card small,body.dark-theme .cl-dialogue-topic-card sma
 body.dark-theme .cl-searchbox input{background:#493a43!important;border-color:#76545d!important;color:#fff1ed!important}
 body.dark-theme .cl-search-clear{background:#654852;color:#ffe1e8}
 @media(max-width:520px){.cl-topic-row,.cl-dialogue-topic-grid{grid-template-columns:1fr 1fr;gap:7px}.cl-topic-card,.cl-dialogue-topic-card{min-height:88px;padding:10px;grid-template-columns:32px 1fr;column-gap:8px}.cl-topic-card-mark,.cl-dialogue-topic-mark{width:31px;height:31px;border-radius:10px;font-size:17px}.cl-topic-card strong,.cl-dialogue-topic-card strong{font-size:11px}.cl-topic-card small,.cl-dialogue-topic-card small{font-size:9px}}
+
+/* Refined PhotoChinese search fields */
+.cl-search-caption,.cl-filter-level-label{display:block;margin:0 0 8px;color:#a56d82;font-size:10px;font-weight:850;letter-spacing:.9px;text-transform:uppercase}
+.cl-library-controls .cl-filter-row{grid-template-columns:112px minmax(0,1fr);align-items:center;gap:9px}
+.cl-library-controls .cl-filter-row .cl-searchbox{grid-column:1/-1;margin-top:3px}
+.cl-library-controls .cl-filter-row select{width:100%;height:48px;padding:0 13px;border-radius:14px;font-size:13px}
+.cl-searchbox{width:100%;min-width:0}
+.cl-searchbox input{font-size:13px!important;letter-spacing:.05px}
+.cl-searchbox input::-webkit-search-cancel-button{-webkit-appearance:none;appearance:none}
+.cl-searchbox input:focus-visible{outline:2px solid rgba(203,139,164,.24);outline-offset:2px}
+.cl-search-clear{transition:background .18s,transform .18s,color .18s}
+.cl-search-clear:hover{background:#efd6e0;color:#874e67;transform:translateY(-50%) scale(1.06)}
+.cl-search-caption{margin-top:2px}
+.cl-phrasebook-controls .cl-searchbox{margin-top:9px}
+.cl-topic-heading{margin-bottom:12px}
+.cl-results-count{padding:8px 11px;border-radius:10px;background:#fff4f7;color:#a56d82;font-weight:700}
+body.dark-theme .cl-search-caption,body.dark-theme .cl-filter-level-label{color:#e3a9bd}
+body.dark-theme .cl-results-count{background:#503d47;color:#efc2d1}
+@media(max-width:520px){
+ .cl-library-controls .cl-filter-row{grid-template-columns:1fr;gap:7px}
+ .cl-library-controls .cl-filter-row .cl-searchbox{grid-column:1;margin-top:2px}
+ .cl-library-controls .cl-filter-row select{height:46px}
+}
