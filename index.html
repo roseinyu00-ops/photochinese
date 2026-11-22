@@ -8248,9 +8248,9 @@ document.getElementById("accountForm").addEventListener("submit", async function
         email: email,
         password: password,
         options: {
-          emailRedirectTo: "https://roseinyu00-ops.github.io/photochinese/"
-        },
-        captchaToken: captchaToken
+          emailRedirectTo: "https://roseinyu00-ops.github.io/photochinese/",
+          captchaToken: captchaToken
+        }
       });
 
       if (!result.error && result.data.session) {
