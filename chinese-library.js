@@ -273,14 +273,17 @@ words.slice(0,120).forEach(w=>{const item=make("div","cl-word-item");item.append
 card.append(grid);root.append(card);
 }
 function select(ch){$("clCharacterInput").value=ch;document.querySelectorAll(".cl-character-chip").forEach(b=>b.classList.toggle("active",b.textContent===ch));showWords(ch);}
-$("clGrammarLevel")?.addEventListener("change",renderGrammar);$("clGrammarSearch")?.addEventListener("input",renderGrammar);
-$("clDialogueSearch")?.addEventListener("input",()=>{renderDialogs();renderDialogue();});
+$("clGrammarLevel")?.addEventListener("change",renderGrammar);
+$("clGrammarSearch")?.addEventListener("input",()=>{renderGrammar();syncSearchClear("clGrammarSearch");});
+$("clDialogueSearch")?.addEventListener("input",()=>{renderDialogs();renderDialogue();syncSearchClear("clDialogueSearch");});
+function syncSearchClear(id){const input=$(id),btn=$(id+"Clear");if(btn)btn.hidden=!input.value;}
+["clGrammarSearch","clDialogueSearch"].forEach(id=>{const input=$(id),btn=$(id+"Clear");if(!input||!btn)return;btn.addEventListener("click",()=>{input.value="";input.dispatchEvent(new Event("input",{bubbles:true}));input.focus();});syncSearchClear(id);});
 $("clCharacterSearch")?.addEventListener("click",()=>{const ch=$("clCharacterInput").value.trim();if(ch)select([...ch][0]);else $("clCharacterHint").textContent="Сначала введи один китайский иероглиф.";});
 $("clCharacterInput")?.addEventListener("keydown",e=>{if(e.key==="Enter")$("clCharacterSearch").click();});
 $("clCharacterInput")?.addEventListener("input",e=>{const chars=[...e.target.value.trim()];if(chars.length>1)e.target.value=chars[0];});
 window.addEventListener("storage",renderChips);
 window.addEventListener("photoChineseDataLoaded",renderChips);
 window.addEventListener("photoChineseDictionaryReady",()=>{renderChips();const ch=$("clCharacterInput").value.trim();if(ch)showWords([...ch][0]);});
-renderGrammarTopics();renderGrammar();renderDialogs();renderDialogue();renderChips();
+renderGrammarTopics();renderGrammar();renderDialogueTopics();renderDialogs();renderDialogue();renderChips();
 if(!$("clCharacterInput").value.trim())select("学");
 })();
