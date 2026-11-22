@@ -7383,6 +7383,7 @@ updateAchievements = function() {
   updateCollection();
   renderAchievements();
   renderCollection();
+  if (typeof renderCompanions === "function") renderCompanions();
 };
 
 // Первоначальная загрузка
