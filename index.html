@@ -2839,42 +2839,54 @@ body.dark-theme nav button.active {
 </style>
 
 <style id="photochinese-refined-motion">
-/* PHOTOCHINESE — selective accents and calm, consistent motion */
-.tab > .panel,.tab > .section{border-color:var(--line);box-shadow:0 4px 16px rgba(112,67,82,.035)}
-/* Accent lines are reserved for meaningful, high-level blocks. */
-.tab > .panel::before,.tab > .section::before{display:none}
-
-#learn > .hero::before,#learn > #analysisPanel::before,#coach > .coach-hero::before,#hsk > .hsk-diagnostic::before,#studytools > .study-tools-hero::before{
+/* Editorial accents: emphasis follows meaning, not every card. */
+.tab>.panel,.tab>.section{border-color:var(--line);box-shadow:0 4px 16px rgba(112,67,82,.035)}
+.tab>.panel::before,.tab>.section::before{display:none}
+#learn>.hero::before,#learn>#analysisPanel::before,#coach>.coach-hero::before,#hsk>.hsk-diagnostic::before,#studytools>.study-tools-hero::before{
  display:block;content:"";position:absolute;top:0;left:22px;right:22px;height:3px;border-radius:0 0 8px 8px;
  background:linear-gradient(90deg,#e7a5b7,#c9a8dc,#e7a5b7);opacity:.82;pointer-events:none
 }
-#learn > .hero,#learn > #analysisPanel,#coach > .coach-hero,#hsk > .hsk-diagnostic,#studytools > .study-tools-hero{position:relative;overflow:hidden}
-body.dark-theme #learn > .hero::before,body.dark-theme #learn > #analysisPanel::before,body.dark-theme #coach > .coach-hero::before,body.dark-theme #hsk > .hsk-diagnostic::before,body.dark-theme #studytools > .study-tools-hero::before{background:linear-gradient(90deg,#b8758d,#9b7caf,#b8758d)}
+#learn>.hero,#learn>#analysisPanel,#coach>.coach-hero,#hsk>.hsk-diagnostic,#studytools>.study-tools-hero{position:relative;overflow:hidden}
+.pc-editorial-emphasis{font-style:italic;font-weight:600;color:#b65f7d;position:relative}
+.pc-inline-emphasis{font-weight:750;color:#a94f70;background:linear-gradient(transparent 66%,rgba(238,177,194,.38) 66%)}
+.pc-note-label{display:inline;color:#a94f70;background:#fff0f4;border:1px solid rgba(207,120,147,.2);border-radius:6px;padding:1px 6px;margin-right:3px;font-size:.88em;font-weight:800;white-space:nowrap}
+.pc-keyword{color:#a94f70;background:linear-gradient(transparent 58%,rgba(238,177,194,.42) 58%);border-radius:3px;padding:0 2px;font-weight:800}
 .coach-lesson-card,.coach-word,.coach-grammar-box,.coach-practice,.hsk-question-card,.hsk-result,.profile-section,.study-tools-card,.learning-progress-stat,.pc-character-card,.result,.word-of-day,.companion-card{
  border-color:var(--line);box-shadow:none;transition:transform .42s cubic-bezier(.2,.75,.25,1),box-shadow .42s cubic-bezier(.2,.75,.25,1),border-color .42s ease,background-color .42s ease
 }
-.coach-lesson-card::before,.hsk-question-card::before,.study-tools-card::before,.learning-progress-stat::before,.pc-character-card::before{display:none}
 .coach-grammar-box,.coach-practice,.profile-section{border-left:1px solid var(--line)}
 .coach-word{border-color:rgba(207,120,147,.22);background:var(--surface,#fff)}
-.coach-word strong,.coach-example-hanzi,.coach-dialogue-line strong{color:var(--ink)}
 .coach-example{background:var(--surface-soft,rgba(230,170,190,.07));border:1px solid var(--line);padding:12px 14px}
 .coach-objectives{background:linear-gradient(110deg,rgba(238,190,204,.13),rgba(201,168,220,.09));border-color:rgba(207,120,147,.24)}
-.coach-final-exam{border-top:1px solid rgba(207,120,147,.28)}
-.pc-keyword{color:#a94f70;background:linear-gradient(transparent 58%,rgba(238,177,194,.42) 58%);border-radius:3px;padding:0 2px;font-weight:800}
-.pc-note-label{display:inline;color:#a94f70;background:#fff0f4;border:1px solid rgba(207,120,147,.2);border-radius:6px;padding:1px 6px;margin-right:3px;font-size:.88em;font-weight:800;white-space:nowrap}
 .coach-lesson-card:hover,.coach-word:hover,.hsk-question-card:hover,.study-tools-card:hover,.profile-section:hover{border-color:rgba(207,120,147,.48);box-shadow:0 6px 17px rgba(178,103,128,.07);transform:translateY(-1px)}
 nav button{transition:color .35s ease,background-color .35s ease,border-color .35s ease,box-shadow .35s ease,transform .35s cubic-bezier(.2,.75,.25,1)}
 nav button.active{color:var(--ink);background:rgba(255,240,245,.55);box-shadow:inset 0 -2px 0 rgba(207,120,147,.65)}
 nav button.active::after{height:2px;box-shadow:none}
 .primary:not(:disabled),.secondary:not(:disabled),.theme-toggle,.settings-icon-button{transition:transform .32s cubic-bezier(.2,.75,.25,1),box-shadow .32s ease,filter .32s ease}
 .primary:not(:disabled):active,.secondary:not(:disabled):active,.theme-toggle:active,.settings-icon-button:active{transform:scale(.98)}
-body.dark-theme .pc-keyword{color:#f0b2c4;background:linear-gradient(transparent 58%,rgba(210,140,164,.3) 58%)}
-body.dark-theme .pc-note-label{color:#ffdce6;background:#62434c;border-color:#805968}
+/* Every page gets one coordinated entrance; nested text fades in without jumping. */
+@keyframes pc-tab-enter{0%{opacity:0;transform:translate3d(0,14px,0)}65%{opacity:1}100%{opacity:1;transform:translate3d(0,0,0)}}
+@keyframes pc-tab-content{0%{opacity:0}100%{opacity:1}}
+.tab.is-entering>.panel,.tab.is-entering>.section,.tab.is-entering>.side{
+ animation:pc-tab-enter 760ms cubic-bezier(.16,1,.3,1) both
+}
+.tab.is-entering>.panel:nth-child(2),.tab.is-entering>.section:nth-child(2){animation-delay:90ms}
+.tab.is-entering>.panel:nth-child(3),.tab.is-entering>.section:nth-child(3){animation-delay:160ms}
+.tab.is-entering>.panel:nth-child(4),.tab.is-entering>.section:nth-child(4){animation-delay:220ms}
+.tab.is-entering>.panel :where(h1,h2,h3,p,label,button,.coach-word,.coach-lesson-card),
+.tab.is-entering>.section :where(h1,h2,h3,p,label,button,.coach-word,.coach-lesson-card){
+ animation:pc-tab-content 560ms ease-out both
+}
+body.dark-theme .pc-editorial-emphasis,body.dark-theme .pc-inline-emphasis,body.dark-theme .pc-note-label,body.dark-theme .pc-keyword{color:#f0b2c4}
+body.dark-theme .pc-inline-emphasis{background:linear-gradient(transparent 66%,rgba(210,140,164,.3) 66%)}
+body.dark-theme .pc-note-label{background:#62434c;border-color:#805968}
 body.dark-theme .coach-word{background:var(--surface,#49383d);border-color:var(--line)}
-body.dark-theme .coach-word strong,body.dark-theme .coach-example-hanzi,body.dark-theme .coach-dialogue-line strong{color:var(--text)}
 body.dark-theme .coach-objectives{background:linear-gradient(110deg,rgba(117,76,91,.24),rgba(100,79,119,.2));border-color:#76545d}
 @media(hover:hover) and (pointer:fine){.primary:not(:disabled):hover,.secondary:not(:disabled):hover{filter:brightness(1.025);box-shadow:0 5px 14px rgba(178,103,128,.12)}}
-@media(prefers-reduced-motion:reduce){*,*::before,*::after{scroll-behavior:auto!important;animation-duration:.01ms!important;animation-iteration-count:1!important;transition-duration:.01ms!important}}
+@media(prefers-reduced-motion:reduce){
+ .tab.is-entering>.panel,.tab.is-entering>.section,.tab.is-entering>.side{animation:pc-tab-content 280ms ease-out both}
+ .tab.is-entering>.panel :where(h1,h2,h3,p,label,button,.coach-word,.coach-lesson-card),.tab.is-entering>.section :where(h1,h2,h3,p,label,button,.coach-word,.coach-lesson-card){animation:none}
+}
 </style>
 
 </head>
@@ -2905,8 +2917,8 @@ body.dark-theme .coach-objectives{background:linear-gradient(110deg,rgba(117,76,
   
 <section id="learn" class="tab">
   <div class="panel hero">
-    <h1>Китайский начинается<br>с одного фото.</h1>
-    <p>Наведи камеру на текст или загрузи изображение — PhotoChinese поможет прочитать, понять и запомнить каждый иероглиф.</p>
+    <h1>Китайский начинается<br>с <em class="pc-editorial-emphasis">одного</em> фото.</h1>
+    <p>Наведи камеру на текст или загрузи изображение — PhotoChinese поможет <strong class="pc-inline-emphasis">прочитать, понять и запомнить</strong> каждый иероглиф.</p>
     <div class="ocr-locked-card" role="status" aria-live="polite">
       <div class="ocr-locked-icon" aria-hidden="true">🔒</div>
       <div>
@@ -3541,24 +3553,17 @@ tabs.forEach(btn => btn.addEventListener('click', () => {
   document.body.classList.toggle("profile-open", btn.dataset.tab === "profile");
   if (btn.dataset.tab === "profile") updateProfileAccess();
 
-  // Единовременное мягкое появление блоков без вложенных transform-анимаций.
+  // CSS-driven entrance is reliable on mobile browsers and animates the whole section.
   if (targetTab && !alreadyActive) {
-    const reduceMotion = window.matchMedia && window.matchMedia('(prefers-reduced-motion: reduce)').matches;
-    if (!reduceMotion && typeof targetTab.animate === 'function') {
-      const majorBlocks = Array.from(targetTab.children).filter(item => !item.hidden && !item.matches('#learningSidebar'));
-      majorBlocks.forEach((block,index) => {
-        if (typeof block.animate !== 'function') return;
-        block.animate(
-          [{opacity:0,transform:'translate3d(0,10px,0)'},{opacity:1,transform:'translate3d(0,0,0)'}],
-          {duration:820,delay:Math.min(index*85,340),easing:'cubic-bezier(.16,1,.3,1)',fill:'both'}
-        );
-        // Внутренние элементы только проявляются: они не конкурируют с движением родителя.
-        Array.from(block.children).filter(item=>!item.hidden&&!item.matches('script,style')).slice(0,18).forEach((item,innerIndex)=>{
-          if(typeof item.animate!=='function')return;
-          item.animate([{opacity:.35},{opacity:1}],{duration:560,delay:90+Math.min(innerIndex*32,260),easing:'ease-out',fill:'both'});
-        });
-      });
-    }
+    targetTab.classList.remove('is-entering');
+    void targetTab.offsetWidth;
+    targetTab.classList.add('is-entering');
+    targetTab.addEventListener('animationend', function finishEntrance(event) {
+      if (event.target === targetTab.firstElementChild) {
+        targetTab.classList.remove('is-entering');
+        targetTab.removeEventListener('animationend', finishEntrance);
+      }
+    });
   }
 }));
 const photo = document.getElementById('photo');
@@ -5161,14 +5166,27 @@ function renderCoachPracticeQuestion(){
 function appendCoachEmphasisText(container,text){
  container.textContent='';
  const source=String(text||'');
- const marker=/(Важно:|Обрати внимание:|Запомни:|Не путай:|Формула:|Порядок слов:|Например:|Подсказка:|Совет:|Исключение:)/gi;
- let last=0,match;
- while((match=marker.exec(source))){
-  if(match.index>last)container.appendChild(document.createTextNode(source.slice(last,match.index)));
-  const label=document.createElement('strong');label.className='pc-note-label';label.textContent=match[0];container.appendChild(label);
-  last=match.index+match[0].length;
- }
- if(last<source.length)container.appendChild(document.createTextNode(source.slice(last)));
+ const patterns=[
+  {re:/(Важно:|Обрати внимание:|Запомни:|Не путай:|Формула:|Порядок слов:|Например:|Подсказка:|Совет:|Исключение:|Обрати внимание на то, что:)/gi,cls:'pc-note-label',tag:'strong'},
+  {re:/(\\b(?:необходимо|важно|главное|только|всегда|никогда|исключение|порядок слов|обратный порядок|вопросительная частица)\\b)/gi,cls:'pc-inline-emphasis',tag:'strong'}
+ ];
+ const matches=[];
+ patterns.forEach((pattern,priority)=>{
+  pattern.re.lastIndex=0;let match;
+  while((match=pattern.re.exec(source))){
+   if(matches.some(item=>match.index<item.end&&match.index+match[0].length>item.start))continue;
+   matches.push({start:match.index,end:match.index+match[0].length,text:match[0],cls:pattern.cls,tag:pattern.tag,priority});
+  }
+ });
+ matches.sort((a,b)=>a.start-b.start||a.priority-b.priority);
+ let cursor=0;
+ matches.forEach(item=>{
+  if(item.start<cursor)return;
+  if(item.start>cursor)container.appendChild(document.createTextNode(source.slice(cursor,item.start)));
+  const node=document.createElement(item.tag);node.className=item.cls;node.textContent=item.text;container.appendChild(node);
+  cursor=item.end;
+ });
+ if(cursor<source.length)container.appendChild(document.createTextNode(source.slice(cursor)));
 }
 function appendCoachHighlightedText(container, text, vocabulary){
  container.textContent='';
@@ -5197,7 +5215,7 @@ function openCoachLesson(index){
  document.getElementById('coachLessonTitle').textContent=lesson.title;
  appendCoachEmphasisText(document.getElementById('coachLessonIntro'),lesson.intro);
  const objectives=document.getElementById('coachLessonObjectives');objectives.innerHTML='';
- if(lesson.objectives&&lesson.objectives.length){objectives.hidden=false;const title=document.createElement('strong');title.textContent='После урока ты сможешь:';objectives.appendChild(title);const list=document.createElement('ul');lesson.objectives.forEach(item=>{const li=document.createElement('li');li.textContent=item;list.appendChild(li);});objectives.appendChild(list);}else{objectives.hidden=true;}
+ if(lesson.objectives&&lesson.objectives.length){objectives.hidden=false;const title=document.createElement('strong');title.textContent='После урока ты сможешь:';objectives.appendChild(title);const list=document.createElement('ul');lesson.objectives.forEach(item=>{const li=document.createElement('li');appendCoachEmphasisText(li,item);list.appendChild(li);});objectives.appendChild(list);}else{objectives.hidden=true;}
  const dialogue=document.getElementById('coachLessonDialogue'),dialogueLines=document.getElementById('coachDialogueLines');dialogueLines.innerHTML='';
  if(lesson.dialogue&&lesson.dialogue.length){dialogue.hidden=false;lesson.dialogue.forEach(line=>{const item=document.createElement('div');item.className='coach-dialogue-line';const hanzi=document.createElement('strong');appendCoachHighlightedText(hanzi,line[0],lesson.words);const pinyin=document.createElement('div');pinyin.className='coach-example-pinyin';pinyin.textContent=line[1];const translation=document.createElement('div');translation.className='coach-example-translation';translation.textContent=line[2];item.append(hanzi,pinyin,translation);dialogueLines.appendChild(item);});}else{dialogue.hidden=true;}
  appendCoachEmphasisText(document.getElementById('coachLessonGrammar'),lesson.grammar);
@@ -5226,7 +5244,7 @@ function openCoachLesson(index){
    const card=document.createElement('section');card.className='coach-grammar-rule';
    const heading=document.createElement('h4');heading.textContent=match?match[1].split('. ')[0]:'Правило '+(ruleIndex+1);card.appendChild(heading);
    const bodyLines=[...(match&&first.includes('. ')?[first.slice(first.indexOf('. ')+2)]:[]),...lines].filter(Boolean);
-   bodyLines.forEach(line=>{const row=document.createElement('p');row.className='coach-grammar-rule-text';row.textContent=line;card.appendChild(row);});
+   bodyLines.forEach(line=>{const row=document.createElement('p');row.className='coach-grammar-rule-text';appendCoachEmphasisText(row,line);card.appendChild(row);});
    const pinyinText=grammarPinyinByLesson[currentCoachLevel()===1?index:-1]?.[ruleIndex];
    if(pinyinText){const pinyinRow=document.createElement('p');pinyinRow.className='coach-grammar-pinyin';pinyinRow.textContent='Пиньинь: '+pinyinText;card.appendChild(pinyinRow);}
    grammarDetails.appendChild(card);
@@ -5590,7 +5608,7 @@ renderQ();
   <script>
 if ("serviceWorker" in navigator) {
   window.addEventListener("load", () => {
-    navigator.serviceWorker.register("./service-worker.js?v=14", { updateViaCache: "none" })
+    navigator.serviceWorker.register("./service-worker.js?v=15", { updateViaCache: "none" })
       .then(() => console.log("PhotoChinese PWA ready!"))
       .catch(error => console.error("PWA error:", error));
   });
