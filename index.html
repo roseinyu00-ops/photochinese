@@ -3148,6 +3148,152 @@ body.dark-theme #learn #analysisInput{background-color:#403438;color:var(--ink)}
 
 </style>
 
+<style>
+/* PROFILE POLISH: выразительные градиенты и награда рядом с ником */
+#profile .profile-name-line{
+  display:flex;
+  align-items:center;
+  justify-content:flex-start;
+  flex-wrap:nowrap;
+  gap:8px;
+  min-width:0;
+  width:max-content;
+  max-width:100%;
+}
+#profile .profile-name-line h2{
+  flex:0 1 auto;
+  min-width:0;
+  white-space:nowrap;
+  font-weight:850;
+  letter-spacing:-.045em;
+  background:linear-gradient(105deg,#a94f72 0%,#d17d9c 42%,#9b79bd 78%,#bd83a8 100%);
+  -webkit-background-clip:text;
+  background-clip:text;
+  color:transparent;
+  -webkit-text-fill-color:transparent;
+  filter:drop-shadow(0 2px 5px rgba(183,111,145,.13));
+}
+#profile #equippedDecoration{
+  display:inline-flex;
+  align-items:center;
+  justify-content:center;
+  flex:0 0 auto;
+  min-width:0;
+  margin:0;
+  line-height:1;
+  font-size:22px;
+  transform:translateY(-1px);
+  filter:drop-shadow(0 2px 5px rgba(185,119,153,.2));
+}
+#profile .profile-identity{min-width:0}
+#profile .profile-bio{
+  background:linear-gradient(112deg,rgba(255,244,248,.96),rgba(248,233,247,.76) 54%,rgba(239,232,250,.7));
+  border:1px solid rgba(202,139,169,.23);
+  box-shadow:inset 0 1px 0 rgba(255,255,255,.8),0 7px 20px rgba(151,103,133,.055);
+}
+#profile .profile-facts{
+  display:flex;
+  flex-wrap:wrap;
+  gap:8px 15px;
+}
+#profile .profile-facts span{
+  padding:6px 10px;
+  border:1px solid rgba(205,151,176,.18);
+  border-radius:999px;
+  background:linear-gradient(110deg,rgba(250,232,239,.72),rgba(242,235,249,.66));
+}
+#profile .profile-section>h2{
+  display:flex;
+  align-items:center;
+  gap:10px;
+  color:#775064;
+}
+#profile .profile-section>h2::after{
+  content:"";
+  display:block;
+  width:clamp(34px,8vw,70px);
+  height:3px;
+  margin:0;
+  border-radius:99px;
+  opacity:1;
+  background:linear-gradient(90deg,#d889a7,#b69bd2,transparent);
+}
+#profile .profile-stat{
+  background:linear-gradient(145deg,rgba(255,246,249,.95),rgba(246,237,250,.86));
+  border:1px solid rgba(201,143,171,.2);
+  box-shadow:0 7px 20px rgba(136,91,119,.07);
+}
+#profile .profile-stat strong{
+  background:linear-gradient(100deg,#b65f7d,#9b79bd);
+  -webkit-background-clip:text;
+  background-clip:text;
+  color:transparent;
+}
+#profile .profile-hsk-badge{
+  background:linear-gradient(115deg,#f4dce6,#e9def3);
+  border:1px solid rgba(193,135,168,.25);
+  box-shadow:0 4px 13px rgba(160,105,143,.1);
+}
+#profile .companion-card{
+  background:linear-gradient(125deg,rgba(255,245,248,.95),rgba(244,237,250,.86));
+  border:1px solid rgba(201,143,171,.2);
+}
+#profile .collection-item{
+  border:1px solid rgba(204,151,177,.2);
+  background:linear-gradient(125deg,rgba(255,249,251,.96),rgba(247,241,250,.82));
+}
+#profile .collection-item:hover{
+  border-color:rgba(191,124,160,.43);
+  background:linear-gradient(125deg,#fff0f5,#f0e8f8);
+  box-shadow:0 7px 18px rgba(155,103,139,.1);
+}
+body.dark-theme #profile .profile-name-line h2{
+  background:linear-gradient(105deg,#f2b2c8 0%,#d6a8e7 55%,#f0c3d8 100%);
+  -webkit-background-clip:text;
+  background-clip:text;
+  color:transparent;
+  -webkit-text-fill-color:transparent;
+}
+body.dark-theme #profile .profile-bio{
+  background:linear-gradient(112deg,rgba(104,67,82,.42),rgba(91,72,108,.38));
+  border-color:rgba(216,157,186,.22);
+  box-shadow:inset 0 1px 0 rgba(255,255,255,.035),0 7px 20px rgba(0,0,0,.08);
+}
+body.dark-theme #profile .profile-facts span{
+  background:linear-gradient(110deg,rgba(117,76,91,.42),rgba(96,78,117,.38));
+  border-color:rgba(216,157,186,.2);
+}
+body.dark-theme #profile .profile-section>h2{color:#f0d5e2}
+body.dark-theme #profile .profile-section>h2::after{
+  background:linear-gradient(90deg,#c47d9e,#a68bc8,transparent);
+}
+body.dark-theme #profile .profile-stat,
+body.dark-theme #profile .companion-card,
+body.dark-theme #profile .collection-item{
+  background:linear-gradient(140deg,rgba(91,61,75,.72),rgba(77,66,94,.68));
+  border-color:rgba(207,151,180,.2);
+  box-shadow:0 7px 20px rgba(0,0,0,.1);
+}
+body.dark-theme #profile .profile-stat strong{
+  background:linear-gradient(100deg,#efabc4,#c9a8e4);
+  -webkit-background-clip:text;
+  background-clip:text;
+  color:transparent;
+}
+body.dark-theme #profile .profile-hsk-badge{
+  background:linear-gradient(115deg,#694b5b,#554968);
+  border-color:rgba(207,151,180,.24);
+}
+body.dark-theme #profile .collection-item:hover{
+  background:linear-gradient(125deg,#604451,#514663);
+  border-color:rgba(216,157,186,.42);
+}
+@media(max-width:560px){
+  #profile .profile-name-line{gap:6px}
+  #profile .profile-name-line h2{font-size:clamp(17px,5.1vw,21px)}
+  #profile #equippedDecoration{font-size:19px}
+}
+</style>
 </head>
 <body>
 <div class="app">
@@ -7276,148 +7422,3 @@ window.addEventListener("keydown", function(event) {
 </script>
 </body>
 </html>
-
-/* PROFILE POLISH: выразительные градиенты и награда рядом с ником */
-#profile .profile-name-line{
-  display:flex;
-  align-items:center;
-  justify-content:flex-start;
-  flex-wrap:nowrap;
-  gap:8px;
-  min-width:0;
-  width:max-content;
-  max-width:100%;
-}
-#profile .profile-name-line h2{
-  flex:0 1 auto;
-  min-width:0;
-  white-space:nowrap;
-  font-weight:850;
-  letter-spacing:-.045em;
-  background:linear-gradient(105deg,#a94f72 0%,#d17d9c 42%,#9b79bd 78%,#bd83a8 100%);
-  -webkit-background-clip:text;
-  background-clip:text;
-  color:transparent;
-  -webkit-text-fill-color:transparent;
-  filter:drop-shadow(0 2px 5px rgba(183,111,145,.13));
-}
-#profile #equippedDecoration{
-  display:inline-flex;
-  align-items:center;
-  justify-content:center;
-  flex:0 0 auto;
-  min-width:0;
-  margin:0;
-  line-height:1;
-  font-size:22px;
-  transform:translateY(-1px);
-  filter:drop-shadow(0 2px 5px rgba(185,119,153,.2));
-}
-#profile .profile-identity{min-width:0}
-#profile .profile-bio{
-  background:linear-gradient(112deg,rgba(255,244,248,.96),rgba(248,233,247,.76) 54%,rgba(239,232,250,.7));
-  border:1px solid rgba(202,139,169,.23);
-  box-shadow:inset 0 1px 0 rgba(255,255,255,.8),0 7px 20px rgba(151,103,133,.055);
-}
-#profile .profile-facts{
-  display:flex;
-  flex-wrap:wrap;
-  gap:8px 15px;
-}
-#profile .profile-facts span{
-  padding:6px 10px;
-  border:1px solid rgba(205,151,176,.18);
-  border-radius:999px;
-  background:linear-gradient(110deg,rgba(250,232,239,.72),rgba(242,235,249,.66));
-}
-#profile .profile-section>h2{
-  display:flex;
-  align-items:center;
-  gap:10px;
-  color:#775064;
-}
-#profile .profile-section>h2::after{
-  content:"";
-  display:block;
-  width:clamp(34px,8vw,70px);
-  height:3px;
-  margin:0;
-  border-radius:99px;
-  opacity:1;
-  background:linear-gradient(90deg,#d889a7,#b69bd2,transparent);
-}
-#profile .profile-stat{
-  background:linear-gradient(145deg,rgba(255,246,249,.95),rgba(246,237,250,.86));
-  border:1px solid rgba(201,143,171,.2);
-  box-shadow:0 7px 20px rgba(136,91,119,.07);
-}
-#profile .profile-stat strong{
-  background:linear-gradient(100deg,#b65f7d,#9b79bd);
-  -webkit-background-clip:text;
-  background-clip:text;
-  color:transparent;
-}
-#profile .profile-hsk-badge{
-  background:linear-gradient(115deg,#f4dce6,#e9def3);
-  border:1px solid rgba(193,135,168,.25);
-  box-shadow:0 4px 13px rgba(160,105,143,.1);
-}
-#profile .companion-card{
-  background:linear-gradient(125deg,rgba(255,245,248,.95),rgba(244,237,250,.86));
-  border:1px solid rgba(201,143,171,.2);
-}
-#profile .collection-item{
-  border:1px solid rgba(204,151,177,.2);
-  background:linear-gradient(125deg,rgba(255,249,251,.96),rgba(247,241,250,.82));
-}
-#profile .collection-item:hover{
-  border-color:rgba(191,124,160,.43);
-  background:linear-gradient(125deg,#fff0f5,#f0e8f8);
-  box-shadow:0 7px 18px rgba(155,103,139,.1);
-}
-body.dark-theme #profile .profile-name-line h2{
-  background:linear-gradient(105deg,#f2b2c8 0%,#d6a8e7 55%,#f0c3d8 100%);
-  -webkit-background-clip:text;
-  background-clip:text;
-  color:transparent;
-  -webkit-text-fill-color:transparent;
-}
-body.dark-theme #profile .profile-bio{
-  background:linear-gradient(112deg,rgba(104,67,82,.42),rgba(91,72,108,.38));
-  border-color:rgba(216,157,186,.22);
-  box-shadow:inset 0 1px 0 rgba(255,255,255,.035),0 7px 20px rgba(0,0,0,.08);
-}
-body.dark-theme #profile .profile-facts span{
-  background:linear-gradient(110deg,rgba(117,76,91,.42),rgba(96,78,117,.38));
-  border-color:rgba(216,157,186,.2);
-}
-body.dark-theme #profile .profile-section>h2{color:#f0d5e2}
-body.dark-theme #profile .profile-section>h2::after{
-  background:linear-gradient(90deg,#c47d9e,#a68bc8,transparent);
-}
-body.dark-theme #profile .profile-stat,
-body.dark-theme #profile .companion-card,
-body.dark-theme #profile .collection-item{
-  background:linear-gradient(140deg,rgba(91,61,75,.72),rgba(77,66,94,.68));
-  border-color:rgba(207,151,180,.2);
-  box-shadow:0 7px 20px rgba(0,0,0,.1);
-}
-body.dark-theme #profile .profile-stat strong{
-  background:linear-gradient(100deg,#efabc4,#c9a8e4);
-  -webkit-background-clip:text;
-  background-clip:text;
-  color:transparent;
-}
-body.dark-theme #profile .profile-hsk-badge{
-  background:linear-gradient(115deg,#694b5b,#554968);
-  border-color:rgba(207,151,180,.24);
-}
-body.dark-theme #profile .collection-item:hover{
-  background:linear-gradient(125deg,#604451,#514663);
-  border-color:rgba(216,157,186,.42);
-}
-@media(max-width:560px){
-  #profile .profile-name-line{gap:6px}
-  #profile .profile-name-line h2{font-size:clamp(17px,5.1vw,21px)}
-  #profile #equippedDecoration{font-size:19px}
-}
