@@ -3612,6 +3612,16 @@ body.dark-theme .companion-option{background:rgba(65,49,57,.65);border-color:rgb
 body.dark-theme .companion-option.selected{background:rgba(113,72,91,.45);border-color:#d6a2af}
 @media(max-width:420px){.companion-gallery{grid-template-columns:repeat(2,minmax(0,1fr))}}
 
+
+/* Заблокированные спутники остаются видимыми — как маленькая цель */
+.companion-option.locked{opacity:1;filter:none;background:rgba(248,242,246,.52);border-style:dashed}
+.companion-option.locked .companion-option-emoji{filter:blur(3px);opacity:.72;transform:scale(1.04)}
+.companion-option.locked strong{opacity:.78}
+.companion-option.locked small{color:var(--muted,#8c7b82);font-size:9px;line-height:1.35}
+.achievement-companion-reward{display:block;margin-top:5px;color:#b47b9a;font-size:10px;font-weight:600;line-height:1.35}
+body.dark-theme .companion-option.locked{background:rgba(57,45,54,.45)}
+body.dark-theme .achievement-companion-reward{color:#dfabc4}
+
 </style>
 </head>
 <body>
@@ -7051,6 +7061,12 @@ function renderAchievements() {
       list.appendChild(item);
     }
     const unlocked = progress.achievements.includes(id);
+    const companionReward = achievementCompanionRewards[id];
+    let companionNote = item.querySelector(".achievement-companion-reward");
+    if(companionReward){
+      if(!companionNote){companionNote=document.createElement("small");companionNote.className="achievement-companion-reward";item.appendChild(companionNote);}
+      companionNote.textContent = "✦ Дополнительная награда: "+companionReward;
+    } else if(companionNote){companionNote.remove();}
     item.classList.toggle("unlocked",unlocked);
     item.classList.toggle("locked",!unlocked);
     item.hidden = index >= 3 && !achievementCatalogExpanded;
@@ -7260,13 +7276,23 @@ function renderCollection() {
 
 // ===== КОМПАНЬОНЫ ПО УРОВНЯМ HSK =====
 const companionCatalog = [
-  {level:1,id:"fox",emoji:"🦊",name:"Лисёнок",description:"Любопытный спутник, который начинает путь вместе с тобой."},
-  {level:2,id:"bunny",emoji:"🐰",name:"Зайчонок",description:"Быстрый и внимательный помощник новых открытий."},
-  {level:3,id:"cat",emoji:"🐱",name:"Котёнок",description:"Любит уют, слова и маленькие ежедневные победы."},
-  {level:4,id:"panda",emoji:"🐼",name:"Панда",description:"Спокойный компаньон для серьёзных занятий."},
-  {level:5,id:"deer",emoji:"🦌",name:"Оленёнок",description:"Изящный спутник на пути к свободному чтению."},
-  {level:6,id:"dragon",emoji:"🐉",name:"Дракончик",description:"Редкий спутник для покорителя самой высокой ступени."}
+  {level:1,id:"fox",emoji:"🦊",name:"Лисёнок",description:"Любопытный спутник, который начинает путь вместе с тобой.",requirement:"Доступен с самого начала"},
+  {level:2,id:"bunny",emoji:"🐰",name:"Зайчонок",description:"Быстрый и внимательный помощник новых открытий.",requirement:"Откроется на HSK 2"},
+  {level:3,id:"cat",emoji:"🐱",name:"Котёнок",description:"Любит уют, слова и маленькие ежедневные победы.",requirement:"Откроется на HSK 3"},
+  {level:4,id:"panda",emoji:"🐼",name:"Панда",description:"Спокойный компаньон для серьёзных занятий.",requirement:"Откроется на HSK 4"},
+  {level:5,id:"deer",emoji:"🦌",name:"Оленёнок",description:"Изящный спутник на пути к свободному чтению.",requirement:"Откроется на HSK 5"},
+  {level:6,id:"dragon",emoji:"🐉",name:"Дракончик",description:"Редкий спутник для покорителя самой высокой ступени.",requirement:"Откроется на HSK 6"},
+  {achievement:"character_master",id:"moon_fox",emoji:"🦊",name:"Лунная кицунэ",description:"Таинственная кицунэ с лунной магией.",requirement:"За достижение «Знаток знаков»"},
+  {achievement:"lesson_pro",id:"wise_owl",emoji:"🦉",name:"Сова-хранитель",description:"Мудрая сова, которая ценит упорство.",requirement:"За достижение «Мастер занятий»"},
+  {achievement:"month_journey",id:"moon_bunny",emoji:"🐇",name:"Лунный зайчик",description:"Редкий спутник тех, кто не бросает свой путь.",requirement:"За достижение «Длинный путь»"},
+  {achievement:"hsk_six",id:"celestial_dragon",emoji:"🐲",name:"Небесный дракон",description:"Особенный дракон для настоящего покорителя HSK.",requirement:"За достижение «Вершина HSK»"}
 ];
+const achievementCompanionRewards = {
+  character_master:"Лунная кицунэ",
+  lesson_pro:"Сова-хранитель",
+  month_journey:"Лунный зайчик",
+  hsk_six:"Небесный дракон"
+};
 function getUnlockedCompanionLevel(){
   try{return Math.max(1,Math.min(6,Number(JSON.parse(localStorage.getItem("photoChineseHskDiagnostic")||"{}").level)||1));}
   catch(e){return 1;}
@@ -7274,7 +7300,7 @@ function getUnlockedCompanionLevel(){
 function renderCompanions(){
   const unlockedLevel=getUnlockedCompanionLevel();
   const chosen=localStorage.getItem("equippedCompanion")||"fox";
-  const active=companionCatalog.find(c=>c.id===chosen&&c.level<=unlockedLevel)||companionCatalog[0];
+  const active=companionCatalog.find(c=>c.id===chosen&&(c.level?c.level<=unlockedLevel:progress.achievements.includes(c.achievement)))||companionCatalog[0];
   const emoji=document.getElementById("activeCompanionEmoji");
   const name=document.getElementById("activeCompanionName");
   const desc=document.getElementById("activeCompanionDescription");
@@ -7287,14 +7313,15 @@ function renderCompanions(){
   if(!gallery)return;
   gallery.innerHTML="";
   companionCatalog.forEach(companion=>{
-    const unlocked=companion.level<=unlockedLevel;
+    const unlocked=companion.level ? companion.level<=unlockedLevel : progress.achievements.includes(companion.achievement);
     const card=document.createElement("button");
     card.type="button";
     card.className="companion-option"+(companion.id===active.id?" selected":"")+(unlocked?"":" locked");
     card.disabled=!unlocked||!profileModeActive;
-    const icon=document.createElement("span");icon.className="companion-option-emoji";icon.textContent=unlocked?companion.emoji:"🔒";
+    const icon=document.createElement("span");icon.className="companion-option-emoji";icon.textContent=companion.emoji;
+    if(!unlocked)icon.classList.add("companion-locked-visual");
     const title=document.createElement("strong");title.textContent=companion.name;
-    const sub=document.createElement("small");sub.textContent=unlocked?"HSK "+companion.level:"Откроется на HSK "+companion.level;
+    const sub=document.createElement("small");sub.textContent=unlocked?(companion.level?"HSK "+companion.level:"Особая награда"):(companion.requirement||"Особое достижение");
     card.append(icon,title,sub);
     card.addEventListener("click",()=>{
       if(!profileModeActive||!unlocked)return;
