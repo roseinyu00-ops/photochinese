@@ -3989,7 +3989,7 @@ body.dark-theme .security-status,body.dark-theme .security-secret{background:#49
   <div class="panel hsk-diagnostic">
     <div class="hsk-kicker">PHOTOCHINESE · ДИАГНОСТИКА</div>
     <h1>Определи свой уровень HSK</h1>
-    <p>30 заданий постепенно возрастающей сложности: лексика, грамматика и понимание фраз. В конце ты получишь ориентировочную оценку от HSK 1 до HSK 6.</p>
+    <p>48 заданий — по 8 на каждый уровень HSK. Вопросы проверяют чтение, лексику, грамматику и понимание контекста; для подтверждения ступени нужно набрать минимум 6 из 8. В конце ты получишь ориентировочную оценку от HSK 1 до HSK 6.</p>
     <div id="hskIntro" class="hsk-intro">
       <div class="hsk-intro-stats">
         <div><strong>30</strong><span>заданий</span></div>
@@ -4001,7 +4001,7 @@ body.dark-theme .security-status,body.dark-theme .security-secret{background:#49
       <div id="hskPreviousResult" class="small" aria-live="polite"></div>
     </div>
     <div id="hskTest" hidden>
-      <div class="hsk-test-top"><span id="hskQuestionNumber">Задание 1 из 30</span><span id="hskQuestionBand">HSK 1</span></div>
+      <div class="hsk-test-top"><span id="hskQuestionNumber">Задание 1 из 48</span><span id="hskQuestionBand">HSK 1</span></div>
       <div class="hsk-progress-track"><div id="hskProgressFill"></div></div>
       <div class="hsk-question-card">
         <div id="hskQuestionType" class="hsk-question-type">Лексика</div>
@@ -6676,7 +6676,7 @@ function finishHskDiagnostic(){
  document.getElementById('hskLevelBreakdown').innerHTML='';
  scores.forEach((score,i)=>{const row=document.createElement('div');row.className='hsk-level-row';const label=document.createElement('strong');label.textContent='HSK '+(i+1);const bar=document.createElement('div');bar.className='hsk-level-bar';const fill=document.createElement('span');fill.style.width=(score/totals[i]*100)+'%';bar.appendChild(fill);const status=document.createElement('span');status.className='hsk-level-status';status.textContent=score+'/'+totals[i]+' '+(score>=6?'· пройден':'· повторить');row.append(label,bar,status);document.getElementById('hskLevelBreakdown').appendChild(row)});
  document.getElementById('hskResultAdvice').textContent='Для подтверждения каждой ступени нужно правильно выполнить не менее 6 из 8 заданий этого уровня. В диагностике нет подсказок с пиньинем и мгновенного показа правильного ответа. Оценка приблизительная: тест проверяет чтение, лексику, грамматику и понимание контекста.';
- localStorage.setItem('photoChineseHskDiagnostic',JSON.stringify({level:hskSuggestedLevel,score:totalCorrect,scores,at:new Date().toISOString()}));updateLearningDashboard();if(typeof updateAchievements==='function')updateAchievements();if(typeof renderCompanions==='function')renderCompanions();window.photoChineseSync?.();
+ localStorage.setItem('photoChineseHskDiagnostic',JSON.stringify({level:hskSuggestedLevel,score:totalCorrect,total:hskDiagnosticQuestions.length,scores,at:new Date().toISOString()}));updateLearningDashboard();if(typeof updateAchievements==='function')updateAchievements();if(typeof renderCompanions==='function')renderCompanions();window.photoChineseSync?.();
  const badge=document.getElementById('profileHskBadge');if(badge)badge.textContent='HSK '+hskSuggestedLevel;
  document.getElementById('applyHskLevel').textContent='Открыть курс HSK '+hskSuggestedLevel+' в ИИ-учителе';
 }
@@ -6686,7 +6686,7 @@ document.getElementById('quitHskDiagnostic').addEventListener('click',()=>{if(!c
 document.getElementById('retryHskDiagnostic').addEventListener('click',startHskDiagnostic);
 document.getElementById('applyHskLevel').addEventListener('click',()=>{document.getElementById('coachLevel').value=String(hskSuggestedLevel);document.getElementById('coachLessonPanel').hidden=true;document.getElementById('coachExamPanel').hidden=true;renderCoachCourse();document.querySelector('nav button[data-tab="coach"]').click();document.getElementById('coachLevelNotice').textContent='Тест предложил HSK '+hskSuggestedLevel+'. Ты можешь изменить уровень вручную в любое время.'});
 const previousHskDiagnostic=localStorage.getItem('photoChineseHskDiagnostic');
-if(previousHskDiagnostic){try{const saved=JSON.parse(previousHskDiagnostic);if(saved.level){hskSuggestedLevel=saved.level;document.getElementById('hskPreviousResult').textContent='Последний результат: HSK '+saved.level+' · '+saved.score+'/48. Новый тест можно пройти повторно.';document.getElementById('profileHskBadge').textContent='HSK '+saved.level;}}catch(e){}}
+if(previousHskDiagnostic){try{const saved=JSON.parse(previousHskDiagnostic);if(saved.level){hskSuggestedLevel=saved.level;document.getElementById('hskPreviousResult').textContent='Последний результат: HSK '+saved.level+' · '+saved.score+'/'+(saved.total||30)+'. Новый тест можно пройти повторно.';document.getElementById('profileHskBadge').textContent='HSK '+saved.level;}}catch(e){}}
 document.getElementById('openHskTest').addEventListener('click',()=>{
  document.querySelector('nav button[data-tab="hsk"]').click();
  document.getElementById('hsk').scrollIntoView({behavior:'smooth',block:'start'});
