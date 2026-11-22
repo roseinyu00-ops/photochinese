@@ -2593,6 +2593,17 @@ body.dark-theme .writing-character-canvas{background:linear-gradient(135deg,#493
 body.dark-theme .writing-feedback{background:#49383d;color:#ffe1e8}
 body.dark-theme .writing-note{background:#49383d;border-color:#76545d}
 @media(max-width:650px){.learning-hub-intro{padding:16px 8px 8px}.learning-subtab{min-width:calc(50% - 6px);font-size:13px;padding:11px 8px}.writing-practice-grid{grid-template-columns:1fr}.writing-character-canvas{width:210px;height:210px}}
+
+/* Mini-games level selector */
+.games-level-picker{display:grid;grid-template-columns:minmax(0,260px) minmax(180px,1fr);align-items:end;gap:10px 16px;margin:17px 0 14px;padding:13px 15px;border:1px solid #efd9df;border-radius:15px;background:rgba(255,255,255,.58)}
+.games-level-picker label{margin:0 0 6px;font-size:12px;letter-spacing:.04em;text-transform:uppercase;color:#a45d73}
+.games-level-picker select{width:100%;min-height:43px;border:1px solid #e8cbd5;border-radius:11px;padding:9px 12px;background:#fff;color:#60464d;font:inherit;font-weight:650}
+.games-level-picker small{align-self:center;color:#98858a;font-size:12px;line-height:1.5}
+body.dark-theme .games-level-picker{background:#382d34;border-color:#76545d}
+body.dark-theme .games-level-picker label{color:#f0a9bb}
+body.dark-theme .games-level-picker select{background:#49383d;color:#fff1ed;border-color:#76545d}
+body.dark-theme .games-level-picker small{color:#e0bdc9}
+@media(max-width:560px){.games-level-picker{grid-template-columns:1fr;gap:5px}.games-level-picker small{margin-top:2px}}
 </style>
 <style>
 .learning-progress-heading{display:flex;align-items:center;justify-content:space-between;gap:10px}
