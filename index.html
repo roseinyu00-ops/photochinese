@@ -3558,12 +3558,16 @@ tabs.forEach(btn => btn.addEventListener('click', () => {
     targetTab.classList.remove('is-entering');
     void targetTab.offsetWidth;
     targetTab.classList.add('is-entering');
-    targetTab.addEventListener('animationend', function finishEntrance(event) {
-      if (event.target === targetTab.firstElementChild) {
+    let pendingEntranceBlocks = targetTab.querySelectorAll(':scope > .panel, :scope > .section, :scope > .side').length;
+    const finishEntrance = function(event) {
+      if (event.target.parentElement !== targetTab) return;
+      pendingEntranceBlocks -= 1;
+      if (pendingEntranceBlocks <= 0) {
         targetTab.classList.remove('is-entering');
         targetTab.removeEventListener('animationend', finishEntrance);
       }
-    });
+    };
+    if (pendingEntranceBlocks) targetTab.addEventListener('animationend', finishEntrance);
   }
 }));
 const photo = document.getElementById('photo');
