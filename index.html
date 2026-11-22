@@ -2395,6 +2395,29 @@ body.dark-theme #chooseBannerBtn {
   border: 1px solid #76545d !important;
 }
 
+
+/* Удобство: поиск, избранное, настройки и адаптивность */
+.header-actions{display:flex;gap:8px;align-items:center}
+.coach-lesson-row{display:flex;gap:8px;align-items:stretch}
+.coach-lesson-row .coach-lesson-card{flex:1;min-width:0}
+.coach-favorite-button{width:46px;flex:0 0 46px;border:1px solid var(--line);border-radius:13px;background:#fff;color:#b65d73;font-size:23px}
+body.dark-theme .coach-favorite-button{background:#49383d;border-color:#76545d;color:#f2a9ba}
+.coach-search-results{display:grid;gap:8px;margin-top:12px}
+.coach-search-result{width:100%;text-align:left;padding:12px;border:1px solid var(--line);border-radius:12px;background:#fff;color:var(--ink)}
+.coach-search-result strong{display:block}
+.coach-search-result small{display:block;color:var(--muted);margin-top:3px}
+body.dark-theme .coach-search-result{background:#49383d;color:#fff1ed;border-color:#76545d}
+.settings-backdrop{position:fixed;inset:0;z-index:100001;background:#24191dcc;display:grid;place-items:center;padding:16px}
+.settings-card{width:min(100%,440px);max-height:90vh;overflow:auto;background:#fffaf8;color:#60464d;border-radius:20px;padding:22px;box-shadow:0 20px 70px #0003}
+.settings-card label{margin-top:16px}
+.settings-card .settings-close{float:right;border-radius:10px;padding:7px 11px;background:#f8dce3;color:#60464d}
+body.dark-theme .settings-card{background:#3d3034;color:#fff1ed}
+body.dark-theme .settings-card .settings-close{background:#62434c;color:#ffe1e8}
+body[data-text-size="small"]{font-size:14px}
+body[data-text-size="normal"]{font-size:15px}
+body[data-text-size="large"]{font-size:17px}
+@media(max-width:800px){header{gap:12px}header nav{width:100%;overflow-x:auto;flex-wrap:nowrap;padding-bottom:5px}header nav button{white-space:nowrap;flex:0 0 auto}.header-actions{position:absolute;right:14px;top:14px}.brand{padding-right:100px}}
+@media(max-width:520px){.panel{padding:16px;border-radius:17px}.coach-lesson-row{gap:6px}.coach-favorite-button{width:42px;flex-basis:42px}.coach-lesson-card{padding:11px}.coach-search-result{padding:10px}.settings-card{padding:18px}.coach-word-grid{grid-template-columns:repeat(2,minmax(0,1fr))}}
 </style>
 </head>
 <body>
@@ -2415,6 +2438,7 @@ body.dark-theme #chooseBannerBtn {
   </nav>
 
   <div class="header-actions">
+  <button class="secondary" id="openSettings" type="button" aria-label="Настройки">⚙️</button>
   <button class="theme-toggle" id="themeToggle" type="button" aria-label="Сменить тему">🌙</button>
 </div>
 </header>
@@ -2493,6 +2517,14 @@ body.dark-theme #chooseBannerBtn {
 </section>
 
 <section id="coach" class="tab" hidden>
+  <div class="panel section" id="coachFindPanel">
+    <h2>Найти урок или слово</h2>
+    <p class="small">Поиск по всем уровням HSK, названиям уроков, словам, пиньиню и переводам.</p>
+    <input id="coachGlobalSearch" type="search" placeholder="Например: путешествие, 学习 или xuéxí" autocomplete="off">
+    <div id="coachSearchResults" class="coach-search-results" aria-live="polite"></div>
+    <div class="actions"><button type="button" class="secondary" id="toggleFavoriteLessons">♡ Избранные уроки</button></div>
+    <div id="coachFavoriteResults" class="coach-search-results" hidden></div>
+  </div>
   <div class="panel coach-hero">
     <h1>Твой преподаватель китайского</h1>
     <p>Последовательный курс, практика и подсказки. Выбери уровень сам или начни с результата теста HSK.</p>
@@ -4568,9 +4600,14 @@ function renderCoachCourse(){
   const supplemental=(coachSupplementalVocabulary[level]||{})[index]||{};
   const wordCount=lesson.words.length+(supplemental.words||[]).length;
   const phraseCount=(supplemental.phrases||[]).length;
+  const row=document.createElement('div');row.className='coach-lesson-row';
   const b=document.createElement('button');b.type='button';b.className='coach-lesson-card';b.disabled=locked;
   b.innerHTML='<span class="coach-lesson-number">'+(isDone?'✓':index+1)+'</span><span><strong>'+lesson.title+'</strong><span class="coach-lesson-meta">'+(isDone?'Урок завершён':locked?'Сначала пройди предыдущий урок':'Урок · '+wordCount+' слов · '+phraseCount+' фраз · грамматика и практика')+'</span></span><span class="coach-lesson-status">'+(locked?'🔒':'›')+'</span>';
-  b.addEventListener('click',()=>openCoachLesson(index));list.appendChild(b);
+  b.addEventListener('click',()=>openCoachLesson(index));
+  const favorites=readFavoriteLessons(),lessonId=level+':'+index;
+  const star=document.createElement('button');star.type='button';star.className='coach-favorite-button';star.textContent=favorites.includes(lessonId)?'★':'☆';star.setAttribute('aria-label',favorites.includes(lessonId)?'Убрать из избранного':'Добавить в избранное');star.title=star.getAttribute('aria-label');
+  star.addEventListener('click',event=>{event.stopPropagation();const current=readFavoriteLessons();const next=current.includes(lessonId)?current.filter(id=>id!==lessonId):[...current,lessonId];localStorage.setItem('photoChineseFavoriteLessons',JSON.stringify(next));window.photoChineseSync?.();star.textContent=next.includes(lessonId)?'★':'☆';star.title=next.includes(lessonId)?'Убрать из избранного':'Добавить в избранное';star.setAttribute('aria-label',star.title);});
+  row.append(b,star);list.appendChild(row);
  });
 }
 function shuffleCoachItems(items){return items.slice().sort(()=>Math.random()-.5);}
@@ -5944,7 +5981,7 @@ const PHOTOCHINESE_SYNC_KEYS = [
   "equippedDecoration", "profileAvatar", "photoChineseCoachProgress",
   "photoChineseCoachVocabulary", "photoChineseCoachExams",
   "photoChineseHskDiagnostic", "photoChineseActivityDays",
-  "photoChineseStudyWords", "photoChineseReviewState"
+  "photoChineseStudyWords", "photoChineseReviewState", "photoChineseFavoriteLessons"
 ];
 
 let photoChineseSyncTimer = null;
@@ -6344,5 +6381,64 @@ window.addEventListener("keydown", function(event) {
 
 
 <script src="./study-tools.js"></script>
+<div class="settings-backdrop" id="settingsModal" hidden>
+  <div class="settings-card" role="dialog" aria-modal="true" aria-labelledby="settingsTitle">
+    <button class="settings-close" id="closeSettings" type="button" aria-label="Закрыть настройки">✕</button>
+    <h2 id="settingsTitle">Настройки PhotoChinese</h2>
+    <label for="textSizeSetting">Размер текста</label>
+    <select id="textSizeSetting"><option value="small">Небольшой</option><option value="normal">Обычный</option><option value="large">Крупный</option></select>
+    <label><input id="soundSetting" type="checkbox" style="width:auto;margin-right:8px"> Разрешить озвучивание китайских слов</label>
+    <p class="small">Тема оформления меняется кнопкой ☀️/🌙 в верхней части сайта.</p>
+    <button class="primary" id="saveSettings" type="button">Сохранить настройки</button>
+  </div>
+</div>
+<script>
+(function(){
+  const $=id=>document.getElementById(id);
+  const favoritesKey='photoChineseFavoriteLessons';
+  window.readFavoriteLessons=function(){try{const v=JSON.parse(localStorage.getItem(favoritesKey)||'[]');return Array.isArray(v)?v:[]}catch(e){return[]}};
+  const search=$('coachGlobalSearch'),results=$('coachSearchResults'),favoriteButton=$('toggleFavoriteLessons'),favoriteResults=$('coachFavoriteResults');
+  function lessonWords(level,index,lesson){const extra=(coachSupplementalVocabulary[level]||{})[index]||{};return (lesson.words||[]).concat(extra.words||[]).concat(extra.phrases||[]);}
+  function renderSearch(){
+    const q=(search.value||'').trim().toLocaleLowerCase();
+    results.innerHTML='';
+    if(q.length<2){results.textContent=q?'Введи ещё хотя бы один символ.':'Начни вводить слово, пиньинь, перевод или название темы.';return;}
+    const matches=[];
+    Object.keys(coachCourses).forEach(level=>coachCourses[level].forEach((lesson,index)=>{
+      const fields=[lesson.title,lesson.intro,lesson.grammar].concat(lessonWords(level,index,lesson).flat());
+      if(fields.some(value=>String(value||'').toLocaleLowerCase().includes(q)))matches.push({level:Number(level),index,lesson});
+    }));
+    if(!matches.length){results.textContent='Ничего не найдено. Попробуй другой запрос.';return;}
+    matches.slice(0,30).forEach(item=>{
+      const b=document.createElement('button');b.type='button';b.className='coach-search-result';
+      const title=document.createElement('strong');title.textContent='HSK '+item.level+' · '+item.lesson.title;
+      const detail=document.createElement('small');detail.textContent='Открыть урок · совпадение в теме, словах или объяснении';
+      b.append(title,detail);b.addEventListener('click',()=>{document.getElementById('coachLevel').value=String(item.level);renderCoachCourse();openCoachLesson(item.index);favoriteResults.hidden=true;});results.appendChild(b);
+    });
+    if(matches.length>30){const note=document.createElement('p');note.className='small';note.textContent='Показаны первые 30 совпадений.';results.appendChild(note);}
+  }
+  function renderFavorites(){
+    favoriteResults.innerHTML='';
+    const ids=readFavoriteLessons();
+    if(!ids.length){favoriteResults.textContent='Пока нет избранных уроков. Нажми ☆ рядом с уроком, чтобы сохранить его здесь.';return;}
+    ids.forEach(id=>{
+      const [level,index]=id.split(':').map(Number),lesson=coachCourses[level]?.[index];if(!lesson)return;
+      const b=document.createElement('button');b.type='button';b.className='coach-search-result';
+      const title=document.createElement('strong');title.textContent='HSK '+level+' · '+lesson.title;
+      const detail=document.createElement('small');detail.textContent='Открыть сохранённый урок';
+      b.append(title,detail);b.addEventListener('click',()=>{document.getElementById('coachLevel').value=String(level);renderCoachCourse();openCoachLesson(index);favoriteResults.hidden=true;});favoriteResults.appendChild(b);
+    });
+  }
+  search.addEventListener('input',renderSearch);
+  favoriteButton.addEventListener('click',()=>{favoriteResults.hidden=!favoriteResults.hidden;favoriteButton.textContent=favoriteResults.hidden?'♡ Избранные уроки':'♡ Скрыть избранное';if(!favoriteResults.hidden)renderFavorites();});
+  const modal=$('settingsModal'),size=$('textSizeSetting'),sound=$('soundSetting');
+  function applySettings(){document.body.dataset.textSize=localStorage.getItem('photoChineseTextSize')||'normal';sound.checked=localStorage.getItem('photoChineseSoundEnabled')!=='false';size.value=document.body.dataset.textSize;}
+  $('openSettings').addEventListener('click',()=>{applySettings();modal.hidden=false;});
+  $('closeSettings').addEventListener('click',()=>modal.hidden=true);
+  modal.addEventListener('click',event=>{if(event.target===modal)modal.hidden=true;});
+  $('saveSettings').addEventListener('click',()=>{localStorage.setItem('photoChineseTextSize',size.value);localStorage.setItem('photoChineseSoundEnabled',sound.checked?'true':'false');applySettings();modal.hidden=true;});
+  applySettings();
+})();
+</script>
 </body>
 </html>
