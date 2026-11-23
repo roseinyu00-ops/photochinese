@@ -1,5 +1,5 @@
 -- PhotoChinese: облачное хранение профиля и прогресса
--- Выполни этот скрипт один раз в Supabase → SQL Editor → New query.
+-- Выполни или повторно запусти этот идемпотентный скрипт в Supabase → SQL Editor → New query.
 
 alter table public.profiles
   add column if not exists app_data jsonb not null default '{}'::jsonb;
