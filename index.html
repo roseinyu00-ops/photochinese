@@ -2546,17 +2546,17 @@ body.dark-theme .games-reset{color:#e0bdc9;border-color:#76545d}
 body.dark-theme .companion-picture{background:linear-gradient(145deg,#3a3034,#49343a)}
 .pc-status-lock{width:16px;height:16px;vertical-align:middle;fill:none;stroke:currentColor;stroke-width:1.7;stroke-linecap:round;stroke-linejoin:round}
 
-.pc-nav-icon,.pc-teacher-icon,.pc-button-icon{display:inline-flex;align-items:center;justify-content:center;color:#b66f89;vertical-align:middle}
+.pc-nav-icon,,.pc-button-icon{display:inline-flex;align-items:center;justify-content:center;color:#b66f89;vertical-align:middle}
 .pc-nav-icon{width:19px;height:19px;margin-right:5px}
-.pc-teacher-icon{width:27px;height:27px;margin:0 auto 2px}
+{width:27px;height:27px;margin:0 auto 2px}
 .pc-button-icon{width:17px;height:17px;margin-right:4px}
-.pc-nav-icon svg,.pc-teacher-icon svg,.pc-button-icon svg,.ocr-locked-icon svg,.writing-step-icon svg,.profile-avatar-placeholder svg{width:100%;height:100%;fill:none;stroke:currentColor;stroke-width:1.65;stroke-linecap:round;stroke-linejoin:round}
+.pc-nav-icon svg, svg,.pc-button-icon svg,.ocr-locked-icon svg,.writing-step-icon svg,.profile-avatar-placeholder svg{width:100%;height:100%;fill:none;stroke:currentColor;stroke-width:1.65;stroke-linecap:round;stroke-linejoin:round}
 .ocr-locked-icon{color:#a85e78}
 .writing-step-icon{display:inline-flex;width:25px;height:25px;color:#b66f89}
 .profile-avatar-placeholder{display:inline-flex;width:48px;height:48px;align-items:center;justify-content:center;color:#b66f89}
 .profile-avatar-placeholder svg{width:42px;height:42px;stroke-width:1.5}
-.pc-teacher-icon svg{width:26px;height:26px}
-body.dark-theme .pc-nav-icon,body.dark-theme .pc-teacher-icon,body.dark-theme .pc-button-icon,body.dark-theme .writing-step-icon,body.dark-theme .profile-avatar-placeholder{color:#e2a8bd}
+ svg{width:26px;height:26px}
+body.dark-theme .pc-nav-icon,body.dark-theme ,body.dark-theme .pc-button-icon,body.dark-theme .writing-step-icon,body.dark-theme .profile-avatar-placeholder{color:#e2a8bd}
 /* Learning hub navigation */
 .learning-hub-intro{padding:24px 26px 12px}
 .learning-hub-kicker,.writing-trainer-kicker{font-size:11px;letter-spacing:1.8px;font-weight:800;color:#b56c88}
@@ -4182,9 +4182,9 @@ body.dark-theme .security-status,body.dark-theme .security-secret{background:#49
   <p id="savedCharactersCount">Сохранено иероглифов: 0</p>
 
   <h3 class="saved-characters-heading">Выученные слова</h3>
-  <p class="small">Слова, которые ты отметила как выученные в ИИ-учителе. Они сохраняются здесь вместе с пиньинем, переводом и уровнем курса.</p>
+  <p class="small">Слова, которые ты отметила как выученные в курсе HSK. Они сохраняются здесь вместе с пиньинем, переводом и уровнем курса.</p>
   <div class="profile-collection learned-vocabulary-list" id="learnedCoachVocabularyList">
-    <p>Пока нет отмеченных слов. Выучи первые слова в ИИ-учителе — и они появятся здесь.</p>
+    <p>Пока нет отмеченных слов. Выучи первые слова в курсе HSK — и они появятся здесь.</p>
   </div>
   <p id="learnedCoachVocabularyCount">Выучено слов: 0</p>
 
@@ -4356,7 +4356,7 @@ body.dark-theme .security-status,body.dark-theme .security-secret{background:#49
 
     <section id="studyViewDictionary" class="study-tools-view panel" aria-label="Личный словарь">
       <h2>Все твои слова</h2>
-      <p>Сюда автоматически попадают слова, отмеченные как выученные в ИИ-учителе, и сохранённые иероглифы.</p>
+      <p>Сюда автоматически попадают слова, отмеченные как выученные в курсе HSK, и сохранённые иероглифы.</p>
       <section id="studyRecommendations" class="study-recommendations" aria-live="polite" aria-label="Персональные рекомендации">
         <div class="study-recommendations-heading">
           <span class="study-recommendations-icon" aria-hidden="true">✦</span>
@@ -7643,7 +7643,7 @@ function renderCollection() {
     const learnedWords = getLearnedCoachVocabularyRecords();
     vocabularyList.innerHTML = "";
     if (!learnedWords.length) {
-      vocabularyList.textContent = "Пока нет отмеченных слов. Выучи первые слова в ИИ-учителе — и они появятся здесь.";
+      vocabularyList.textContent = "Пока нет отмеченных слов. Выучи первые слова в курсе HSK — и они появятся здесь.";
     } else {
       learnedWords.forEach(word => {
         const card = document.createElement("article");
