@@ -6675,7 +6675,7 @@ function finishHskDiagnostic(){
  document.getElementById('hskResultAdvice').textContent='Для подтверждения каждой ступени нужно правильно выполнить не менее 9 из 12 заданий этого уровня. В диагностике нет подсказок с пиньинем и мгновенного показа правильного ответа. Оценка приблизительная: тест проверяет чтение, лексику, грамматику и понимание контекста.';
  localStorage.setItem('photoChineseHskDiagnostic',JSON.stringify({level:hskSuggestedLevel,score:totalCorrect,total:hskDiagnosticQuestions.length,scores,at:new Date().toISOString()}));updateLearningDashboard();if(typeof updateAchievements==='function')updateAchievements();if(typeof renderCompanions==='function')renderCompanions();window.photoChineseSync?.();
  const badge=document.getElementById('profileHskBadge');if(badge)badge.textContent='HSK '+hskSuggestedLevel;
- document.getElementById('applyHskLevel').textContent='Открыть курс HSK '+hskSuggestedLevel';
+ document.getElementById('applyHskLevel').textContent='Открыть курс HSK '+hskSuggestedLevel;
 }
 document.getElementById('startHskDiagnostic').addEventListener('click',startHskDiagnostic);
 document.getElementById('nextHskQuestion').addEventListener('click',()=>{if(hskDiagnosticAnswers[hskDiagnosticIndex]===undefined)return;if(hskDiagnosticIndex<hskDiagnosticQuestions.length-1){hskDiagnosticIndex++;renderHskDiagnosticQuestion()}else finishHskDiagnostic()});
