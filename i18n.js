@@ -2047,7 +2047,8 @@
   "Рассказывать о событиях и опыте": "Talk about events and experiences",
   "Строить связные фразы с новой грамматикой": "Build coherent sentences using new grammar"
 });
-  const reverse = Object.fromEntries(Object.entries(translations).map(([ru,en]) => [en,ru]));
+  const reverse = {};
+  for (const [ru, en] of Object.entries(translations)) if (!(en in reverse)) reverse[en] = ru;
   const getLang = () => localStorage.getItem(KEY) === 'en' ? 'en' : 'ru';
   function translateTextNode(node, lang) {
     const raw = node.nodeValue;
