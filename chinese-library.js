@@ -267,7 +267,7 @@ function initHanziExplorer(){
   list.forEach(item=>{
    const card=make("button","cl-explorer-result");card.type="button";card.addEventListener("click",()=>openCharacter(item.ch));
    const symbol=make("strong","cl-explorer-symbol",item.ch),body=make("span","cl-explorer-result-body");
-   body.append(make("b","",item.pinyin||"Пиньинь пока не найден"),make("span","",item.meaning||"Значение уточняется"));
+   body.append(make("b","",item.pinyin||"Пиньинь пока не найден"));if(item.meaning)body.append(make("span","",item.meaning));
    const meta=make("small","",[(item.radical?"Радикал "+item.radical:""),(item.parts.length?"Компоненты: "+item.parts.slice(0,4).join(" "):"")].filter(Boolean).join(" · "));
    card.append(symbol,body,meta);target.append(card);
   });
