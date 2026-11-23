@@ -4254,6 +4254,7 @@ body.dark-theme .security-status,body.dark-theme .security-secret{background:#49
 
       <section class="profile-section profile-account-actions" id="profileAccountActions" hidden>
         <p class="profile-collection-note" id="photoChineseSyncStatus" role="status" aria-live="polite">Облачная синхронизация ожидает входа.</p>
+        <p class="profile-collection-note" id="photoChineseRoleDiagnostic" role="status" aria-live="polite">Проверка прав владельца ожидает входа.</p>
         <button class="secondary" type="button" id="photoChineseSyncRetry" hidden>Повторить синхронизацию</button>
         <button class="secondary" type="button" id="signOutButton">Выйти из аккаунта</button>
       </section>
@@ -4456,7 +4457,7 @@ window.photoChineseIsLoggedIn = () => Boolean(photoChineseUser);
 
 function setOwnerRoleDiagnostic(message, isError = false) {
   photoChineseRoleDiagnostic = message;
-  const nodes = [];
+  const nodes = [document.getElementById("photoChineseRoleDiagnostic")];
   nodes.forEach(node => {
     if (node) {
       node.textContent = message;
