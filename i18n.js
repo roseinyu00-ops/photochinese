@@ -2947,7 +2947,7 @@
   function translateElement(el, lang) {
     if (el.nodeType === Node.TEXT_NODE) { translateTextNode(el, lang); return; }
     if (el.nodeType !== Node.ELEMENT_NODE) return;
-    if (el.matches('script,style,textarea,[contenteditable="true"],input:not([type="button"]):not([type="submit"])')) return;
+    if (el.matches('script,style,[contenteditable="true"]')) return;
     for (const attr of ['placeholder','title','aria-label','alt','content']) {
       const value = el.getAttribute(attr);
       if (!value) continue;
@@ -2960,6 +2960,7 @@
       const dict = lang === 'en' ? translations : reverse;
       if (value && dict[value]) el.setAttribute('value',dict[value]);
     }
+    if (el.matches('textarea,input:not([type="button"]):not([type="submit"])')) return;
     for (const child of el.childNodes) translateElement(child, lang);
   }
   function applyLanguage(lang, persist = true) {
