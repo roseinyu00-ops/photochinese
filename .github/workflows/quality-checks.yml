@@ -1,0 +1,29 @@
+name: PhotoChinese quality checks
+
+on:
+  push:
+    branches: [main, "chore/**", "fix/**", "feature/**"]
+  pull_request:
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  static-checks:
+    name: Static integrity checks
+    runs-on: ubuntu-latest
+    steps:
+      - name: Check out repository
+        uses: actions/checkout@v4
+      - name: Set up Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: 22
+      - name: Check JavaScript syntax
+        run: |
+          node --check study-tools.js
+          node --check chinese-library.js
+          node --check i18n.js
+      - name: Check page integrity and inline scripts
+        run: node scripts/check-site.mjs
