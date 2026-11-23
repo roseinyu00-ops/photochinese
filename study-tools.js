@@ -631,5 +631,11 @@
   }
 
   if(document.readyState==="loading") document.addEventListener("DOMContentLoaded",init,{once:true}); else init();
+  window.addEventListener("photoChineseLanguageChanged",()=>{
+    if (activeView === "review") renderReview();
+    else if (activeView === "dictionary") renderDictionary();
+    else if (activeView === "speak") { populateSpeakSelect(); renderSpeakWord(); }
+    renderRecommendations();
+  });
   window.addEventListener("photoChineseDataLoaded",()=>{renderReview();renderDictionary();populateSpeakSelect();});
 })();
