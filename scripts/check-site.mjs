@@ -37,11 +37,25 @@ for (const match of html.matchAll(/\bid=["']([^"']+)["']/gi)) {
   idCounts.set(match[1], (idCounts.get(match[1]) || 0) + 1);
 }
 for (const [id, count] of idCounts) {
-  if (count > 1) warnings.push('Duplicate HTML id "' + id + '" (' + count + " occurrences)");
+  if (count > 1) failures.push('Duplicate HTML id "' + id + '" (' + count + " occurrences)");
 }
 
-for (const file of ["study-tools.js", "chinese-library.js", "i18n.js"]) {
-  if (!exists(file)) failures.push("Required module is missing: " + file);
+for (const file of ["study-tools.js", "chinese-library.js", "i18n.js", "service-worker.js", "manifest.json"]) {
+  if (!exists(file)) failures.push("Required application file is missing: " + file);
+}
+
+try {
+  JSON.parse(fs.readFileSync(path.join(root, "manifest.json"), "utf8"));
+} catch (error) {
+  failures.push("manifest.json is not valid JSON: " + error.message);
+}
+
+const serviceWorker = fs.readFileSync(path.join(root, "service-worker.js"), "utf8");
+for (const match of serviceWorker.matchAll(/["'](\.\/[^"']+)["']/g)) {
+  const ref = match[1].replace(/^\.\//, "");
+  if (/\.[a-z0-9]{1,8}$/i.test(ref) && !exists(ref)) {
+    failures.push("Service worker references a missing cached asset: " + ref);
+  }
 }
 
 console.log("PhotoChinese quality checks");
