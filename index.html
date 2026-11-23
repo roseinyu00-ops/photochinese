@@ -1162,6 +1162,18 @@ body.dark-theme .saved-character-remove {
   text-decoration: underline;
   text-underline-offset: 2px;
 }
+.pc-character-external-sources {
+  display: block;
+  margin-top: 4px;
+  color: #a18b92;
+  font-size: 11px;
+  line-height: 1.5;
+}
+.pc-character-external-sources a {
+  color: #a85d73;
+  text-decoration: underline;
+  text-underline-offset: 2px;
+}
 body.dark-theme .pc-character-meaning-source { color: #d0b5bf; }
 body.dark-theme .pc-character-meaning-source a { color: #f0a9bd; }
 
@@ -5490,6 +5502,11 @@ function buildCharacterCard(ch, d) {
     '<div class="pc-character-reading"><span class="pc-character-pinyin">' + esc(pinyinSource || 'Пиньинь не найден') + '</span>' + toneText + '</div>' +
     '<div class="pc-character-meaning">' + esc(displayMeaning) + '</div>' +
     (directMeanings.length ? '<small class="pc-character-meaning-source">Источник: ' + (localMeanings.length ? esc(localMeaningSource) : '') + (localMeanings.length && wiktionaryMeanings.length ? ' · ' : '') + (wiktionaryMeanings.length ? '<a href="' + esc(d.wiktionaryUrl || ('https://ru.wiktionary.org/wiki/' + encodeURIComponent(ch))) + '" target="_blank" rel="noopener noreferrer">Викисловарь</a>' : '') + '</small>' : '') +
+    '<small class="pc-character-external-sources">Дополнительная сверка: ' +
+      '<a href="https://www.zhonga.ru/chinese-russian/' + encodeURIComponent(ch) + '/funs0" target="_blank" rel="noopener noreferrer">Чжунга</a> · ' +
+      '<a href="https://cidian.ru/r.php?q=' + encodeURIComponent(ch) + '" target="_blank" rel="noopener noreferrer">Cidian.ru</a> · ' +
+      '<a href="https://zimaster.com/ru/character/' + encodeURIComponent(ch) + '/" target="_blank" rel="noopener noreferrer">ZiMaster</a>' +
+    '</small>' +
     '</div></div>' +
     (originText ? '<section class="pc-character-origin"><h3>Состав и происхождение</h3><p class="pc-character-description">' + esc(originText) + '</p></section>' : '') +
     '<div class="pc-character-tags">' + tags + '</div>' +
