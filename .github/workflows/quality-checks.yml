@@ -25,5 +25,6 @@ jobs:
           node --check study-tools.js
           node --check chinese-library.js
           node --check i18n.js
+          node --check service-worker.js
       - name: Check page integrity and inline scripts
         run: node scripts/check-site.mjs
