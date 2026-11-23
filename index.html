@@ -3729,6 +3729,18 @@ body.dark-theme .security-status,body.dark-theme .security-secret{background:#49
     </div>
   </div>
   <div class="panel section" id="analysisPanel">
+    <section class="cl-hanzi-explorer" id="clHanziExplorer">
+      <div class="cl-hanzi-explorer-heading"><div><span class="cl-kicker">PHOTOCHINESE · HANZI EXPLORER</span><h2>Проводник по <em>иероглифам</em></h2><p>Ищи знак по написанию, пиньиню, радикалу, компонентам или значению. Открывай подробный разбор и возвращайся к недавно изученным знакам.</p></div><span class="cl-hanzi-explorer-mark" aria-hidden="true">汉</span></div>
+      <label for="clHanziSearch">Поиск по базе иероглифов</label>
+      <div class="cl-hanzi-search-row"><input id="clHanziSearch" type="search" placeholder="Например: 爱, ài, 心, сердце…" autocomplete="off"><button id="clHanziSearchClear" type="button" aria-label="Очистить поиск">×</button></div>
+      <p class="small">Поиск охватывает загруженную базу и дополнительные словарные записи. Тоны в пиньине можно не вводить.</p>
+      <div id="clHanziResults" class="cl-hanzi-results" aria-live="polite"><p class="cl-explorer-empty">Загружаем базу иероглифов…</p></div>
+      <div class="cl-hanzi-personal-grid">
+        <section><div class="cl-hanzi-subheading"><h3>Недавно открытые</h3><button id="clHanziHistoryClear" type="button" class="cl-hanzi-text-button">Очистить</button></div><div id="clHanziHistory" class="cl-hanzi-list"></div></section>
+        <section><div class="cl-hanzi-subheading"><h3>Избранное</h3><button id="clHanziFavoritesRefresh" type="button" class="cl-hanzi-text-button">Обновить</button></div><div id="clHanziFavorites" class="cl-hanzi-list"></div></section>
+      </div>
+      <section class="cl-hanzi-similar-section"><h3>Похожие иероглифы</h3><div id="clHanziSimilar" class="cl-hanzi-list"><p class="cl-explorer-empty">Выбери знак из результатов поиска.</p></div></section>
+    </section>
     <h2>Разбор иероглифов и предложений</h2>
     <p>Вставь китайский текст вручную или отправь сюда текст, распознанный с фотографии. Приложение ищет слова в большой китайско-русской базе.</p>
     <label for="analysisInput">Китайский текст</label>
@@ -5105,6 +5117,7 @@ async function loadCharacterStructureData(){
   });
   if(!count) throw new Error('В файле не найдены записи');
   if(status) status.textContent='База Make Me a Hanzi · '+count.toLocaleString('ru-RU')+' знаков · чтение '+withPinyin.toLocaleString('ru-RU')+' · состав '+withDecomposition.toLocaleString('ru-RU')+' · определения '+withDefinition.toLocaleString('ru-RU')+' · этимология '+withEtymology.toLocaleString('ru-RU');
+   window.dispatchEvent(new Event('photoChineseCharacterStructureReady'));
  }catch(error){
   console.warn('Не удалось загрузить структуру иероглифов:',error);
   if(status) status.textContent='Данные о компонентах пока не загрузились. Проверь интернет и обнови страницу.';
@@ -7539,6 +7552,7 @@ function saveCharacterToCollection(character) {
   learnCharacter(character);
   window.photoChineseSync?.();
   renderSavedCharacters();
+  window.dispatchEvent(new Event("photoChineseCollectionChanged"));
 
   document.querySelectorAll('[data-save-character]').forEach(button => {
     if (button.dataset.saveCharacter === character) {
@@ -7583,6 +7597,7 @@ function renderSavedCharacters() {
       localStorage.setItem("savedCharacters", JSON.stringify(updated));
       window.photoChineseSync?.();
       renderSavedCharacters();
+      window.dispatchEvent(new Event("photoChineseCollectionChanged"));
       document.querySelectorAll('[data-save-character]').forEach(button => {
         if (button.dataset.saveCharacter === character) {
           button.classList.remove("is-saved");
@@ -7922,7 +7937,7 @@ const PHOTOCHINESE_SYNC_KEYS = [
   "equippedDecoration", "equippedCompanion", "profileAvatar", "photoChineseCoachProgress",
   "photoChineseCoachVocabulary", "photoChineseCoachExams",
   "photoChineseHskDiagnostic", "photoChineseActivityDays",
-  "photoChineseStudyWords", "photoChineseReviewState", "photoChineseFavoriteLessons"
+  "photoChineseStudyWords", "photoChineseReviewState", "photoChineseFavoriteLessons", "photoChineseCharacterHistory"
 ];
 
 let photoChineseSyncTimer = null;
@@ -7962,6 +7977,19 @@ function mergePhotoChineseDictionaryData(localData, cloudData) {
       merged[key] = Array.from(new Set([...cloudItems, ...localItems]));
     }
   });
+
+  const cloudHistory = Array.isArray(merged.photoChineseCharacterHistory) ? merged.photoChineseCharacterHistory : [];
+  const localHistory = Array.isArray(local.photoChineseCharacterHistory) ? local.photoChineseCharacterHistory : [];
+  if (cloudHistory.length || localHistory.length) {
+    const historyByCharacter = new Map();
+    [...cloudHistory, ...localHistory].forEach(item => {
+      if (!item || !/\p{Script=Han}/u.test(String(item.ch || ""))) return;
+      const previous = historyByCharacter.get(item.ch);
+      if (!previous || Number(item.at) > Number(previous.at)) historyByCharacter.set(item.ch, item);
+    });
+    merged.photoChineseCharacterHistory = [...historyByCharacter.values()]
+      .sort((a, b) => Number(b.at) - Number(a.at)).slice(0, 30);
+  }
 
   const cloudCoach = merged.photoChineseCoachVocabulary && typeof merged.photoChineseCoachVocabulary === "object"
     ? merged.photoChineseCoachVocabulary : {};
