@@ -301,6 +301,7 @@ function initHanziExplorer(){
  window.addEventListener("photoChineseDataLoaded",()=>{collect();runSearch();renderHistory();renderFavorites();});
  window.addEventListener("photoChineseCollectionChanged",renderFavorites);
  window.addEventListener("photoChineseDictionaryReady",()=>{collect();runSearch();renderHistory();renderFavorites();});
+ window.addEventListener("photoChineseCharacterStructureReady",()=>{collect();runSearch();});
  collect();runSearch();renderHistory();renderFavorites();renderSimilar("");
 }
 if(document.readyState==="loading")document.addEventListener("DOMContentLoaded",initHanziExplorer,{once:true});else initHanziExplorer();
