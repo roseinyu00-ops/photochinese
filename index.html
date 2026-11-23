@@ -3146,7 +3146,7 @@ body.dark-theme #meme .meme-token:hover{background:rgba(210,140,164,.1)}
 #meme>.panel>h1::after{width:100%;height:4px;background:linear-gradient(90deg,#e6a1b6,#c6a7df,#f0c5d1)}
 #meme>.panel>h1::before{content:"✦";position:absolute;right:-25px;top:-7px;font-size:.38em;color:#c18aaa}
 #meme #translateBtn{background-image:linear-gradient(105deg,#d98fa8,#b99acb);color:#fff}
-/* ИИ-учитель: поиск, уроки, диалоги */
+/* Курс HSK: поиск, уроки и прогресс */
 #coach #coachFindPanel{background-image:radial-gradient(ellipse at 100% 0,rgba(201,168,220,.12),transparent 42%)}
 #coach .coach-search-shell{border:1px solid rgba(207,120,147,.22);border-radius:14px;padding:4px;background:rgba(255,250,252,.55)}
 #coach .coach-search-result{border-left:3px solid #d99aae!important;border-radius:10px}
@@ -3773,7 +3773,6 @@ body.dark-theme .security-status,body.dark-theme .security-secret{background:#49
   </div>
   <div class="learning-subnav" role="tablist" aria-label="Разделы обучения">
     <button type="button" class="learning-subtab active" data-learning-view="course" role="tab" aria-selected="true"><span class="pc-nav-icon" aria-hidden="true"><svg viewBox="0 0 24 24"><path d="M4 5.5A2.5 2.5 0 0 1 6.5 3H20v16H6.5A2.5 2.5 0 0 0 4 21z"/><path d="M4 5.5v13A2.5 2.5 0 0 1 6.5 16H20M8 7h8M8 10h7"/></svg></span> Курс HSK</button>
-    <button type="button" class="learning-subtab" data-learning-view="teacher" role="tab" aria-selected="false"><span class="pc-nav-icon" aria-hidden="true"><svg viewBox="0 0 24 24"><rect x="4" y="7" width="16" height="13" rx="4"/><path d="M12 3v4M9 12h.01M15 12h.01M9 16h6M2 12h2M20 12h2"/></svg></span> ИИ-учитель</button>
     <button type="button" class="learning-subtab" data-learning-view="writing" role="tab" aria-selected="false"><span class="pc-nav-icon" aria-hidden="true"><svg viewBox="0 0 24 24"><path d="m4 20 4.5-1 10.8-10.8a2.1 2.1 0 0 0-3-3L5.5 16zM14.8 6.2l3 3"/></svg></span> Тренажёр иероглифов</button>
     <button type="button" class="learning-subtab" data-learning-view="games" role="tab" aria-selected="false"><span class="pc-nav-icon" aria-hidden="true"><svg viewBox="0 0 24 24"><rect x="3" y="5" width="18" height="14" rx="3"/><path d="M8 9v6M5 12h6M16 10h.01M18 14h.01"/></svg></span> Мини-игры</button>
     <button type="button" class="learning-subtab" data-learning-view="grammar" role="tab" aria-selected="false">Грамматика</button>
@@ -3875,22 +3874,6 @@ body.dark-theme .security-status,body.dark-theme .security-secret{background:#49
     </div>
   </div>
     </div>
-  <div id="learningView-teacher" class="learning-view" hidden>
-<div class="panel section">
-    <h2>Мой преподаватель</h2>
-    <p class="small">Выбери стиль обратной связи — содержание уроков от этого не меняется.</p>
-    <div class="teacher" id="teacherChoices">
-      <button data-teacher="strict"><span class="pc-teacher-icon" aria-hidden="true"><svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="8.5"/><path d="M8.5 15h7M9 9.5h.01M15 9.5h.01"/></svg></span><br>Требовательный</button>
-      <button data-teacher="balanced" class="chosen"><span class="pc-teacher-icon" aria-hidden="true"><svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="8.5"/><path d="M8.5 14a4.2 4.2 0 0 0 7 0M9 9.5h.01M15 9.5h.01"/></svg></span><br>Спокойный</button>
-      <button data-teacher="kind"><span class="pc-teacher-icon" aria-hidden="true"><svg viewBox="0 0 24 24"><path d="M12 12c-2-2-2-6 0-8 2 2 2 6 0 8Zm0 0c2-2 6-2 8 0-2 2-6 2-8 0Zm0 0c2 2 2 6 0 8-2-2-2-6 0-8Zm0 0c-2 2-6 2-8 0 2-2 6-2 8 0Z"/><circle cx="12" cy="12" r="2"/></svg></span><br>Поддерживающий</button>
-    </div>
-    <label for="studentText">Напиши свой вопрос или предложение на китайском</label>
-    <textarea id="studentText" placeholder="Например: 我喜欢学习中文。"></textarea>
-    <div class="actions"><button class="primary" id="checkBtn" type="button">Разобрать с преподавателем</button></div>
-    <div id="coachResult" class="result" hidden></div>
-    <p class="small">Сейчас это учебный помощник на основе подготовленных уроков и правил, а не подключённая генеративная языковая модель. Свободная проверка любых фраз появится после отдельной ИИ-интеграции.</p>
-  </div>
-  </div>
   <div id="learningView-writing" class="learning-view" hidden>
     <div class="panel writing-trainer-hero">
       <div class="writing-trainer-kicker">ПИШИ · ПОВТОРЯЙ · ЗАПОМИНАЙ</div>
@@ -4023,7 +4006,7 @@ body.dark-theme .security-status,body.dark-theme .security-secret{background:#49
       <div id="hskLevelBreakdown" class="hsk-level-breakdown"></div>
       <p class="small" id="hskResultAdvice"></p>
       <div class="actions">
-        <button class="primary" id="applyHskLevel" type="button">Перейти к этому уровню в ИИ-учителе</button>
+        <button class="primary" id="applyHskLevel" type="button">Перейти к этому уровню в курсе HSK</button>
         <button class="secondary" id="retryHskDiagnostic" type="button">Пройти ещё раз</button>
       </div>
     </div>
@@ -4048,7 +4031,7 @@ body.dark-theme .security-status,body.dark-theme .security-secret{background:#49
       <div class="learning-progress-stat"><strong id="learningProgressVocabulary">0</strong><span>слов в словаре</span></div>
     </div>
     <div class="learning-progress-course">
-      <div class="learning-progress-course-label"><span>Уроки ИИ-учителя</span><strong id="learningProgressCoursePercent">0%</strong></div>
+      <div class="learning-progress-course-label"><span>Уроки курса HSK</span><strong id="learningProgressCoursePercent">0%</strong></div>
       <div class="learning-progress-course-track"><div id="learningProgressCourseFill"></div></div>
       <p class="small" id="learningProgressCourseNote">Начни первый урок, и здесь появится твоя статистика</p>
     </div>
@@ -5700,19 +5683,6 @@ document.getElementById('translateBtn').onclick=async()=>{
   localNote.textContent='Локальный разбор: без платного API и отправки текста на сторонний ИИ-сервис.';
   result.appendChild(localNote);
 };
-let teacher='balanced';
-document.querySelectorAll('#teacherChoices button').forEach(b=>b.onclick=()=>{
-  teacher=b.dataset.teacher;
-  document.querySelectorAll('#teacherChoices button').forEach(x=>x.classList.toggle('chosen',x===b));
-});
-document.getElementById('checkBtn').onclick=()=>{
-  const t=document.getElementById('studentText').value.trim(), r=document.getElementById('coachResult');
-  r.hidden=false;
-  if(!t){r.textContent='Напиши предложение, и учитель сможет его проверить.';return;}
-  const intro={strict:'Проверка завершена. Будь внимательнее к структуре предложения.',balanced:'Хорошая попытка! Разберём предложение спокойно.',kind:'Здорово, что практикуешься! Давай посмотрим вместе.'};
-  r.textContent=intro[teacher]+'\n\nТвой текст: '+t+'\n\nДемонстрационный режим: автоматическая проверка грамматики пока не подключена. После интеграции ИИ здесь появятся исправленная версия, объяснение каждой ошибки и похожее упражнение.';
-};
-
 // Учебный курс PhotoChinese: уровень, уроки и прогресс сохраняются локально.
 const coachCourses = {
   1:[
@@ -6705,7 +6675,7 @@ function finishHskDiagnostic(){
  document.getElementById('hskResultAdvice').textContent='Для подтверждения каждой ступени нужно правильно выполнить не менее 9 из 12 заданий этого уровня. В диагностике нет подсказок с пиньинем и мгновенного показа правильного ответа. Оценка приблизительная: тест проверяет чтение, лексику, грамматику и понимание контекста.';
  localStorage.setItem('photoChineseHskDiagnostic',JSON.stringify({level:hskSuggestedLevel,score:totalCorrect,total:hskDiagnosticQuestions.length,scores,at:new Date().toISOString()}));updateLearningDashboard();if(typeof updateAchievements==='function')updateAchievements();if(typeof renderCompanions==='function')renderCompanions();window.photoChineseSync?.();
  const badge=document.getElementById('profileHskBadge');if(badge)badge.textContent='HSK '+hskSuggestedLevel;
- document.getElementById('applyHskLevel').textContent='Открыть курс HSK '+hskSuggestedLevel+' в ИИ-учителе';
+ document.getElementById('applyHskLevel').textContent='Открыть курс HSK '+hskSuggestedLevel';
 }
 document.getElementById('startHskDiagnostic').addEventListener('click',startHskDiagnostic);
 document.getElementById('nextHskQuestion').addEventListener('click',()=>{if(hskDiagnosticAnswers[hskDiagnosticIndex]===undefined)return;if(hskDiagnosticIndex<hskDiagnosticQuestions.length-1){hskDiagnosticIndex++;renderHskDiagnosticQuestion()}else finishHskDiagnostic()});
@@ -6718,26 +6688,7 @@ document.getElementById('openHskTest').addEventListener('click',()=>{
  document.querySelector('nav button[data-tab="hsk"]').click();
  document.getElementById('hsk').scrollIntoView({behavior:'smooth',block:'start'});
 });
-document.getElementById('teacherChoices').querySelectorAll('button').forEach(b=>b.addEventListener('click',()=>{
- document.querySelectorAll('#teacherChoices button').forEach(x=>x.classList.toggle('chosen',x===b));
- localStorage.setItem('photoChineseTeacherStyle',b.dataset.teacher);
-}));
-const savedTeacherStyle=localStorage.getItem('photoChineseTeacherStyle');
-if(savedTeacherStyle){const b=document.querySelector('#teacherChoices [data-teacher="'+savedTeacherStyle+'"]');if(b)b.classList.add('chosen')}
-document.getElementById('checkBtn').onclick=()=>{
- const t=document.getElementById('studentText').value.trim(),r=document.getElementById('coachResult');
- r.hidden=false;
- if(!t){r.textContent='Напиши предложение или вопрос, и мы разберём его вместе.';return}
- const style=localStorage.getItem('photoChineseTeacherStyle')||'balanced';
- const intro={strict:'Разберём внимательно и по пунктам.',balanced:'Хорошая попытка! Посмотрим на твою фразу.',kind:'Здорово, что практикуешься! Давай разберём спокойно.'};
- const tips=[];
- if(/吗/.test(t))tips.push('Частица 吗 обычно ставится в конце общего вопроса.');
- if(/因为/.test(t))tips.push('因为 вводит причину; в паре с ним часто используется 所以 для результата.');
- if(/虽然/.test(t))tips.push('虽然 часто образует пару с 但是: «хотя…, но…».');
- if(/比/.test(t))tips.push('В сравнении обычно используется порядок A + 比 + B + признак.');
- if(/了/.test(t))tips.push('Обрати внимание на функцию 了: она может отмечать завершённость или изменение ситуации.');
- r.textContent=intro[style]+'\n\nТвоя фраза: '+t+'\n\n'+(tips.length?tips.join('\n')+'\n\n':'Я пока не нашёл в этой фразе знакомую мне учебную конструкцию. Это не означает, что предложение неправильное. ')+'Я могу подсказать по знакомым правилам, но полноценная свободная проверка требует подключения языковой модели.';
-};
+
 renderCoachCourse();
 
 </script>
@@ -7273,7 +7224,7 @@ function updateLearningDashboard() {
   put("learningProgressLevelNote", level >= 1 && level <= 6 ? "По результатам последней диагностики" : "Пройди диагностику HSK, чтобы определить стартовый уровень");
   const percent = courseTotal ? Math.min(100, Math.round(courseDone / courseTotal * 100)) : 0;
   put("learningProgressCoursePercent", percent + "%");
-  put("learningProgressCourseNote", courseTotal ? courseDone + " из " + courseTotal + " уроков ИИ-учителя завершено" : "Курсы пока не загружены");
+  put("learningProgressCourseNote", courseTotal ? courseDone + " из " + courseTotal + " уроков курса HSK завершено" : "Курсы пока не загружены");
   const fill = byId("learningProgressCourseFill");
   if (fill) fill.style.width = percent + "%";
   const syncNote = byId("learningProgressSyncNote");
@@ -7598,7 +7549,7 @@ function renderSavedCharacters() {
   count.textContent = "Сохранено иероглифов: " + saved.length;
 }
 
-// Собираем подробные карточки слов, отмеченных как выученные в ИИ-учителе.
+// Собираем подробные карточки слов, отмеченных как выученные в курсе HSK.
 function getLearnedCoachVocabularyRecords() {
   let saved = {};
   try { saved = JSON.parse(localStorage.getItem("photoChineseCoachVocabulary") || "{}") || {}; } catch(e) { saved = {}; }
