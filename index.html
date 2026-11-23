@@ -5117,6 +5117,7 @@ async function loadCharacterStructureData(){
   });
   if(!count) throw new Error('В файле не найдены записи');
   if(status) status.textContent='База Make Me a Hanzi · '+count.toLocaleString('ru-RU')+' знаков · чтение '+withPinyin.toLocaleString('ru-RU')+' · состав '+withDecomposition.toLocaleString('ru-RU')+' · определения '+withDefinition.toLocaleString('ru-RU')+' · этимология '+withEtymology.toLocaleString('ru-RU');
+   window.dispatchEvent(new Event('photoChineseCharacterStructureReady'));
  }catch(error){
   console.warn('Не удалось загрузить структуру иероглифов:',error);
   if(status) status.textContent='Данные о компонентах пока не загрузились. Проверь интернет и обнови страницу.';
