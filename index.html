@@ -5109,19 +5109,32 @@ function extractWiktionaryRussianCharacterMeanings(markup){
  const doc=new DOMParser().parseFromString(markup,'text/html');
  const root=doc.querySelector('.mw-parser-output')||doc.body;
  const headings=[...root.querySelectorAll('h2,h3,h4')];
- const headingLabel=h=>(h.textContent||'').replace(/править/g,'').replace(/\[править\]/g,'').trim().replace(/\s+/g,' ');
- const characterHeading=headings.find(h=>headingLabel(h)==='Китайский иероглиф');
+ // Parsoid wraps edit links inside headings as "[править]". Strip the
+ // complete edit control before comparing heading labels.
+ const headingLabel=h=>{
+  const headline=h.querySelector('.mw-headline');
+  return String(headline?.textContent||h.textContent||'')
+   .replace(/\[\s*править\s*\]/gi,'')
+   .replace(/\bправить\b/gi,'')
+   .replace(/\s+/g,' ').trim();
+ };
+ const characterHeading=headings.find(h=>h.tagName==='H2'&&headingLabel(h)==='Китайский иероглиф');
  if(!characterHeading)return [];
  const headingIndex=headings.indexOf(characterHeading);
  const nextLanguageHeading=headings.slice(headingIndex+1).find(h=>h.tagName==='H2');
- const meaningHeading=headings.slice(headingIndex+1).find(h=>h.tagName==='H3'&&headingLabel(h)==='Значение');
- if(!meaningHeading || (nextLanguageHeading && !(meaningHeading.compareDocumentPosition(nextLanguageHeading)&Node.DOCUMENT_POSITION_FOLLOWING)))return [];
- const nextMeaningHeading=headings.slice(headings.indexOf(meaningHeading)+1).find(h=>h.tagName==='H2'||h.tagName==='H3');
- const list=[...root.querySelectorAll('ol')].find(ol=>{
-  const afterMeaning=!!(meaningHeading.compareDocumentPosition(ol)&Node.DOCUMENT_POSITION_FOLLOWING);
-  const beforeNext=!nextMeaningHeading||!!(ol.compareDocumentPosition(nextMeaningHeading)&Node.DOCUMENT_POSITION_FOLLOWING);
-  return afterMeaning&&beforeNext;
- });
+ const meaningHeading=headings.slice(headingIndex+1).find(h=>
+  h.tagName==='H3'&&headingLabel(h)==='Значение'&&
+  (!nextLanguageHeading || !!(h.compareDocumentPosition(nextLanguageHeading)&Node.DOCUMENT_POSITION_FOLLOWING))
+ );
+ if(!meaningHeading)return [];
+ // Only inspect the content belonging to this exact "Значение" subsection.
+ // This avoids collecting definitions from Mandarin/Japanese sections.
+ let list=null;
+ for(let node=meaningHeading.nextElementSibling;node&&!/^H[2-4]$/.test(node.tagName);node=node.nextElementSibling){
+  if(node.matches?.('ol')){list=node;break;}
+  const nested=node.querySelector?.('ol');
+  if(nested){list=nested;break;}
+ }
  if(!list)return [];
  return [...list.querySelectorAll(':scope > li')].map(li=>(li.textContent||'')
   .replace(/\[[^\]]+\]/g,'')
@@ -5389,7 +5402,7 @@ function buildCharacterCard(ch, d) {
     .filter(([word,entry]) => word.includes(ch) && word !== ch && entry?.m && entry?.p)
     .sort((a,b) => (Number(a[1].frequencyRank)||999999)-(Number(b[1].frequencyRank)||999999) || a[0].length-b[0].length);
   const relatedWords = relatedWordPool.slice(0,6);
-  const displayMeaning = extra.meanings || directMeanings[0] || 'В русскоязычных словарях пока не найдено подтверждённое значение этого знака. Ниже показаны чтение, состав и примеры.';
+  const displayMeaning = extra.meanings || directMeanings[0] || '';
   const directHskLevel = d.hsk2025 || d.hsk30 || d.hsk20 || '';
   const inferredHskEntry = relatedWordPool
     .map(([word,entry]) => ({word,entry,level:entry.hsk2025 || entry.hsk30 || entry.hsk20 || ''}))
@@ -5500,7 +5513,7 @@ function buildCharacterCard(ch, d) {
     '<button class="pc-save-character-button' + (alreadySaved ? ' is-saved' : '') + '" data-save-character="' + esc(ch) + '" type="button">' + (alreadySaved ? '✓ В коллекции' : '♡ Сохранить в коллекцию') + '</button>' +
     '<div class="pc-character-head"><div class="pc-character-symbol">' + esc(ch) + '</div><div>' +
     '<div class="pc-character-reading"><span class="pc-character-pinyin">' + esc(pinyinSource || 'Пиньинь не найден') + '</span>' + toneText + '</div>' +
-    '<div class="pc-character-meaning">' + esc(displayMeaning) + '</div>' +
+    (displayMeaning ? '<div class="pc-character-meaning">' + esc(displayMeaning) + '</div>' : '') +
     (directMeanings.length ? '<small class="pc-character-meaning-source">Источник: ' + (localMeanings.length ? esc(localMeaningSource) : '') + (localMeanings.length && wiktionaryMeanings.length ? ' · ' : '') + (wiktionaryMeanings.length ? '<a href="' + esc(d.wiktionaryUrl || ('https://ru.wiktionary.org/wiki/' + encodeURIComponent(ch))) + '" target="_blank" rel="noopener noreferrer">Викисловарь</a>' : '') + '</small>' : '') +
     '<small class="pc-character-external-sources">Дополнительная сверка: ' +
       '<a href="https://www.zhonga.ru/chinese-russian/' + encodeURIComponent(ch) + '/funs0" target="_blank" rel="noopener noreferrer">Чжунга</a> · ' +
