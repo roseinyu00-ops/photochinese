@@ -5039,7 +5039,7 @@ async function loadLargeDictionary(){
   window.dispatchEvent(new Event('photoChineseDictionaryReady'));
   console.info('PhotoChinese: загружено записей словаря:',count);
   const status=document.getElementById('dictionaryStatus');
-  if(status) status.textContent='Большой словарь загружен · '+count.toLocaleString('ru-RU')+' записей';
+  if(status) status.textContent='Большой словарь загружен · '+count.toLocaleString(window.photoChineseGetLanguage?.() === 'en' ? 'en-US' : 'ru-RU')+' записей';
  } catch(error) {
   console.warn('Не удалось загрузить hsk_uz_ru.csv:',error);
   const status=document.getElementById('dictionaryStatus');
@@ -5103,7 +5103,7 @@ async function loadCharacterStructureData(){
    }catch(e){}
   });
   if(!count) throw new Error('В файле не найдены записи');
-  if(status) status.textContent='База Make Me a Hanzi · '+count.toLocaleString('ru-RU')+' знаков · чтение '+withPinyin.toLocaleString('ru-RU')+' · состав '+withDecomposition.toLocaleString('ru-RU')+' · определения '+withDefinition.toLocaleString('ru-RU')+' · этимология '+withEtymology.toLocaleString('ru-RU');
+  if(status) status.textContent='База Make Me a Hanzi · '+count.toLocaleString(window.photoChineseGetLanguage?.() === 'en' ? 'en-US' : 'ru-RU')+' знаков · чтение '+withPinyin.toLocaleString(window.photoChineseGetLanguage?.() === 'en' ? 'en-US' : 'ru-RU')+' · состав '+withDecomposition.toLocaleString(window.photoChineseGetLanguage?.() === 'en' ? 'en-US' : 'ru-RU')+' · определения '+withDefinition.toLocaleString(window.photoChineseGetLanguage?.() === 'en' ? 'en-US' : 'ru-RU')+' · этимология '+withEtymology.toLocaleString(window.photoChineseGetLanguage?.() === 'en' ? 'en-US' : 'ru-RU');
  }catch(error){
   console.warn('Не удалось загрузить структуру иероглифов:',error);
   if(status) status.textContent='Данные о компонентах пока не загрузились. Проверь интернет и обнови страницу.';
@@ -5364,7 +5364,7 @@ function buildCharacterCard(ch, d) {
   const originText=[hintText,originDetails].filter(Boolean).join(' ');
   const hskTag = hskLevel ? 'HSK · ' + esc(hskLevel) : (extra.hskLabel ? 'HSK · ' + esc(extra.hskLabel) : '');
   const frequencyTag = frequencyRank > 0
-    ? '<span title="Место в частотном списке: чем меньше номер, тем чаще встречается">Частотный ранг · №' + frequencyRank.toLocaleString('ru-RU') + '</span>'
+    ? '<span title="Место в частотном списке: чем меньше номер, тем чаще встречается">Частотный ранг · №' + frequencyRank.toLocaleString(window.photoChineseGetLanguage?.() === 'en' ? 'en-US' : 'ru-RU') + '</span>'
     : (extra.frequencyLabel ? '<span title="Для этого знака нет числового ранга в используемом частотном словаре">' + esc(extra.frequencyLabel) + '</span>' : '');
   const tags = (hskTag ? '<span>' + hskTag + '</span>' : '') +
     '<span class="pc-character-stroke-count" data-stroke-count-for="' + esc(ch) + '">' + (strokeCount ? strokeCount + ' черт' : 'Число черт не найдено') + '</span>' +
