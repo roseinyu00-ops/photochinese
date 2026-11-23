@@ -5352,6 +5352,8 @@ function buildCharacterCard(ch, d) {
   const rawMeanings = String(d.m || d.meaning || d.russian || '').split(/\s*;\s*/).filter(Boolean);
   const wiktionaryMeanings = Array.isArray(d.wiktionaryMeanings) ? d.wiktionaryMeanings : [];
   const directMeanings = [...new Set([...rawMeanings, ...wiktionaryMeanings].map(v => String(v).trim()).filter(Boolean))];
+  const localMeanings = rawMeanings.filter(value => !wiktionaryMeanings.includes(value));
+  const localMeaningSource = d.meaningSource || (databaseCharDictionary[ch]?.m ? 'словарная база PhotoChinese' : 'встроенный словарь PhotoChinese');
   const frequencyRank = Number(String(d.frequencyRank || '').replace(/[^0-9]/g, ''));
   const strokeCount = Number(d.n) || (Array.isArray(d.matches) ? d.matches.length : 0) || Number(extra.strokeCount) || 0;
   const allExampleWords = {...wordDictionary,...databaseWordDictionary};
@@ -5471,7 +5473,7 @@ function buildCharacterCard(ch, d) {
     '<div class="pc-character-head"><div class="pc-character-symbol">' + esc(ch) + '</div><div>' +
     '<div class="pc-character-reading"><span class="pc-character-pinyin">' + esc(pinyinSource || 'Пиньинь не найден') + '</span>' + toneText + '</div>' +
     '<div class="pc-character-meaning">' + esc(displayMeaning) + '</div>' +
-    (directMeanings.length ? '<small class="pc-character-meaning-source">Словарные значения: ' + (rawMeanings.length ? 'PhotoChinese / HSK' : '') + (rawMeanings.length && wiktionaryMeanings.length ? ' · ' : '') + (wiktionaryMeanings.length ? '<a href="' + esc(d.wiktionaryUrl || ('https://ru.wiktionary.org/wiki/' + encodeURIComponent(ch))) + '" target="_blank" rel="noopener noreferrer">Викисловарь</a>' : '') + '</small>' : '') +
+    (directMeanings.length ? '<small class="pc-character-meaning-source">Источник: ' + (localMeanings.length ? esc(localMeaningSource) : '') + (localMeanings.length && wiktionaryMeanings.length ? ' · ' : '') + (wiktionaryMeanings.length ? '<a href="' + esc(d.wiktionaryUrl || ('https://ru.wiktionary.org/wiki/' + encodeURIComponent(ch))) + '" target="_blank" rel="noopener noreferrer">Викисловарь</a>' : '') + '</small>' : '') +
     '</div></div>' +
     (originText ? '<section class="pc-character-origin"><h3>Состав и происхождение</h3><p class="pc-character-description">' + esc(originText) + '</p></section>' : '') +
     '<div class="pc-character-tags">' + tags + '</div>' +
