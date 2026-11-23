@@ -225,7 +225,7 @@ function initHanziExplorer(){
   const direct=String(info.m||"").trim();
   if(direct)return direct;
   const wiktionary=Array.isArray(info.wiktionaryMeanings)?info.wiktionaryMeanings.filter(Boolean):[];
-  return wiktionary.length?[...new Set(wiktionary)].join("; "):"Прямое русское значение пока не найдено.";
+  return wiktionary.length?[...new Set(wiktionary)].join("; "):"";
  };
  const collect=()=>{
   entries.clear();
