@@ -4253,6 +4253,8 @@ body.dark-theme .security-status,body.dark-theme .security-secret{background:#49
 <div class="pc-mfa-modal" id="photoChineseMfaChallenge" hidden><div class="pc-mfa-card" role="dialog" aria-modal="true" aria-labelledby="photoChineseMfaTitle"><h2 id="photoChineseMfaTitle">Подтверди вход</h2><p>Введи одноразовый код из приложения-аутентификатора, чтобы завершить вход в PhotoChinese.</p><label for="photoChineseMfaLoginCode">Код подтверждения</label><input class="security-code" id="photoChineseMfaLoginCode" type="text" inputmode="numeric" autocomplete="one-time-code" maxlength="6" placeholder="000000"><div class="security-actions"><button class="primary" id="photoChineseMfaLoginVerify" type="button">Подтвердить</button><button class="secondary" id="photoChineseMfaLoginCancel" type="button">Отмена</button></div><p class="security-message" id="photoChineseMfaLoginMessage" aria-live="polite"></p></div></div>
 
       <section class="profile-section profile-account-actions" id="profileAccountActions" hidden>
+        <p class="profile-collection-note" id="photoChineseSyncStatus" role="status" aria-live="polite">Облачная синхронизация ожидает входа.</p>
+        <button class="secondary" type="button" id="photoChineseSyncRetry" hidden>Повторить синхронизацию</button>
         <button class="secondary" type="button" id="signOutButton">Выйти из аккаунта</button>
       </section>
 
@@ -7924,6 +7926,17 @@ const PHOTOCHINESE_SYNC_KEYS = [
 
 let photoChineseSyncTimer = null;
 let photoChineseSyncQueue = Promise.resolve();
+let photoChineseSyncDirty = false;
+
+function setPhotoChineseSyncStatus(state, message) {
+  const status = document.getElementById("photoChineseSyncStatus");
+  const retry = document.getElementById("photoChineseSyncRetry");
+  if (status) {
+    status.textContent = message;
+    status.dataset.state = state;
+  }
+  if (retry) retry.hidden = state !== "error";
+}
 
 function collectPhotoChineseData() {
   const storage = {};
@@ -8035,7 +8048,11 @@ function applyPhotoChineseData(appData) {
 function savePhotoChineseDataNow() {
   if (!photoChineseUser || !window.photoChineseSupabase) return Promise.resolve();
   const userId = photoChineseUser.id;
+  clearTimeout(photoChineseSyncTimer);
+  photoChineseSyncTimer = null;
   photoChineseSyncQueue = photoChineseSyncQueue.catch(() => {}).then(async () => {
+    if (!photoChineseUser || photoChineseUser.id !== userId) return;
+    setPhotoChineseSyncStatus("saving", "Сохраняем прогресс в облако…");
     // Снимок данных делаем внутри очереди, чтобы более позднее сохранение
     // не могло быть затёрто устаревшим payload из предыдущего вызова.
     const payload = collectPhotoChineseData();
@@ -8062,21 +8079,58 @@ function savePhotoChineseDataNow() {
       .from("profiles")
       .update({ app_data: payload })
       .eq("id", userId);
-    if (error) {
-      console.error("Не удалось сохранить данные PhotoChinese в облако:", error);
-      throw error;
+    if (error) throw error;
+    if (photoChineseUser && photoChineseUser.id === userId) {
+      photoChineseSyncDirty = false;
+      setPhotoChineseSyncStatus("saved", "Прогресс сохранён в облаке ✓");
     }
+  }).catch(error => {
+    console.error("Не удалось сохранить данные PhotoChinese в облако:", error);
+    if (photoChineseUser && photoChineseUser.id === userId) {
+      photoChineseSyncDirty = true;
+      setPhotoChineseSyncStatus("error", "Не удалось сохранить прогресс. Проверь подключение и повтори синхронизацию.");
+    }
+    throw error;
   });
   return photoChineseSyncQueue;
 }
 
 window.photoChineseSync = function() {
   if (!photoChineseUser) return;
+  photoChineseSyncDirty = true;
+  setPhotoChineseSyncStatus("pending", "Есть несохранённые изменения. Синхронизируем…");
   clearTimeout(photoChineseSyncTimer);
   photoChineseSyncTimer = setTimeout(() => {
     savePhotoChineseDataNow().catch(() => {});
   }, 500);
 };
+
+async function flushPhotoChineseSync() {
+  clearTimeout(photoChineseSyncTimer);
+  photoChineseSyncTimer = null;
+  if (!photoChineseUser || !photoChineseSyncDirty) return photoChineseSyncQueue;
+  return savePhotoChineseDataNow();
+}
+
+document.getElementById("photoChineseSyncRetry")?.addEventListener("click", async () => {
+  const button = document.getElementById("photoChineseSyncRetry");
+  if (!button) return;
+  button.disabled = true;
+  try {
+    await flushPhotoChineseSync();
+  } catch (_) {
+    // Состояние ошибки и кнопка повтора обновляются в savePhotoChineseDataNow.
+  } finally {
+    button.disabled = false;
+  }
+});
+
+document.addEventListener("visibilitychange", () => {
+  if (document.visibilityState === "hidden") flushPhotoChineseSync().catch(() => {});
+});
+window.addEventListener("pagehide", () => {
+  flushPhotoChineseSync().catch(() => {});
+});
 
 async function loadCloudProfile(user) {
   photoChineseUser = user;
@@ -8226,14 +8280,28 @@ signOutButton.addEventListener("click", async () => {
   const client = window.photoChineseSupabase;
   if (!client) return;
   signOutButton.disabled = true;
+  try {
+    await flushPhotoChineseSync();
+  } catch (_) {
+    const leaveAnyway = confirm("Последние изменения не удалось сохранить в облако. Всё равно выйти из аккаунта?");
+    if (!leaveAnyway) {
+      signOutButton.disabled = false;
+      return;
+    }
+  }
   const { error } = await client.auth.signOut();
   signOutButton.disabled = false;
   if (error) {
     console.error("Не удалось выйти из аккаунта:", error);
+    setPhotoChineseSyncStatus("error", "Не удалось выйти из аккаунта. Попробуй ещё раз.");
     return;
   }
+  clearTimeout(photoChineseSyncTimer);
+  photoChineseSyncTimer = null;
   photoChineseUser = null;
   photoChineseRole = null;
+  photoChineseSyncDirty = false;
+  setPhotoChineseSyncStatus("idle", "Облачная синхронизация ожидает входа.");
   updateProfileAccess();
   openAccountModal();
   switchAccountMode("login");
