@@ -3304,10 +3304,59 @@
   "отправлять; выпускать": "to send; to release",
   "весь; целый": "whole; entire",
   "после; в будущем": "after; in the future",
-  "требование; требовать": "requirement; to require"
+  "требование; требовать": "requirement; to require",
+
+  "✦ Панель владельца": "✦ Owner Dashboard",
+  "Ничего не найдено. Попробуй изменить тему, уровень или запрос.": "No results found. Try changing the topic, level, or search query.",
+  "Найдено конструкций: ": "Grammar patterns found: ",
+  "Запомни: ": "Remember: ",
+  "Проверь себя": "Check yourself",
+  "Выбери один вариант ответа.": "Choose one answer.",
+  "Верно! ": "Correct! ",
+  "Не совсем. ": "Not quite. ",
+  "Все ситуации": "All situations",
+  "Полный разговорник": "Complete phrasebook",
+  "Знакомство и общение": "Introductions and conversation",
+  "Представиться, договориться, позвонить": "Introduce yourself, make plans, and make phone calls",
+  "Учёба": "Studying",
+  "Университет и библиотека": "University and library",
+  "Кафе и рестораны": "Cafés and restaurants",
+  "Заказ еды, меню и оплата": "Ordering food, menus, and payment",
+  "Покупки": "Shopping",
+  "Цена, размер и оплата": "Prices, sizes, and payment",
+  "Город и транспорт": "Getting around",
+  "Дорога, такси и аэропорт": "Directions, taxis, and the airport",
+  "Отель и проживание": "Hotels and accommodation",
+  "Заселение и номер": "Checking in and hotel rooms",
+  "Ничего не найдено. Попробуй другое слово или выбери другую тему.": "No results found. Try another word or choose a different topic.",
+  "Выбери ситуацию из списка выше.": "Choose a situation from the list above.",
+  "РАЗГОВОРНАЯ СИТУАЦИЯ": "CONVERSATION SCENARIO",
+  "Слушать": "Listen",
+  "Полезные выражения: ": "Useful expressions: ",
+  "Нажми «Слушать», чтобы услышать китайское произношение.": "Select “Listen” to hear the Chinese pronunciation.",
+  "ТВОИ ИЗУЧЕННЫЕ": "YOUR LEARNED CHARACTERS",
+  "Пока нет отмеченных знаков — начни с популярных ниже.": "You haven't marked any characters as learned yet. Start with the popular ones below.",
+  "ПОПУЛЯРНЫЕ ИЕРОГЛИФЫ": "POPULAR CHARACTERS",
+  "В доступном словаре пока не нашлось слов с этим иероглифом.": "No words containing this character were found in the available dictionaries.",
+  "» пока нет подходящей подборки. Большой словарь может ещё загружаться — попробуй немного позже или выбери другой знак.": "» doesn't have a matching word list yet. The full dictionary may still be loading. Try again in a moment or choose another character.",
+  "Найдено слов: ": "Words found: ",
+  ". Показаны сочетания из словаря PhotoChinese.": ". These combinations are from the PhotoChinese dictionary.",
+  " · слова с этим иероглифом": " · words containing this character",
+  "Иероглиф встречается в следующих словах.": "This character appears in the following words.",
+  "Сначала введи один китайский иероглиф.": "Enter a single Chinese character first."
 });
   const reverse = {};
   for (const [ru, en] of Object.entries(translations)) if (!(en in reverse)) reverse[en] = ru;
+
+  function translateString(value, lang) {
+    const input = String(value ?? "");
+    const dict = lang === "ru" ? reverse : translations;
+    if (dict[input]) return dict[input];
+    let updated = input;
+    const pairs = Object.entries(dict).filter(([key]) => key.length >= 3).sort((a,b) => b[0].length-a[0].length);
+    for (const [from,to] of pairs) if (updated.includes(from)) updated = updated.split(from).join(to);
+    return updated;
+  }
   const getLang = () => localStorage.getItem(KEY) === 'en' ? 'en' : 'ru';
   function translateTextNode(node, lang) {
     const raw = node.nodeValue;
@@ -3369,6 +3418,7 @@
   }
   window.photoChineseGetLanguage = getLang;
   window.photoChineseSetLanguage = applyLanguage;
+  window.photoChineseTranslateText = translateString;
   document.addEventListener('DOMContentLoaded', () => {
     document.querySelectorAll('[data-language-choice]').forEach(button => button.addEventListener('click', () => applyLanguage(button.dataset.languageChoice)));
     applyLanguage(getLang(), false);
