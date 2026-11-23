@@ -2085,6 +2085,7 @@
       if (!value) continue;
       const dict = lang === 'en' ? translations : reverse;
       if (dict[value]) el.setAttribute(attr, dict[value]);
+      else if (lang === 'en' && attr === 'title' && /^Черта \\d+$/.test(value)) el.setAttribute(attr, value.replace(/^Черта /, 'Stroke '));
     }
     if (el.matches('input[type="button"],input[type="submit"],button')) {
       const value = el.getAttribute('value');
@@ -2115,10 +2116,17 @@
       const lang = getLang();
       for (const record of records) {
         if (record.type === 'characterData') translateTextNode(record.target, lang);
-        else record.addedNodes.forEach(node => translateElement(node, lang));
+        else if (record.type === 'attributes') {
+          const target = record.target;
+          const attr = record.attributeName;
+          const value = target.getAttribute(attr);
+          const dict = lang === 'en' ? translations : reverse;
+          if (value && dict[value]) target.setAttribute(attr, dict[value]);
+          else if (lang === 'en' && attr === 'title' && /^Черта \\d+$/.test(value || '')) target.setAttribute(attr, value.replace(/^Черта /, 'Stroke '));
+        } else record.addedNodes.forEach(node => translateElement(node, lang));
       }
     });
-    observer.observe(document.body, { childList: true, subtree: true, characterData: true });
-    observer.observe(document.head, { childList: true, subtree: true, characterData: true });
+    observer.observe(document.body, { childList: true, subtree: true, characterData: true, attributes: true, attributeFilter: ['placeholder','title','aria-label','alt','content','value'] });
+    observer.observe(document.head, { childList: true, subtree: true, characterData: true, attributes: true, attributeFilter: ['content'] });
   });
 })();
