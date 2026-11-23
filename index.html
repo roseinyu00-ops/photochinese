@@ -7934,7 +7934,7 @@ const PHOTOCHINESE_SYNC_KEYS = [
   "equippedDecoration", "equippedCompanion", "profileAvatar", "photoChineseCoachProgress",
   "photoChineseCoachVocabulary", "photoChineseCoachExams",
   "photoChineseHskDiagnostic", "photoChineseActivityDays",
-  "photoChineseStudyWords", "photoChineseReviewState", "photoChineseFavoriteLessons"
+  "photoChineseStudyWords", "photoChineseReviewState", "photoChineseFavoriteLessons", "photoChineseCharacterHistory"
 ];
 
 let photoChineseSyncTimer = null;
@@ -7974,6 +7974,19 @@ function mergePhotoChineseDictionaryData(localData, cloudData) {
       merged[key] = Array.from(new Set([...cloudItems, ...localItems]));
     }
   });
+
+  const cloudHistory = Array.isArray(merged.photoChineseCharacterHistory) ? merged.photoChineseCharacterHistory : [];
+  const localHistory = Array.isArray(local.photoChineseCharacterHistory) ? local.photoChineseCharacterHistory : [];
+  if (cloudHistory.length || localHistory.length) {
+    const historyByCharacter = new Map();
+    [...cloudHistory, ...localHistory].forEach(item => {
+      if (!item || !/\\p{Script=Han}/u.test(String(item.ch || ""))) return;
+      const previous = historyByCharacter.get(item.ch);
+      if (!previous || Number(item.at) > Number(previous.at)) historyByCharacter.set(item.ch, item);
+    });
+    merged.photoChineseCharacterHistory = [...historyByCharacter.values()]
+      .sort((a, b) => Number(b.at) - Number(a.at)).slice(0, 30);
+  }
 
   const cloudCoach = merged.photoChineseCoachVocabulary && typeof merged.photoChineseCoachVocabulary === "object"
     ? merged.photoChineseCoachVocabulary : {};
