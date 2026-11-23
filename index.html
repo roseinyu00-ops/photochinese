@@ -6737,52 +6737,6 @@ document.getElementById('checkBtn').onclick=()=>{
 };
 renderCoachCourse();
 
-const questions=[
- {q:'1. Что означает 朋友 (péngyou)?',o:['Учитель','Друг','Семья'],a:1},
- {q:'2. Выбери правильный перевод 我是学生。',o:['Я студент.','Я учитель.','Я дома.'],a:0},
- {q:'3. Что означает 因为 (yīnwèi)?',o:['Поэтому','Потому что','Хотя'],a:1},
- {q:'4. Выбери фразу «Если будет время, я пойду».',o:['如果有时间，我就去。','我昨天去了。','我不喜欢这个。'],a:0},
- {q:'5. Что означает 虽然…但是…?',o:['Не только… но и…','Хотя… но…','Сначала… потом…'],a:1}
-];
-let qi=0,score=0,answered=false;
-function renderQ(){
- const q=questions[qi];document.getElementById('question').textContent=q.q;
- const box=document.getElementById('options');box.innerHTML='';
- q.o.forEach((v,i)=>{const b=document.createElement('button');b.className='quiz-option';b.textContent=v;b.onclick=()=>{
- if(answered)return;answered=true;if(i===q.a)score++;
- document.getElementById('quizFeedback').textContent=i===q.a?'Верно!':'Не совсем. Правильный ответ: '+q.o[q.a];
- [...box.children].forEach((x,j)=>{x.style.borderColor=j===q.a?'#70ad88':j===i?'#d98798':'';});
- };box.appendChild(b)});
- document.getElementById('quizFeedback').textContent='Вопрос '+(qi+1)+' из '+questions.length;answered=false;
-}
-document.getElementById('nextQuestion').onclick=()=>{
- if(!answered){document.getElementById('quizFeedback').textContent='Сначала выбери ответ.';return}
- qi++;
- if(qi<questions.length)renderQ();
-const storedSuggestedLevel=localStorage.getItem('photoChineseHskSuggestedLevel');
-if(storedSuggestedLevel && document.getElementById('coachLevel')){
- document.getElementById('coachLevel').value=storedSuggestedLevel;
- document.getElementById('coachLevelNotice').textContent='Последняя рекомендация теста: '+(localStorage.getItem('photoChineseHskSuggestedLabel')||('HSK '+storedSuggestedLevel))+'. Уровень можно изменить.';
- renderCoachCourse();
-}
-
- else{
-  document.getElementById('quiz').hidden=true;
-  const level=score<=1?1:score<=3?2:3;
-  const levelLabel=score<=1?'Начальный ориентир — HSK 1':score<=3?'Ориентир — HSK 2–3':'Ориентир — HSK 3–4';
-  localStorage.setItem('photoChineseHskSuggestedLevel',String(level));
-  localStorage.setItem('photoChineseHskSuggestedLabel',levelLabel);
-  const out=document.getElementById('hskResult');out.hidden=false;
-  out.innerHTML='Твой результат: '+score+' из '+questions.length+'.<br>'+levelLabel+'.<br><br>Это короткая ознакомительная проверка, а не официальный экзамен. Учитель использует результат как стартовую рекомендацию — уровень можно изменить вручную.<br><br><button class="primary" id="startCoachFromHsk" type="button">Начать обучение с этим уровнем</button>';
-  document.getElementById('startCoachFromHsk').addEventListener('click',()=>{
-    document.getElementById('coachLevel').value=String(level);
-    document.getElementById('coachLevelNotice').textContent='Уровень предложен тестом HSK: '+levelLabel+'. Его можно изменить в любое время.';
-    renderCoachCourse();
-    document.querySelector('nav button[data-tab="coach"]').click();
-  });
- }
-};
-renderQ();
 </script>
   <script>
 if ("serviceWorker" in navigator) {
