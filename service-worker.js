@@ -1,5 +1,5 @@
 
-const CACHE_NAME = "photochinese-v49";
+const CACHE_NAME = "photochinese-v50";
 
 const FILES_TO_CACHE = [
   "./",
@@ -8,6 +8,8 @@ const FILES_TO_CACHE = [
   "./chinese-library.css",
   "./chinese-library.js",
   "./study-tools.js",
+  "./i18n.js",
+  "./hsk_uz_ru.csv",
   "./manifest.json",
   "./icon-192.png",
   "./icon-512.png"
