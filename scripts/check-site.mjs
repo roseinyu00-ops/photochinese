@@ -57,7 +57,7 @@ if (html.includes("В русскоязычных словарях пока не 
 if (!html.includes("querySelector('.mw-headline')") || !html.includes(".replace(/\\[\\s*править\\s*\\]/gi,''")) {
   failures.push("Wiktionary parser must normalize Parsoid heading edit links before matching sections.");
 }
-if (characterLibrary.includes("Значение уточняется") || characterLibrary.includes("Прямое русское значение пока не найдено.")) {
+if (html.includes("Значение уточняется") || characterLibrary.includes("Значение уточняется") || characterLibrary.includes("Прямое русское значение пока не найдено.")) {
   failures.push("Hanzi Explorer must not present placeholder text as a character translation.");
 }
 
