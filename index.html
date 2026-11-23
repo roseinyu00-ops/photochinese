@@ -1150,6 +1150,21 @@ body.dark-theme .saved-character-remove {
   margin: 8px 0;
 }
 
+.pc-character-meaning-source {
+  display: block;
+  margin-top: 5px;
+  color: #927b82;
+  font-size: 12px;
+  line-height: 1.5;
+}
+.pc-character-meaning-source a {
+  color: #b65d73;
+  text-decoration: underline;
+  text-underline-offset: 2px;
+}
+body.dark-theme .pc-character-meaning-source { color: #d0b5bf; }
+body.dark-theme .pc-character-meaning-source a { color: #f0a9bd; }
+
 .pc-character-description {
   font-size: 16px;
   line-height: 1.7;
@@ -5068,6 +5083,83 @@ let characterStructurePromise=Promise.resolve();
 let dictionaryPromise=Promise.resolve();
 function esc(s){return String(s).replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));}
 function getCharInfo(ch){return {...(databaseCharDictionary[ch]||{}),...(makeMeCharacterDictionary[ch]||{}),...(charDictionary[ch]||{})};}
+
+// Дополнительный источник именно русских значений отдельных китайских знаков:
+// русскоязычный Викисловарь, раздел «Китайский иероглиф».
+// Английские определения Make Me a Hanzi здесь намеренно не используются.
+const WIKTIONARY_RU_CACHE_KEY='photoChineseWiktionaryRuV1';
+const wiktionaryRuCache=(()=>{
+ try{return JSON.parse(localStorage.getItem(WIKTIONARY_RU_CACHE_KEY)||'{}')||{};}
+ catch(_){return {};}
+})();
+const wiktionaryRuRequests=new Map();
+function extractWiktionaryRussianCharacterMeanings(markup){
+ const doc=new DOMParser().parseFromString(markup,'text/html');
+ const root=doc.querySelector('.mw-parser-output')||doc.body;
+ const headings=[...root.querySelectorAll('h2,h3,h4')];
+ const headingLabel=h=>(h.textContent||'').replace(/править/g,'').replace(/\[править\]/g,'').trim().replace(/\s+/g,' ');
+ const characterHeading=headings.find(h=>headingLabel(h)==='Китайский иероглиф');
+ if(!characterHeading)return [];
+ const headingIndex=headings.indexOf(characterHeading);
+ const nextLanguageHeading=headings.slice(headingIndex+1).find(h=>h.tagName==='H2');
+ const meaningHeading=headings.slice(headingIndex+1).find(h=>h.tagName==='H3'&&headingLabel(h)==='Значение');
+ if(!meaningHeading || (nextLanguageHeading && !(meaningHeading.compareDocumentPosition(nextLanguageHeading)&Node.DOCUMENT_POSITION_FOLLOWING)))return [];
+ const nextMeaningHeading=headings.slice(headings.indexOf(meaningHeading)+1).find(h=>h.tagName==='H2'||h.tagName==='H3');
+ const list=[...root.querySelectorAll('ol')].find(ol=>{
+  const afterMeaning=!!(meaningHeading.compareDocumentPosition(ol)&Node.DOCUMENT_POSITION_FOLLOWING);
+  const beforeNext=!nextMeaningHeading||!!(ol.compareDocumentPosition(nextMeaningHeading)&Node.DOCUMENT_POSITION_FOLLOWING);
+  return afterMeaning&&beforeNext;
+ });
+ if(!list)return [];
+ return [...list.querySelectorAll(':scope > li')].map(li=>(li.textContent||'')
+  .replace(/\[[^\]]+\]/g,'')
+  .replace(/\s+/g,' ')
+  .replace(/◆.*$/,'')
+  .trim()
+ ).filter(value=>value && !/^(значение уточняется|нет значения|\?)$/i.test(value)).slice(0,12);
+}
+function applyWiktionaryRussianMeanings(ch,meanings){
+ if(!meanings?.length)return;
+ const current=databaseCharDictionary[ch]||{};
+ databaseCharDictionary[ch]={
+  ...current,
+  wiktionaryMeanings:meanings,
+  wiktionaryUrl:'https://ru.wiktionary.org/wiki/'+encodeURIComponent(ch),
+  ...(!String(current.m||'').trim()?{m:meanings.join('; '),meaningSource:'Викисловарь'}:{})
+ };
+}
+async function ensureRussianCharacterMeaning(ch){
+ if(!ch || [...ch].length!==1 || !/\p{Script=Han}/u.test(ch))return [];
+ const cached=wiktionaryRuCache[ch];
+ if(cached?.meanings?.length){
+  applyWiktionaryRussianMeanings(ch,cached.meanings);
+  return cached.meanings;
+ }
+ if(wiktionaryRuRequests.has(ch))return wiktionaryRuRequests.get(ch);
+ const request=(async()=>{
+  try{
+   const url='https://ru.wiktionary.org/w/api.php?action=parse&format=json&prop=text&redirects=1&origin=*&page='+encodeURIComponent(ch);
+   const response=await fetch(url,{headers:{Accept:'application/json'}});
+   if(!response.ok)throw new Error('Wiktionary HTTP '+response.status);
+   const payload=await response.json();
+   const parsed=payload?.parse?.text;
+   const markup=typeof parsed==='string'?parsed:(parsed?.['*']||'');
+   if(!markup)return [];
+   const meanings=extractWiktionaryRussianCharacterMeanings(markup);
+   if(meanings.length){
+    wiktionaryRuCache[ch]={meanings,updatedAt:Date.now()};
+    const keys=Object.keys(wiktionaryRuCache);
+    if(keys.length>1200)keys.sort((x,y)=>(wiktionaryRuCache[x]?.updatedAt||0)-(wiktionaryRuCache[y]?.updatedAt||0)).slice(0,keys.length-1200).forEach(key=>delete wiktionaryRuCache[key]);
+    try{localStorage.setItem(WIKTIONARY_RU_CACHE_KEY,JSON.stringify(wiktionaryRuCache));}catch(_){}
+    applyWiktionaryRussianMeanings(ch,meanings);
+   }
+   return meanings;
+  }catch(error){console.info('Русское значение для '+ch+' пока не получено из Викисловаря:',error);return [];}
+ })();
+ wiktionaryRuRequests.set(ch,request);
+ try{return await request;}finally{wiktionaryRuRequests.delete(ch);}
+}
+window.ensureRussianCharacterMeaning=ensureRussianCharacterMeaning;
 function formatDecomposition(value){
  if(!value) return '';
  const chars=[...value], binary=new Set(['⿰','⿱','⿴','⿵','⿶','⿷','⿸','⿹','⿺','⿻']), ternary=new Set(['⿲','⿳']);
@@ -5274,6 +5366,10 @@ function buildCharacterCard(ch, d) {
   // В русской карточке используем только подтверждённые русские поля.
   // Make Me a Hanzi definition — англоязычная справка, её нельзя показывать как перевод.
   const rawMeanings = String(d.m || d.meaning || d.russian || '').split(/\s*;\s*/).filter(Boolean);
+  const wiktionaryMeanings = Array.isArray(d.wiktionaryMeanings) ? d.wiktionaryMeanings : [];
+  const directMeanings = [...new Set([...rawMeanings, ...wiktionaryMeanings].map(v => String(v).trim()).filter(Boolean))];
+  const localMeanings = rawMeanings.filter(value => !wiktionaryMeanings.includes(value));
+  const localMeaningSource = d.meaningSource || (databaseCharDictionary[ch]?.m ? 'словарная база PhotoChinese' : 'встроенный словарь PhotoChinese');
   const frequencyRank = Number(String(d.frequencyRank || '').replace(/[^0-9]/g, ''));
   const strokeCount = Number(d.n) || (Array.isArray(d.matches) ? d.matches.length : 0) || Number(extra.strokeCount) || 0;
   const allExampleWords = {...wordDictionary,...databaseWordDictionary};
@@ -5281,8 +5377,7 @@ function buildCharacterCard(ch, d) {
     .filter(([word,entry]) => word.includes(ch) && word !== ch && entry?.m && entry?.p)
     .sort((a,b) => (Number(a[1].frequencyRank)||999999)-(Number(b[1].frequencyRank)||999999) || a[0].length-b[0].length);
   const relatedWords = relatedWordPool.slice(0,6);
-  const displayMeaning = extra.meanings || rawMeanings.join('; ') ||
-    (relatedWords.length ? 'Встречается в словах: ' + relatedWords.slice(0,3).map(([word,entry]) => word + ' — ' + entry.m).join('; ') : 'Русский перевод этого знака пока не подтверждён. Ниже показаны доступные чтение, состав и примеры.');
+  const displayMeaning = extra.meanings || directMeanings[0] || 'В русскоязычных словарях пока не найдено подтверждённое значение этого знака. Ниже показаны чтение, состав и примеры.';
   const directHskLevel = d.hsk2025 || d.hsk30 || d.hsk20 || '';
   const inferredHskEntry = relatedWordPool
     .map(([word,entry]) => ({word,entry,level:entry.hsk2025 || entry.hsk30 || entry.hsk20 || ''}))
@@ -5342,8 +5437,8 @@ function buildCharacterCard(ch, d) {
   const partOfSpeech = extra.partOfSpeech || d.partOfSpeech || (relatedWords.length
     ? 'Сам по себе иероглиф не всегда соответствует одной части речи. В словах он встречается, например, в: ' + relatedWords.slice(0,3).map(([w])=>w).join(', ') + '.'
     : 'Часть речи определяется по слову и предложению; для точного разбора нужен контекст.');
-  const otherMeanings = extra.other || rawMeanings.slice(1).map(v => 'Дополнительное значение: ' + v);
-  const otherRows = otherMeanings.length ? otherMeanings : (relatedWords.length ? ['Встречается в словах: ' + relatedWords.slice(0,3).map(([w,e])=>w+' — '+e.m).join('; ')+'.'] : []);
+  const otherMeanings = extra.other || directMeanings.slice(1).map(v => 'Дополнительное словарное значение: ' + v);
+  const otherRows = otherMeanings;
   const otherTable = '<div class="pc-character-meaning-table">' + otherRows.map(item => '<div class="pc-character-meaning-row"><span>' + esc(item) + '</span></div>').join('') + '</div>';
   const synonyms = extra.synonyms || [];
   const synonymsBlock = synonyms.length
@@ -5393,7 +5488,9 @@ function buildCharacterCard(ch, d) {
     '<button class="pc-save-character-button' + (alreadySaved ? ' is-saved' : '') + '" data-save-character="' + esc(ch) + '" type="button">' + (alreadySaved ? '✓ В коллекции' : '♡ Сохранить в коллекцию') + '</button>' +
     '<div class="pc-character-head"><div class="pc-character-symbol">' + esc(ch) + '</div><div>' +
     '<div class="pc-character-reading"><span class="pc-character-pinyin">' + esc(pinyinSource || 'Пиньинь не найден') + '</span>' + toneText + '</div>' +
-    '<div class="pc-character-meaning">' + esc(displayMeaning) + '</div></div></div>' +
+    '<div class="pc-character-meaning">' + esc(displayMeaning) + '</div>' +
+    (directMeanings.length ? '<small class="pc-character-meaning-source">Источник: ' + (localMeanings.length ? esc(localMeaningSource) : '') + (localMeanings.length && wiktionaryMeanings.length ? ' · ' : '') + (wiktionaryMeanings.length ? '<a href="' + esc(d.wiktionaryUrl || ('https://ru.wiktionary.org/wiki/' + encodeURIComponent(ch))) + '" target="_blank" rel="noopener noreferrer">Викисловарь</a>' : '') + '</small>' : '') +
+    '</div></div>' +
     (originText ? '<section class="pc-character-origin"><h3>Состав и происхождение</h3><p class="pc-character-description">' + esc(originText) + '</p></section>' : '') +
     '<div class="pc-character-tags">' + tags + '</div>' +
     '<div class="pc-character-info-grid">' +
@@ -5418,6 +5515,11 @@ function buildCharacterCard(ch, d) {
   }
 
   await Promise.all([dictionaryPromise, characterStructurePromise]);
+
+  // Догружаем прямые русские значения отдельных знаков из Викисловаря.
+  // Слова-контексты не используются как перевод самого иероглифа.
+  const charactersToEnrich = [...new Set([...text].filter(ch => /\p{Script=Han}/u.test(ch)))];
+  await Promise.all(charactersToEnrich.slice(0, 12).map(ch => ensureRussianCharacterMeaning(ch)));
 
   const tokens = tokenizeChinese(text);
 
