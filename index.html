@@ -7551,6 +7551,7 @@ function saveCharacterToCollection(character) {
   learnCharacter(character);
   window.photoChineseSync?.();
   renderSavedCharacters();
+  window.dispatchEvent(new Event("photoChineseCollectionChanged"));
 
   document.querySelectorAll('[data-save-character]').forEach(button => {
     if (button.dataset.saveCharacter === character) {
@@ -7595,6 +7596,7 @@ function renderSavedCharacters() {
       localStorage.setItem("savedCharacters", JSON.stringify(updated));
       window.photoChineseSync?.();
       renderSavedCharacters();
+      window.dispatchEvent(new Event("photoChineseCollectionChanged"));
       document.querySelectorAll('[data-save-character]').forEach(button => {
         if (button.dataset.saveCharacter === character) {
           button.classList.remove("is-saved");
