@@ -7721,7 +7721,7 @@ function renderSavedCharacters() {
 
     const details = document.createElement("span");
     details.className = "saved-character-details";
-    details.textContent = [info.p || info.pinyin || "", info.m || "Значение уточняется"].filter(Boolean).join(" · ");
+    details.textContent = [info.p || info.pinyin || "", info.m || ""].filter(Boolean).join(" · ");
 
     const remove = document.createElement("button");
     remove.type = "button";
