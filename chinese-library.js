@@ -219,16 +219,13 @@ function initHanziExplorer(){
  const hanzi=value=>/\p{Script=Han}/u.test(String(value||""));
  const entries=new Map();
  const getInfo=ch=>{try{return typeof getCharInfo==="function"?getCharInfo(ch)||{}:{};}catch(_){return {};}};
- // Русский интерфейс берёт перевод только из поля m: CSV и встроенного
- // русскоязычного словаря. definition из Make Me a Hanzi — английская справка.
+ // Перевод знака берём только из прямой словарной статьи. Слова, в которых
+ // встречается знак, остаются примерами и никогда не подменяют его значение.
  const russianMeaning=(ch,info=getInfo(ch))=>{
   const direct=String(info.m||"").trim();
   if(direct)return direct;
-  const words=new Map();
-  try{if(typeof wordDictionary!=="undefined")Object.entries(wordDictionary).forEach(([w,v])=>{if(w.includes(ch)&&v?.m)words.set(w,v.m);});}catch(_){}
-  try{if(typeof databaseWordDictionary!=="undefined")Object.entries(databaseWordDictionary).forEach(([w,v])=>{if(w.includes(ch)&&v?.m)words.set(w,v.m);});}catch(_){}
-  const examples=[...words.entries()].slice(0,3).map(([w,m])=>w+" — "+m);
-  return examples.length?"Встречается в словах: "+examples.join("; "):"Русский перевод пока не подтверждён.";
+  const wiktionary=Array.isArray(info.wiktionaryMeanings)?info.wiktionaryMeanings.filter(Boolean):[];
+  return wiktionary.length?[...new Set(wiktionary)].join("; "):"Прямое русское значение пока не найдено.";
  };
  const collect=()=>{
   entries.clear();
@@ -251,10 +248,14 @@ function initHanziExplorer(){
   }));
  };
  const make=(tag,cls,text)=>{const el=document.createElement(tag);if(cls)el.className=cls;if(text!==undefined)el.textContent=text;return el;};
- const openCharacter=ch=>{
+ const openCharacter=async ch=>{
   if(!hanzi(ch))return;
   const history=read(HISTORY_KEY,[]).filter(x=>x&&x.ch!==ch);
   history.unshift({ch,at:Date.now()});write(HISTORY_KEY,history.slice(0,30));
+  // Подтягиваем отдельную русскую словарную статью, если локальный словарь
+  // не знает знак. Слова-примеры не используются как перевод.
+  try{if(typeof window.ensureRussianCharacterMeaning==="function")await window.ensureRussianCharacterMeaning(ch);}catch(_){}
+  collect();
   const input=$("analysisInput"),button=$("analyzeText");
   if(input&&button){input.value=ch;button.click();$("analysisPanel")?.scrollIntoView({behavior:"smooth",block:"start"});}
   renderHistory();
