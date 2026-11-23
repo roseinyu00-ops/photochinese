@@ -10,8 +10,10 @@
   "Панель владельца": "Owner Dashboard",
   "Настройки": "Settings",
   "Закрыть настройки": "Close settings",
-  "Китайский начинается": "Your Chinese journey starts with",
-  "фото.": "a photo.",
+  "Китайский начинается": "Your Chinese journey starts",
+  "с": "with",
+  "одного": "one",
+  "фото.": "photo.",
   "Наведи камеру на текст или загрузи изображение — PhotoChinese поможет": "Point your camera at text or upload an image. PhotoChinese will help you",
   "прочитать, понять и запомнить": "read, understand, and remember",
   "каждый иероглиф.": "every Chinese character.",
@@ -561,6 +563,7 @@
     "Изучай китайский язык с PhotoChinese: распознавай иероглифы по фото, узнавай пиньинь, перевод, радикалы и количество черт. Удобный помощник для изучения китайского языка.":"Learn Chinese with PhotoChinese: recognize characters from photos and explore pinyin, translations, radicals, and stroke counts. A helpful companion for learning Chinese.",
     "Твой уютный помощник в изучении китайского языка. Распознавай иероглифы, изучай пиньинь и запоминай новые слова.":"Your friendly companion for learning Chinese. Recognize characters, explore pinyin, and remember new words."
   });
+  translations["✦ Панель владельца"] = "✦ Owner Dashboard";
   const reverse = Object.fromEntries(Object.entries(translations).map(([ru,en]) => [en,ru]));
   const getLang = () => localStorage.getItem(KEY) === 'en' ? 'en' : 'ru';
   function translateTextNode(node, lang) {
