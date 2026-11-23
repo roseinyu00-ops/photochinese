@@ -5097,11 +5097,12 @@ function extractWiktionaryRussianCharacterMeanings(markup){
  const doc=new DOMParser().parseFromString(markup,'text/html');
  const root=doc.querySelector('.mw-parser-output')||doc.body;
  const headings=[...root.querySelectorAll('h2,h3,h4')];
- const characterHeading=headings.find(h=>(h.textContent||'').replace(/\[править\]/g,'').trim().replace(/\s+/g,' ')==='Китайский иероглиф');
+ const headingLabel=h=>(h.textContent||'').replace(/править/g,'').replace(/\[править\]/g,'').trim().replace(/\s+/g,' ');
+ const characterHeading=headings.find(h=>headingLabel(h)==='Китайский иероглиф');
  if(!characterHeading)return [];
  const headingIndex=headings.indexOf(characterHeading);
  const nextLanguageHeading=headings.slice(headingIndex+1).find(h=>h.tagName==='H2');
- const meaningHeading=headings.slice(headingIndex+1).find(h=>h.tagName==='H3'&&(h.textContent||'').replace(/\[править\]/g,'').trim()==='Значение');
+ const meaningHeading=headings.slice(headingIndex+1).find(h=>h.tagName==='H3'&&headingLabel(h)==='Значение');
  if(!meaningHeading || (nextLanguageHeading && !(meaningHeading.compareDocumentPosition(nextLanguageHeading)&Node.DOCUMENT_POSITION_FOLLOWING)))return [];
  const nextMeaningHeading=headings.slice(headings.indexOf(meaningHeading)+1).find(h=>h.tagName==='H2'||h.tagName==='H3');
  const list=[...root.querySelectorAll('ol')].find(ol=>{
