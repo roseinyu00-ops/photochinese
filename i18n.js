@@ -556,6 +556,11 @@
   "Добавь слова в словарь, чтобы тренироваться": "Add words to your dictionary to practise them",
   "Слушаю… Произнеси слово после сигнала браузера.": "Listening… Say the word after the browser signal."
 };
+  Object.assign(translations, {
+    "PhotoChinese — учи китайский через фото":"PhotoChinese — learn Chinese through photos",
+    "Изучай китайский язык с PhotoChinese: распознавай иероглифы по фото, узнавай пиньинь, перевод, радикалы и количество черт. Удобный помощник для изучения китайского языка.":"Learn Chinese with PhotoChinese: recognize characters from photos and explore pinyin, translations, radicals, and stroke counts. A helpful companion for learning Chinese.",
+    "Твой уютный помощник в изучении китайского языка. Распознавай иероглифы, изучай пиньинь и запоминай новые слова.":"Your friendly companion for learning Chinese. Recognize characters, explore pinyin, and remember new words."
+  });
   const reverse = Object.fromEntries(Object.entries(translations).map(([ru,en]) => [en,ru]));
   const getLang = () => localStorage.getItem(KEY) === 'en' ? 'en' : 'ru';
   function translateTextNode(node, lang) {
@@ -582,7 +587,7 @@
     if (el.nodeType === Node.TEXT_NODE) { translateTextNode(el, lang); return; }
     if (el.nodeType !== Node.ELEMENT_NODE) return;
     if (el.matches('script,style,textarea,[contenteditable="true"],input:not([type="button"]):not([type="submit"])')) return;
-    for (const attr of ['placeholder','title','aria-label','alt']) {
+    for (const attr of ['placeholder','title','aria-label','alt','content']) {
       const value = el.getAttribute(attr);
       if (!value) continue;
       const dict = lang === 'en' ? translations : reverse;
