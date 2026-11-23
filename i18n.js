@@ -570,15 +570,15 @@
     const dict = lang === 'en' ? translations : reverse;
     let translated = dict[trimmed];
     if (!translated && lang === 'en') {
-      let match = trimmed.match(/^(Задание|Вопрос) (\\d+) из (\\d+)$/);
+      let match = trimmed.match(/^(Задание|Вопрос) (\d+) из (\d+)$/);
       if (match) translated = (match[1] === 'Задание' ? 'Question ' : 'Question ') + match[2] + ' of ' + match[3];
       match = trimmed.match(/^Осталось времени: ?(.*)$/);
       if (!translated && match) translated = 'Time remaining: ' + match[1];
-      match = trimmed.match(/^Сохранено иероглифов: ?(\\d+)$/);
+      match = trimmed.match(/^Сохранено иероглифов: ?(\d+)$/);
       if (!translated && match) translated = 'Characters saved: ' + match[1];
-      match = trimmed.match(/^Выучено слов: ?(\\d+)$/);
+      match = trimmed.match(/^Выучено слов: ?(\d+)$/);
       if (!translated && match) translated = 'Words learned: ' + match[1];
-      match = trimmed.match(/^Получено предметов: ?(\\d+)$/);
+      match = trimmed.match(/^Получено предметов: ?(\d+)$/);
       if (!translated && match) translated = 'Items received: ' + match[1];
     }
     if (translated && translated !== trimmed) node.nodeValue = raw.replace(trimmed, translated);
