@@ -8538,7 +8538,8 @@ window.addEventListener("keydown", function(event) {
 
   function lessonWords(level,index,lesson){const extra=(coachSupplementalVocabulary[level]||{})[index]||{};return (lesson.words||[]).concat(extra.words||[]).concat(extra.phrases||[]);}
   function renderSearch(){
-    const q=(search.value||'').trim().toLocaleLowerCase();
+    const rawQuery=(search.value||'').trim();
+    const q=(window.photoChineseGetLanguage?.()==='en'?(window.photoChineseTranslateText?.(rawQuery,'ru')||rawQuery):rawQuery).toLocaleLowerCase();
     clearSearch.hidden=!search.value;
     results.innerHTML='';
     if(q.length<2){results.textContent=q?'Введи ещё хотя бы один символ.':'Начни вводить слово, пиньинь, перевод или название темы.';return;}
