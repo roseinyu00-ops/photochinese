@@ -7982,7 +7982,7 @@ function mergePhotoChineseDictionaryData(localData, cloudData) {
   if (cloudHistory.length || localHistory.length) {
     const historyByCharacter = new Map();
     [...cloudHistory, ...localHistory].forEach(item => {
-      if (!item || !/\\p{Script=Han}/u.test(String(item.ch || ""))) return;
+      if (!item || !/\p{Script=Han}/u.test(String(item.ch || ""))) return;
       const previous = historyByCharacter.get(item.ch);
       if (!previous || Number(item.at) > Number(previous.at)) historyByCharacter.set(item.ch, item);
     });
