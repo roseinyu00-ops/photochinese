@@ -5271,8 +5271,9 @@ function buildCharacterCard(ch, d) {
   const normalizedPinyin = String(pinyinSource).normalize('NFD');
   const toneLabel = numericTone ? (numericTone[0] === '5' ? 'нейтральный тон' : numericTone[0] + ' тон')
     : normalizedPinyin.includes('\u0304') ? '1 тон' : normalizedPinyin.includes('\u0301') ? '2 тон' : normalizedPinyin.includes('\u030c') ? '3 тон' : normalizedPinyin.includes('\u0300') ? '4 тон' : '';
-  const rawMeanings = String(d.m || '').split(/\s*;\s*/).filter(Boolean);
-  const displayMeaning = extra.meanings || rawMeanings.join('; ') || d.m || (d.definition ? 'Русский перевод уточняется' : 'Перевод пока не добавлен');
+  // В русской карточке используем только подтверждённые русские поля.
+  // Make Me a Hanzi definition — англоязычная справка, её нельзя показывать как перевод.
+  const rawMeanings = String(d.m || d.meaning || d.russian || '').split(/\s*;\s*/).filter(Boolean);
   const frequencyRank = Number(String(d.frequencyRank || '').replace(/[^0-9]/g, ''));
   const strokeCount = Number(d.n) || (Array.isArray(d.matches) ? d.matches.length : 0) || Number(extra.strokeCount) || 0;
   const allExampleWords = {...wordDictionary,...databaseWordDictionary};
@@ -5280,6 +5281,8 @@ function buildCharacterCard(ch, d) {
     .filter(([word,entry]) => word.includes(ch) && word !== ch && entry?.m && entry?.p)
     .sort((a,b) => (Number(a[1].frequencyRank)||999999)-(Number(b[1].frequencyRank)||999999) || a[0].length-b[0].length);
   const relatedWords = relatedWordPool.slice(0,6);
+  const displayMeaning = extra.meanings || rawMeanings.join('; ') ||
+    (relatedWords.length ? 'Встречается в словах: ' + relatedWords.slice(0,3).map(([word,entry]) => word + ' — ' + entry.m).join('; ') : 'Русский перевод этого знака пока не подтверждён. Ниже показаны доступные чтение, состав и примеры.');
   const directHskLevel = d.hsk2025 || d.hsk30 || d.hsk20 || '';
   const inferredHskEntry = relatedWordPool
     .map(([word,entry]) => ({word,entry,level:entry.hsk2025 || entry.hsk30 || entry.hsk20 || ''}))
@@ -5339,7 +5342,7 @@ function buildCharacterCard(ch, d) {
   const partOfSpeech = extra.partOfSpeech || d.partOfSpeech || (relatedWords.length
     ? 'Сам по себе иероглиф не всегда соответствует одной части речи. В словах он встречается, например, в: ' + relatedWords.slice(0,3).map(([w])=>w).join(', ') + '.'
     : 'Часть речи определяется по слову и предложению; для точного разбора нужен контекст.');
-  const otherMeanings = extra.other || [...rawMeanings.slice(1).map(v => 'Дополнительное значение: ' + v), ...(d.definition && !extra.meanings ? ['Словарная подсказка на английском: ' + d.definition] : [])];
+  const otherMeanings = extra.other || rawMeanings.slice(1).map(v => 'Дополнительное значение: ' + v);
   const otherRows = otherMeanings.length ? otherMeanings : (relatedWords.length ? ['Встречается в словах: ' + relatedWords.slice(0,3).map(([w,e])=>w+' — '+e.m).join('; ')+'.'] : []);
   const otherTable = '<div class="pc-character-meaning-table">' + otherRows.map(item => '<div class="pc-character-meaning-row"><span>' + esc(item) + '</span></div>').join('') + '</div>';
   const synonyms = extra.synonyms || [];
