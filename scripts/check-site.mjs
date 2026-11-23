@@ -50,6 +50,17 @@ try {
   failures.push("manifest.json is not valid JSON: " + error.message);
 }
 
+const characterLibrary = fs.readFileSync(path.join(root, "chinese-library.js"), "utf8");
+if (html.includes("В русскоязычных словарях пока не найдено подтверждённое значение")) {
+  failures.push("Character cards must not display the obsolete generic translation paragraph.");
+}
+if (!html.includes("querySelector('.mw-headline')") || !html.includes(".replace(/\\[\\s*править\\s*\\]/gi,''")) {
+  failures.push("Wiktionary parser must normalize Parsoid heading edit links before matching sections.");
+}
+if (characterLibrary.includes("Значение уточняется") || characterLibrary.includes("Прямое русское значение пока не найдено.")) {
+  failures.push("Hanzi Explorer must not present placeholder text as a character translation.");
+}
+
 const serviceWorker = fs.readFileSync(path.join(root, "service-worker.js"), "utf8");
 for (const match of serviceWorker.matchAll(/["'](\.\/[^"']+)["']/g)) {
   const ref = match[1].replace(/^\.\//, "");
