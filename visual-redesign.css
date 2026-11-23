@@ -1205,3 +1205,9 @@ body.dark-theme .games-mode-card:before { border-color: rgba(232,169,187,.16); }
   .panel, .primary, .secondary, nav button, .info, .coach-word,
   .coach-phrase-item, .games-mode-card, .study-tools-card { transition: none !important; }
 }
+
+
+/* Language selector */
+.language-section .settings-segmented button { min-height: 40px; font-weight: 650; letter-spacing: .01em; }
+.language-section .settings-segmented button.is-selected { background: linear-gradient(135deg,#fff,#fff4f6); color: #a85f74; box-shadow: 0 3px 12px rgba(164,91,112,.14), inset 0 0 0 1px rgba(225,157,174,.25); }
+body.dark-theme .language-section .settings-segmented button.is-selected { background: linear-gradient(135deg,#5b414b,#49343d); color: #ffdce5; box-shadow: inset 0 0 0 1px rgba(232,169,187,.24); }
