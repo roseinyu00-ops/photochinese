@@ -219,6 +219,17 @@ function initHanziExplorer(){
  const hanzi=value=>/\p{Script=Han}/u.test(String(value||""));
  const entries=new Map();
  const getInfo=ch=>{try{return typeof getCharInfo==="function"?getCharInfo(ch)||{}:{};}catch(_){return {};}};
+ // Русский интерфейс берёт перевод только из поля m: CSV и встроенного
+ // русскоязычного словаря. definition из Make Me a Hanzi — английская справка.
+ const russianMeaning=(ch,info=getInfo(ch))=>{
+  const direct=String(info.m||"").trim();
+  if(direct)return direct;
+  const words=new Map();
+  try{if(typeof wordDictionary!=="undefined")Object.entries(wordDictionary).forEach(([w,v])=>{if(w.includes(ch)&&v?.m)words.set(w,v.m);});}catch(_){}
+  try{if(typeof databaseWordDictionary!=="undefined")Object.entries(databaseWordDictionary).forEach(([w,v])=>{if(w.includes(ch)&&v?.m)words.set(w,v.m);});}catch(_){}
+  const examples=[...words.entries()].slice(0,3).map(([w,m])=>w+" — "+m);
+  return examples.length?"Встречается в словах: "+examples.join("; "):"Русский перевод пока не подтверждён.";
+ };
  const collect=()=>{
   entries.clear();
   const sources=[];
@@ -232,7 +243,7 @@ function initHanziExplorer(){
    const decomposition=String(info.c||info.decomposition||"");
    const parts=[...decomposition].filter(x=>hanzi(x)&&x!==ch);
    const pinyin=info.p||info.pinyin||info.pinyinMMH||"";
-   const meaning=info.m||info.meaning||info.definition||"";
+   const meaning=russianMeaning(ch,info);
    const words=[];
    try{if(typeof wordDictionary!=="undefined")Object.entries(wordDictionary).forEach(([w,v])=>{if(w.includes(ch)&&words.length<12)words.push(w+" "+(v.p||"")+" "+(v.m||""));});}catch(_){}
    try{if(typeof databaseWordDictionary!=="undefined")Object.entries(databaseWordDictionary).forEach(([w,v])=>{if(w.includes(ch)&&words.length<12)words.push(w+" "+(v.p||"")+" "+(v.m||""));});}catch(_){}
@@ -261,11 +272,11 @@ function initHanziExplorer(){
   });
  };
  function renderHistory(){
-  const rows=read(HISTORY_KEY,[]).filter(x=>x&&hanzi(x.ch)).slice(0,8).map(x=>entries.get(x.ch)||{ch:x.ch,pinyin:getInfo(x.ch).p||"",meaning:getInfo(x.ch).m||"",radical:"",parts:[]});
+  const rows=read(HISTORY_KEY,[]).filter(x=>x&&hanzi(x.ch)).slice(0,8).map(x=>entries.get(x.ch)||{ch:x.ch,pinyin:getInfo(x.ch).p||getInfo(x.ch).pinyinMMH||"",meaning:russianMeaning(x.ch),radical:"",parts:[]});
   renderCards(rows,historyRoot,"Здесь появятся недавно открытые иероглифы.");
  }
  function renderFavorites(){
-  const saved=read("savedCharacters",[]).filter(hanzi).map(ch=>entries.get(ch)||{ch,pinyin:getInfo(ch).p||"",meaning:getInfo(ch).m||"",radical:"",parts:[]});
+  const saved=read("savedCharacters",[]).filter(hanzi).map(ch=>entries.get(ch)||{ch,pinyin:getInfo(ch).p||getInfo(ch).pinyinMMH||"",meaning:russianMeaning(ch),radical:"",parts:[]});
   renderCards(saved.slice(0,12),favoritesRoot,"Сохраняй знаки кнопкой «В коллекцию» в карточке разбора.");
  }
  function renderSimilar(ch){
