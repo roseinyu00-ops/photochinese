@@ -3361,7 +3361,15 @@
   " фраз · грамматика и практика": " phrases · grammar and practice",
   "Данные успешно обновлены из Supabase.": "Data successfully updated from Supabase.",
   "Не удалось загрузить пользователей. Проверь RLS-политику profiles.": "Could not load users. Check the RLS policy for profiles.",
-  "ID профиля: ": "Profile ID: "
+  "ID профиля: ": "Profile ID: ",
+
+  "PhotoChinese: Supabase подключён": "PhotoChinese: Supabase connected",
+  "Ошибка чтения admin_roles: ": "Error reading admin_roles: ",
+  "Не удалось связаться с admin_roles: ": "Could not connect to admin_roles: ",
+  "Открыть урок · совпадение в теме, словах или объяснении": "Open lesson · match found in the topic, vocabulary, or explanation",
+  "Введи ещё хотя бы один символ.": "Enter at least one more character.",
+  "Начни вводить слово, пиньинь, перевод или название темы.": "Start typing a word, pinyin, translation, or topic title.",
+  "Ничего не найдено. Попробуй другой запрос.": "No results found. Try a different search."
 });
   const reverse = {};
   for (const [ru, en] of Object.entries(translations)) if (!(en in reverse)) reverse[en] = ru;
