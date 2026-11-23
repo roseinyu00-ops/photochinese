@@ -5,6 +5,7 @@
   <link rel="manifest" href="./manifest.json">
   <link rel="stylesheet" href="./study-tools.css">
 <link rel="stylesheet" href="./chinese-library.css">
+
 <meta name="theme-color" content="#F8E4EA">
 <meta name="mobile-web-app-capable" content="yes">
 <meta charset="UTF-8" />
@@ -3666,6 +3667,7 @@ body.dark-theme .achievement-companion-reward{color:#dfabc4}
 body.dark-theme .security-status,body.dark-theme .security-secret{background:#49383d;color:#fff1ed;border-color:#76545d}body.dark-theme .pc-mfa-card{background:#3d3034;border-color:#76545d}body.dark-theme .pc-mfa-card h2{color:#fff1ed}
 @media(max-width:520px){.security-section{padding:14px}.security-qr{min-height:180px}}
 </style>
+\n  <script src="./i18n.js" defer></script>
 </head>
 <body>
 <div class="app">
@@ -5037,7 +5039,7 @@ async function loadLargeDictionary(){
   window.dispatchEvent(new Event('photoChineseDictionaryReady'));
   console.info('PhotoChinese: загружено записей словаря:',count);
   const status=document.getElementById('dictionaryStatus');
-  if(status) status.textContent='Большой словарь загружен · '+count.toLocaleString('ru-RU')+' записей';
+  if(status) status.textContent='Большой словарь загружен · '+count.toLocaleString(window.photoChineseGetLanguage?.() === 'en' ? 'en-US' : 'ru-RU')+' записей';
  } catch(error) {
   console.warn('Не удалось загрузить hsk_uz_ru.csv:',error);
   const status=document.getElementById('dictionaryStatus');
@@ -5101,7 +5103,7 @@ async function loadCharacterStructureData(){
    }catch(e){}
   });
   if(!count) throw new Error('В файле не найдены записи');
-  if(status) status.textContent='База Make Me a Hanzi · '+count.toLocaleString('ru-RU')+' знаков · чтение '+withPinyin.toLocaleString('ru-RU')+' · состав '+withDecomposition.toLocaleString('ru-RU')+' · определения '+withDefinition.toLocaleString('ru-RU')+' · этимология '+withEtymology.toLocaleString('ru-RU');
+  if(status) status.textContent='База Make Me a Hanzi · '+count.toLocaleString(window.photoChineseGetLanguage?.() === 'en' ? 'en-US' : 'ru-RU')+' знаков · чтение '+withPinyin.toLocaleString(window.photoChineseGetLanguage?.() === 'en' ? 'en-US' : 'ru-RU')+' · состав '+withDecomposition.toLocaleString(window.photoChineseGetLanguage?.() === 'en' ? 'en-US' : 'ru-RU')+' · определения '+withDefinition.toLocaleString(window.photoChineseGetLanguage?.() === 'en' ? 'en-US' : 'ru-RU')+' · этимология '+withEtymology.toLocaleString(window.photoChineseGetLanguage?.() === 'en' ? 'en-US' : 'ru-RU');
  }catch(error){
   console.warn('Не удалось загрузить структуру иероглифов:',error);
   if(status) status.textContent='Данные о компонентах пока не загрузились. Проверь интернет и обнови страницу.';
@@ -5362,7 +5364,7 @@ function buildCharacterCard(ch, d) {
   const originText=[hintText,originDetails].filter(Boolean).join(' ');
   const hskTag = hskLevel ? 'HSK · ' + esc(hskLevel) : (extra.hskLabel ? 'HSK · ' + esc(extra.hskLabel) : '');
   const frequencyTag = frequencyRank > 0
-    ? '<span title="Место в частотном списке: чем меньше номер, тем чаще встречается">Частотный ранг · №' + frequencyRank.toLocaleString('ru-RU') + '</span>'
+    ? '<span title="Место в частотном списке: чем меньше номер, тем чаще встречается">Частотный ранг · №' + frequencyRank.toLocaleString(window.photoChineseGetLanguage?.() === 'en' ? 'en-US' : 'ru-RU') + '</span>'
     : (extra.frequencyLabel ? '<span title="Для этого знака нет числового ранга в используемом частотном словаре">' + esc(extra.frequencyLabel) + '</span>' : '');
   const tags = (hskTag ? '<span>' + hskTag + '</span>' : '') +
     '<span class="pc-character-stroke-count" data-stroke-count-for="' + esc(ch) + '">' + (strokeCount ? strokeCount + ' черт' : 'Число черт не найдено') + '</span>' +
@@ -8487,6 +8489,14 @@ window.addEventListener("keydown", function(event) {
       <div><span class="settings-eyebrow">PHOTOCHINESE</span><h2 id="settingsTitle">Настройки</h2></div>
       <button class="settings-close" id="closeSettings" type="button" aria-label="Закрыть настройки">×</button>
     </div>
+    <section class="settings-section language-section">
+      <h3>Язык сайта</h3>
+      <p>Выбери язык интерфейса PhotoChinese.</p>
+      <div class="settings-segmented" role="group" aria-label="Язык сайта">
+        <button type="button" data-language-choice="ru">Русский</button>
+        <button type="button" data-language-choice="en">English</button>
+      </div>
+    </section>
     <section class="settings-section">
       <h3>Размер текста</h3>
       <p>Выбери, как удобно читать материалы.</p>
@@ -8528,7 +8538,8 @@ window.addEventListener("keydown", function(event) {
 
   function lessonWords(level,index,lesson){const extra=(coachSupplementalVocabulary[level]||{})[index]||{};return (lesson.words||[]).concat(extra.words||[]).concat(extra.phrases||[]);}
   function renderSearch(){
-    const q=(search.value||'').trim().toLocaleLowerCase();
+    const rawQuery=(search.value||'').trim();
+    const q=(window.photoChineseGetLanguage?.()==='en'?(window.photoChineseTranslateText?.(rawQuery,'ru')||rawQuery):rawQuery).toLocaleLowerCase();
     clearSearch.hidden=!search.value;
     results.innerHTML='';
     if(q.length<2){results.textContent=q?'Введи ещё хотя бы один символ.':'Начни вводить слово, пиньинь, перевод или название темы.';return;}

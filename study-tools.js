@@ -15,7 +15,7 @@
   };
   const clean = value => String(value || "").trim();
   const escapeHtml = value => String(value ?? "").replace(/[&<>"']/g, ch => ({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"}[ch]));
-  const day = ms => new Date(ms).toLocaleDateString("ru-RU", {day:"numeric",month:"short"});
+  const day = ms => new Date(ms).toLocaleDateString(window.photoChineseGetLanguage?.() === "en" ? "en-US" : "ru-RU", {day:"numeric",month:"short"});
   let activeView = "dictionary";
   let currentReviewId = null;
   let currentReviewCheck = null;
@@ -454,7 +454,7 @@
       addCard("⏰","Есть слова для повторения",due.length + " " + (due.length === 1 ? "слово уже ждёт повторения" : due.length < 5 ? "слова уже ждут повторения" : "слов уже ждут повторения") + ". Лучше закрепить их сейчас, пока материал свежий.","review","Перейти к повторению","focus");
     } else {
       const nextDue = Math.min(...words.map(word => state[word.id]?.due || now));
-      const nextDate = new Date(nextDue).toLocaleString("ru-RU",{day:"numeric",month:"long",hour:"2-digit",minute:"2-digit"});
+      const nextDate = new Date(nextDue).toLocaleString(window.photoChineseGetLanguage?.() === "en" ? "en-US" : "ru-RU",{day:"numeric",month:"long",hour:"2-digit",minute:"2-digit"});
       addCard("🌱","На сегодня повторение выполнено","Следующее запланированное повторение: " + nextDate + ". Можно спокойно изучать новые слова.","review","Посмотреть повторение","calm");
     }
     if (needsWork.length) {
@@ -493,7 +493,8 @@
   function renderDictionary() {
     renderRecommendations();
     const words = getWords();
-    const query = clean($("studyDictionarySearch").value).toLowerCase();
+    const rawQuery = clean($("studyDictionarySearch").value);
+    const query = (window.photoChineseGetLanguage?.() === "en" ? (window.photoChineseTranslateText?.(rawQuery, "ru") || rawQuery) : rawQuery).toLowerCase();
     const level = $("studyDictionaryLevel").value;
     const filtered = words.filter(w => {
       const matches = [w.hanzi,w.pinyin,w.translation].join(" ").toLowerCase().includes(query);

@@ -128,7 +128,7 @@ const dialogueTopics=[
 {id:"travel",title:"Город и транспорт",desc:"Дорога, такси и аэропорт",mark:"行",ids:["travel","directions","taxi","airport"]},
 {id:"stay",title:"Отель и проживание",desc:"Заселение и номер",mark:"住",ids:["hotel"]}
 ];
-function normalizeLibrarySearch(value){return String(value||"").toLocaleLowerCase("ru").normalize("NFD").replace(/[\u0300-\u036f]/g,"").replace(/ё/g,"е").replace(/\s+/g," ").trim();}
+function normalizeLibrarySearch(value){const raw=String(value||"");const source=window.photoChineseGetLanguage?.()==="en"?(window.photoChineseTranslateText?.(raw,"ru")||raw):raw;return String(source).toLocaleLowerCase("ru").normalize("NFD").replace(/[\u0300-\u036f]/g,"").replace(/ё/g,"е").replace(/\s+/g," ").trim();}
 function dialogueMatches(d,q){return !q||normalizeLibrarySearch([d[2],d[3],d[5],...d[4].flat()].join(" ")).includes(q);}
 function renderDialogueTopics(){
 const root=$("clDialogueTopics");if(!root)return;root.replaceChildren();
