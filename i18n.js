@@ -600,6 +600,31 @@
   "В доступном словаре пока не нашлось слов с этим иероглифом.": "No words containing this character were found in the available dictionary.",
   "Сначала введи один китайский иероглиф.": "Enter one Chinese character first."
 });
+  Object.assign(translations, {
+    "Выбери язык всего сайта.": "Choose the language used across the website.",
+    "Закрыть настройки": "Close settings",
+    "Закрыть": "Close",
+    "Поиск": "Search",
+    "Поиск по словарю": "Search the dictionary",
+    "Очистить поиск": "Clear search",
+    "Назад": "Back",
+    "Далее": "Next",
+    "Продолжить": "Continue",
+    "Готово": "Done",
+    "Удалить": "Delete",
+    "Изменить": "Edit",
+    "Открыть": "Open",
+    "Загрузка…": "Loading…",
+    "Загрузка...": "Loading...",
+    "Ошибка загрузки. Попробуй ещё раз.": "Loading failed. Please try again.",
+    "Попробуй ещё раз.": "Please try again.",
+    "Нет данных": "No data",
+    "Пока пусто": "Nothing here yet",
+    "Не удалось загрузить данные.": "Could not load the data.",
+    "Сначала выбери уровень.": "Choose a level first.",
+    "Сначала выбери слово.": "Choose a word first.",
+    "Сначала введи текст.": "Enter some text first."
+  });
   const reverse = Object.fromEntries(Object.entries(translations).map(([ru,en]) => [en,ru]));
   const normalize = value => String(value ?? '').replace(/\s+/g,' ').trim();
   const current = () => localStorage.getItem(STORAGE_KEY) === 'en' ? 'en' : 'ru';
@@ -648,6 +673,16 @@
     if (persist) localStorage.setItem(STORAGE_KEY, lang);
     document.documentElement.lang = lang;
     document.title = lang === 'en' ? 'PhotoChinese — Learn Chinese Through Photos' : 'PhotoChinese — учи китайский через фото';
+    const description = document.querySelector('meta[name="description"]');
+    if (description) description.content = lang === 'en'
+      ? 'Learn Chinese with PhotoChinese: explore characters, pinyin, meanings, radicals, and stroke counts with a friendly study companion.'
+      : 'Изучай китайский язык с PhotoChinese: распознавай иероглифы по фото, узнавай пиньинь, перевод, радикалы и количество черт. Удобный помощник для изучения китайского языка.';
+    const ogTitle = document.querySelector('meta[property="og:title"]');
+    if (ogTitle) ogTitle.content = document.title;
+    const ogDescription = document.querySelector('meta[property="og:description"]');
+    if (ogDescription) ogDescription.content = lang === 'en'
+      ? 'Your friendly companion for learning Chinese. Explore characters, learn pinyin, and remember new words.'
+      : 'Твой уютный помощник в изучении китайского языка. Распознавай иероглифы, изучай пиньинь и запоминай новые слова.';
     const walker = document.createTreeWalker(document.body, NodeFilter.SHOW_TEXT);
     let node;
     while ((node = walker.nextNode())) translateNode(node);
