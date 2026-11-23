@@ -40,14 +40,14 @@ language sql
 stable
 security definer
 set search_path = public
-as $
+as $photochinese$
   select exists (
     select 1
     from public.admin_roles
     where user_id = auth.uid()
       and role = 'owner'
   );
-$;
+$photochinese$;
 
 revoke all on function public.photochinese_is_owner() from public;
 grant execute on function public.photochinese_is_owner() to authenticated;
