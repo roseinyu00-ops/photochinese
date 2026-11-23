@@ -3343,7 +3343,25 @@
   ". Показаны сочетания из словаря PhotoChinese.": ". These combinations are from the PhotoChinese dictionary.",
   " · слова с этим иероглифом": " · words containing this character",
   "Иероглиф встречается в следующих словах.": "This character appears in the following words.",
-  "Сначала введи один китайский иероглиф.": "Enter a single Chinese character first."
+  "Сначала введи один китайский иероглиф.": "Enter a single Chinese character first.",
+
+  "База Make Me a Hanzi · ": "Make Me a Hanzi database · ",
+  "Радикал": "Radical",
+  "Состав и происхождение": "Components and origin",
+  "Компоненты иероглифа": "Character components",
+  "Ассоциация для запоминания": "Memory aid",
+  "Схема последовательности черт": "Stroke-order diagram",
+  "Каждая миниатюра показывает отдельную черту в порядке написания. Нажми на анимацию, чтобы увидеть движение.": "Each thumbnail shows one stroke in writing order. Select the animation to see how it is drawn.",
+  "Подготавливаем схему черт…": "Preparing the stroke diagram…",
+  "Разбор": "Analysis",
+  "Урок завершён": "Lesson completed",
+  "Сначала пройди предыдущий урок": "Complete the previous lesson first",
+  "Урок · ": "Lesson · ",
+  " слов · ": " words · ",
+  " фраз · грамматика и практика": " phrases · grammar and practice",
+  "Данные успешно обновлены из Supabase.": "Data successfully updated from Supabase.",
+  "Не удалось загрузить пользователей. Проверь RLS-политику profiles.": "Could not load users. Check the RLS policy for profiles.",
+  "ID профиля: ": "Profile ID: "
 });
   const reverse = {};
   for (const [ru, en] of Object.entries(translations)) if (!(en in reverse)) reverse[en] = ru;
@@ -3359,6 +3377,7 @@
   }
   const getLang = () => localStorage.getItem(KEY) === 'en' ? 'en' : 'ru';
   function translateTextNode(node, lang) {
+    if (node.parentElement?.closest('#profileNickname, #profileBioText, #profileSubtitle, [data-user-content]')) return;
     const raw = node.nodeValue;
     const trimmed = raw.trim();
     if (!trimmed) return;
