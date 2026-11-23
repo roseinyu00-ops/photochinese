@@ -2698,7 +2698,7 @@
   "Урок завершён": "Lesson completed",
   "урок китайского языка": "Chinese lesson",
   "уроков ·": "lessons ·",
-  "уроков ИИ-учителя завершено": "HSK course lessons completed",
+  "уроков курса HSK завершено": "HSK course lessons completed",
   "условие": "condition",
   "Условие и результат": "Condition and result",
   "Успешный вход! Профиль загружен.": "Signed in successfully! Profile loaded.",
