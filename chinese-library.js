@@ -299,6 +299,7 @@ function initHanziExplorer(){
  $("clHanziFavoritesRefresh")?.addEventListener("click",renderFavorites);
  window.addEventListener("storage",()=>{renderHistory();renderFavorites();});
  window.addEventListener("photoChineseDataLoaded",()=>{collect();runSearch();renderHistory();renderFavorites();});
+ window.addEventListener("photoChineseCollectionChanged",renderFavorites);
  window.addEventListener("photoChineseDictionaryReady",()=>{collect();runSearch();renderHistory();renderFavorites();});
  collect();runSearch();renderHistory();renderFavorites();renderSimilar("");
 }
