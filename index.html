@@ -5100,7 +5100,7 @@ function extractWiktionaryRussianCharacterMeanings(markup){
   .replace(/\s+/g,' ')
   .replace(/◆.*$/,'')
   .trim()
- ).filter(value=>value && !/^(значение уточняется|нет значения|\\?)$/i.test(value)).slice(0,12);
+ ).filter(value=>value && !/^(значение уточняется|нет значения|\?)$/i.test(value)).slice(0,12);
 }
 function applyWiktionaryRussianMeanings(ch,meanings){
  if(!meanings?.length)return;
@@ -5113,7 +5113,7 @@ function applyWiktionaryRussianMeanings(ch,meanings){
  };
 }
 async function ensureRussianCharacterMeaning(ch){
- if(!ch || [...ch].length!==1 || !/\\p{Script=Han}/u.test(ch))return [];
+ if(!ch || [...ch].length!==1 || !/\p{Script=Han}/u.test(ch))return [];
  const cached=wiktionaryRuCache[ch];
  if(cached?.meanings?.length){
   applyWiktionaryRussianMeanings(ch,cached.meanings);
