@@ -2763,6 +2763,41 @@
   "правильных ответов": "correct answers",
   "HTML small hint": "HTML small hint"
 });
+  Object.assign(translations, {
+  "Разделы": "Sections",
+  "Предпросмотр выбранного изображения": "Selected image preview",
+  "Здесь появятся распознанные иероглифы…": "Recognized characters will appear here…",
+  "Например: 你好，我喜欢学习中文。": "For example: 你好，我喜欢学习中文。",
+  "Предпросмотр мема": "Meme preview",
+  "Например: 这也太好笑了吧！": "For example: 这也太好笑了吧！",
+  "Разделы обучения": "Learning sections",
+  "Найти слово, перевод или урок...": "Find a word, translation, or lesson...",
+  "Очистить поиск": "Clear search",
+  "Например: 我喜欢学习中文。": "For example: 我喜欢学习中文。",
+  "Поиск по иероглифам, пиньиню или переводу…": "Search by character, pinyin, or translation…",
+  "Иероглифы выбранного слова": "Characters in the selected word",
+  "Анимация написания иероглифа": "Character stroke-order animation",
+  "Поле для написания иероглифа": "Character writing area",
+  "Найти правило, конструкцию или пример…": "Find a rule, structure, or example…",
+  "Например: заказать чай, 多少钱, метро…": "For example: order tea, 多少钱, subway…",
+  "Например: 学习中文 ♡": "For example: 学习中文 ♡",
+  "Расскажи о себе...": "Tell us about yourself...",
+  "Например, 愛": "For example, 愛",
+  "Новый никнейм": "New username",
+  "Прогресс подготовки к следующему уровню HSK": "Progress toward the next HSK level",
+  "Найти по нику или описанию…": "Search by username or bio…",
+  "Фильтр пользователей": "Filter users",
+  "Закрыть": "Close",
+  "Инструменты изучения": "Study tools",
+  "Повторение слов": "Vocabulary review",
+  "Напиши пиньинь с тонами": "Enter pinyin with tone marks",
+  "Напиши перевод своими словами": "Write the meaning in your own words",
+  "Персональные рекомендации": "Personalized recommendations",
+  "Например, 朋友 или друг": "For example, 朋友 or friend",
+  "друг; приятель": "friend; buddy",
+  "Тренировка произношения": "Pronunciation practice",
+  "Закрыто": "Locked"
+});
   const reverse = {};
   for (const [ru, en] of Object.entries(translations)) if (!(en in reverse)) reverse[en] = ru;
   const getLang = () => localStorage.getItem(KEY) === 'en' ? 'en' : 'ru';
@@ -2801,7 +2836,7 @@
       if (!value) continue;
       const dict = lang === 'en' ? translations : reverse;
       if (dict[value]) el.setAttribute(attr, dict[value]);
-      else if (lang === 'en' && attr === 'title' && /^Черта \\d+$/.test(value)) el.setAttribute(attr, value.replace(/^Черта /, 'Stroke '));
+      else if (lang === 'en' && attr === 'title' && /^Черта \d+$/.test(value)) el.setAttribute(attr, value.replace(/^Черта /, 'Stroke '));
     }
     if (el.matches('input[type="button"],input[type="submit"],button')) {
       const value = el.getAttribute('value');
@@ -2838,7 +2873,7 @@
           const value = target.getAttribute(attr);
           const dict = lang === 'en' ? translations : reverse;
           if (value && dict[value]) target.setAttribute(attr, dict[value]);
-          else if (lang === 'en' && attr === 'title' && /^Черта \\d+$/.test(value || '')) target.setAttribute(attr, value.replace(/^Черта /, 'Stroke '));
+          else if (lang === 'en' && attr === 'title' && /^Черта \d+$/.test(value || '')) target.setAttribute(attr, value.replace(/^Черта /, 'Stroke '));
         } else record.addedNodes.forEach(node => translateElement(node, lang));
       }
     });
