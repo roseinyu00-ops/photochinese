@@ -493,7 +493,8 @@
   function renderDictionary() {
     renderRecommendations();
     const words = getWords();
-    const query = clean($("studyDictionarySearch").value).toLowerCase();
+    const rawQuery = clean($("studyDictionarySearch").value);
+    const query = (window.photoChineseGetLanguage?.() === "en" ? (window.photoChineseTranslateText?.(rawQuery, "ru") || rawQuery) : rawQuery).toLowerCase();
     const level = $("studyDictionaryLevel").value;
     const filtered = words.filter(w => {
       const matches = [w.hanzi,w.pinyin,w.translation].join(" ").toLowerCase().includes(query);
