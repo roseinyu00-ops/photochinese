@@ -206,4 +206,102 @@ window.addEventListener("photoChineseDataLoaded",renderChips);
 window.addEventListener("photoChineseDictionaryReady",()=>{renderChips();const ch=$("clCharacterInput").value.trim();if(ch)showWords([...ch][0]);});
 renderGrammarTopics();renderGrammar();renderDialogueTopics();renderDialogs();renderDialogue();renderChips();
 if(!$("clCharacterInput").value.trim())select("学");
+
+/* ===== Расширенный проводник иероглифов PhotoChinese ===== */
+function initHanziExplorer(){
+ const root=$("clHanziExplorer"); if(!root || root.dataset.ready==="1") return;
+ root.dataset.ready="1";
+ const search=$("clHanziSearch"), results=$("clHanziResults"), historyRoot=$("clHanziHistory"), favoritesRoot=$("clHanziFavorites"), similarRoot=$("clHanziSimilar");
+ const HISTORY_KEY="photoChineseCharacterHistory";
+ const read=(key,fallback)=>{try{const v=JSON.parse(localStorage.getItem(key)||"null");return v==null?fallback:v;}catch(_){return fallback;}};
+ const write=(key,value)=>{try{localStorage.setItem(key,JSON.stringify(value));window.photoChineseSync?.();}catch(e){console.warn("Не удалось сохранить данные проводника:",e);}};
+ const normalize=value=>String(value||"").toLocaleLowerCase("ru").normalize("NFD").replace(/[\u0300-\u036f]/g,"").replace(/ü/g,"u").replace(/ё/g,"е").replace(/\s+/g," ").trim();
+ const hanzi=value=>/\p{Script=Han}/u.test(String(value||""));
+ const entries=new Map();
+ const getInfo=ch=>{try{return typeof getCharInfo==="function"?getCharInfo(ch)||{}:{};}catch(_){return {};}};
+ const collect=()=>{
+  entries.clear();
+  const sources=[];
+  try{if(typeof databaseCharDictionary!=="undefined")sources.push(databaseCharDictionary);}catch(_){}
+  try{if(typeof makeMeCharacterDictionary!=="undefined")sources.push(makeMeCharacterDictionary);}catch(_){}
+  try{if(typeof charDictionary!=="undefined")sources.push(charDictionary);}catch(_){}
+  sources.forEach(source=>Object.keys(source||{}).forEach(ch=>{
+   if(!hanzi(ch)||[...ch].length!==1)return;
+   const info=getInfo(ch);
+   const radical=String(info.r||info.radical||"").split(/[—–-]/)[0].trim();
+   const decomposition=String(info.c||info.decomposition||"");
+   const parts=[...decomposition].filter(x=>hanzi(x)&&x!==ch);
+   const pinyin=info.p||info.pinyin||info.pinyinMMH||"";
+   const meaning=info.m||info.meaning||info.definition||"";
+   const words=[];
+   try{if(typeof wordDictionary!=="undefined")Object.entries(wordDictionary).forEach(([w,v])=>{if(w.includes(ch)&&words.length<12)words.push(w+" "+(v.p||"")+" "+(v.m||""));});}catch(_){}
+   try{if(typeof databaseWordDictionary!=="undefined")Object.entries(databaseWordDictionary).forEach(([w,v])=>{if(w.includes(ch)&&words.length<12)words.push(w+" "+(v.p||"")+" "+(v.m||""));});}catch(_){}
+   entries.set(ch,{ch,pinyin,meaning,radical,decomposition,parts,search:normalize([ch,pinyin,meaning,radical,decomposition,...words].join(" "))});
+  }));
+ };
+ const make=(tag,cls,text)=>{const el=document.createElement(tag);if(cls)el.className=cls;if(text!==undefined)el.textContent=text;return el;};
+ const openCharacter=ch=>{
+  if(!hanzi(ch))return;
+  const history=read(HISTORY_KEY,[]).filter(x=>x&&x.ch!==ch);
+  history.unshift({ch,at:Date.now()});write(HISTORY_KEY,history.slice(0,30));
+  const input=$("analysisInput"),button=$("analyzeText");
+  if(input&&button){input.value=ch;button.click();$("analysisPanel")?.scrollIntoView({behavior:"smooth",block:"start"});}
+  renderHistory();
+  renderSimilar(ch);
+ };
+ const renderCards=(list,target,empty)=>{
+  target.replaceChildren();
+  if(!list.length){target.append(make("p","cl-explorer-empty",empty));return;}
+  list.forEach(item=>{
+   const card=make("button","cl-explorer-result");card.type="button";card.addEventListener("click",()=>openCharacter(item.ch));
+   const symbol=make("strong","cl-explorer-symbol",item.ch),body=make("span","cl-explorer-result-body");
+   body.append(make("b","",item.pinyin||"Пиньинь пока не найден"),make("span","",item.meaning||"Значение уточняется"));
+   const meta=make("small","",[(item.radical?"Радикал "+item.radical:""),(item.parts.length?"Компоненты: "+item.parts.slice(0,4).join(" "):"")].filter(Boolean).join(" · "));
+   card.append(symbol,body,meta);target.append(card);
+  });
+ };
+ function renderHistory(){
+  const rows=read(HISTORY_KEY,[]).filter(x=>x&&hanzi(x.ch)).slice(0,8).map(x=>entries.get(x.ch)||{ch:x.ch,pinyin:getInfo(x.ch).p||"",meaning:getInfo(x.ch).m||"",radical:"",parts:[]});
+  renderCards(rows,historyRoot,"Здесь появятся недавно открытые иероглифы.");
+ }
+ function renderFavorites(){
+  const saved=read("savedCharacters",[]).filter(hanzi).map(ch=>entries.get(ch)||{ch,pinyin:getInfo(ch).p||"",meaning:getInfo(ch).m||"",radical:"",parts:[]});
+  renderCards(saved.slice(0,12),favoritesRoot,"Сохраняй знаки кнопкой «В коллекцию» в карточке разбора.");
+ }
+ function renderSimilar(ch){
+  similarRoot.replaceChildren();
+  if(!ch){similarRoot.append(make("p","cl-explorer-empty","Выбери иероглиф, чтобы увидеть похожие знаки."));return;}
+  const current=entries.get(ch)||{ch,radical:"",parts:[]};
+  const scored=[...entries.values()].filter(x=>x.ch!==ch).map(x=>{
+   let score=0;
+   if(current.radical&&x.radical===current.radical)score+=4;
+   const overlap=x.parts.filter(p=>current.parts.includes(p)).length;score+=overlap*3;
+   if(current.parts.includes(x.ch)||x.parts.includes(ch))score+=2;
+   return {...x,score};
+  }).filter(x=>x.score>0).sort((a,b)=>b.score-a.score||a.ch.localeCompare(b.ch,"zh")).slice(0,10);
+  const title=make("p","cl-explorer-similar-caption","Знаки с общим радикалом или графическими компонентами. Это подсказка для сравнения, а не утверждение об одинаковом происхождении.");
+  similarRoot.append(title);
+  if(!scored.length){similarRoot.append(make("p","cl-explorer-empty","В загруженной базе пока не нашлось достаточно похожих знаков."));return;}
+  renderCards(scored,similarRoot,"");
+ }
+ function runSearch(){
+  const q=normalize(search.value);
+  if(!q){const recent=read(HISTORY_KEY,[]).slice(0,6).map(x=>entries.get(x.ch)).filter(Boolean);renderCards(recent,results,"Начни вводить иероглиф, пиньинь, радикал или значение.");return;}
+  const found=[...entries.values()].filter(x=>x.search.includes(q)||normalize(x.ch)===q).sort((a,b)=>{
+   const exactA=normalize(a.ch)===q?0:a.search.startsWith(q)?1:2,exactB=normalize(b.ch)===q?0:b.search.startsWith(q)?1:2;
+   return exactA-exactB||a.ch.localeCompare(b.ch,"zh");
+  }).slice(0,60);
+  renderCards(found,results, "Ничего не найдено. Попробуй другой вариант написания, пиньинь без тонов или более короткое значение.");
+ }
+ search.addEventListener("input",runSearch);
+ $("clHanziSearchClear")?.addEventListener("click",()=>{search.value="";runSearch();search.focus();});
+ $("clHanziHistoryClear")?.addEventListener("click",()=>{write(HISTORY_KEY,[]);renderHistory();});
+ $("clHanziFavoritesRefresh")?.addEventListener("click",renderFavorites);
+ window.addEventListener("storage",()=>{renderHistory();renderFavorites();});
+ window.addEventListener("photoChineseDataLoaded",()=>{collect();runSearch();renderHistory();renderFavorites();});
+ window.addEventListener("photoChineseDictionaryReady",()=>{collect();runSearch();renderHistory();renderFavorites();});
+ collect();runSearch();renderHistory();renderFavorites();renderSimilar("");
+}
+if(document.readyState==="loading")document.addEventListener("DOMContentLoaded",initHanziExplorer,{once:true});else initHanziExplorer();
+
 })();
