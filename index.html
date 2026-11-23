@@ -3729,6 +3729,18 @@ body.dark-theme .security-status,body.dark-theme .security-secret{background:#49
     </div>
   </div>
   <div class="panel section" id="analysisPanel">
+    <section class="cl-hanzi-explorer" id="clHanziExplorer">
+      <div class="cl-hanzi-explorer-heading"><div><span class="cl-kicker">PHOTOCHINESE · HANZI EXPLORER</span><h2>Проводник по <em>иероглифам</em></h2><p>Ищи знак по написанию, пиньиню, радикалу, компонентам или значению. Открывай подробный разбор и возвращайся к недавно изученным знакам.</p></div><span class="cl-hanzi-explorer-mark" aria-hidden="true">汉</span></div>
+      <label for="clHanziSearch">Поиск по базе иероглифов</label>
+      <div class="cl-hanzi-search-row"><input id="clHanziSearch" type="search" placeholder="Например: 爱, ài, 心, сердце…" autocomplete="off"><button id="clHanziSearchClear" type="button" aria-label="Очистить поиск">×</button></div>
+      <p class="small">Поиск охватывает загруженную базу и дополнительные словарные записи. Тоны в пиньине можно не вводить.</p>
+      <div id="clHanziResults" class="cl-hanzi-results" aria-live="polite"><p class="cl-explorer-empty">Загружаем базу иероглифов…</p></div>
+      <div class="cl-hanzi-personal-grid">
+        <section><div class="cl-hanzi-subheading"><h3>Недавно открытые</h3><button id="clHanziHistoryClear" type="button" class="cl-hanzi-text-button">Очистить</button></div><div id="clHanziHistory" class="cl-hanzi-list"></div></section>
+        <section><div class="cl-hanzi-subheading"><h3>Избранное</h3><button id="clHanziFavoritesRefresh" type="button" class="cl-hanzi-text-button">Обновить</button></div><div id="clHanziFavorites" class="cl-hanzi-list"></div></section>
+      </div>
+      <section class="cl-hanzi-similar-section"><h3>Похожие иероглифы</h3><div id="clHanziSimilar" class="cl-hanzi-list"><p class="cl-explorer-empty">Выбери знак из результатов поиска.</p></div></section>
+    </section>
     <h2>Разбор иероглифов и предложений</h2>
     <p>Вставь китайский текст вручную или отправь сюда текст, распознанный с фотографии. Приложение ищет слова в большой китайско-русской базе.</p>
     <label for="analysisInput">Китайский текст</label>
