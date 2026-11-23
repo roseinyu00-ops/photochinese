@@ -3148,26 +3148,50 @@
     const parent = node.parentElement;
     return !parent || !!parent.closest('script,style,noscript,textarea,input,select,option,[contenteditable="true"],.hanzi-writer,.character-canvas');
   };
+  // Keep each node's original Russian text so switching languages never
+  // depends on reverse lookups (which can be ambiguous when translations repeat).
+  const originalText = new WeakMap();
+  const originalAttributes = new WeakMap();
   function translateNode(node) {
     if (skip(node)) return;
     const value = node.nodeValue;
-    const next = translate(value);
+    let state = originalText.get(node);
+    if (!state || value !== state.rendered) state = {source:value,rendered:value};
+    const next = current() === 'en' ? translate(sourceText(state.source)) : state.source;
+    state.rendered = next;
+    originalText.set(node,state);
     if (next !== value) node.nodeValue = next;
+  }
+  function sourceText(value) {
+    const raw = String(value ?? '');
+    const key = normalize(raw);
+    if (!key) return raw;
+    const translated = translations[key];
+    if (translated) return raw.replace(key,translated);
+    let result = raw;
+    const entries = Object.entries(translations).sort((a,b)=>b[0].length-a[0].length);
+    for (const [from,to] of entries) {
+      if (from.length < 5 || !result.includes(from)) continue;
+      result = result.split(from).join(to);
+    }
+    return result;
+  }
+  function translateElementAttributes(el) {
+    const state = originalAttributes.get(el) || {};
+    for (const attr of ['placeholder','title','aria-label']) {
+      const value = el.getAttribute(attr);
+      if (!value) continue;
+      if (!state[attr] || value !== state[attr].rendered) state[attr] = {source:value,rendered:value};
+      const next = current() === 'en' ? sourceText(state[attr].source) : state[attr].source;
+      state[attr].rendered = next;
+      if (next !== value) el.setAttribute(attr,next);
+    }
+    originalAttributes.set(el,state);
   }
   function translateAttributes(root=document) {
     const selectors = '[placeholder],[title],[aria-label]';
-    if (root.nodeType === 1 && root.matches(selectors)) {
-      for (const attr of ['placeholder','title','aria-label']) {
-        const value = root.getAttribute(attr);
-        if (value) root.setAttribute(attr, translate(value));
-      }
-    }
-    root.querySelectorAll?.(selectors).forEach(el => {
-      for (const attr of ['placeholder','title','aria-label']) {
-        const value = el.getAttribute(attr);
-        if (value) el.setAttribute(attr, translate(value));
-      }
-    });
+    if (root.nodeType === 1 && root.matches(selectors)) translateElementAttributes(root);
+    root.querySelectorAll?.(selectors).forEach(translateElementAttributes);
   }
   function applyLanguage(language, persist=true) {
     const lang = language === 'en' ? 'en' : 'ru';
@@ -3210,9 +3234,7 @@
       const section = document.createElement('section');
       section.className = 'settings-section';
       section.id = 'languageSetting';
-      section.innerHTML = '<h3 data-language-label>Язык</h3><p>' +
-        (current() === 'en' ? 'Choose the language used across the website.' : 'Выбери язык всего сайта.') +
-        '</p><div class="settings-segmented" role="group" aria-label="Language"><button id="languageRu" type="button">Русский</button><button id="languageEn" type="button">English</button></div>';
+      section.innerHTML = '<h3 data-language-label>Язык</h3><p>Выбери язык всего сайта.</p><div class="settings-segmented" role="group" aria-label="Language"><button id="languageRu" type="button">Русский</button><button id="languageEn" type="button">English</button></div>';
       settings.insertBefore(section, settings.firstElementChild.nextElementSibling);
       section.querySelector('#languageRu').addEventListener('click', () => applyLanguage('ru'));
       section.querySelector('#languageEn').addEventListener('click', () => applyLanguage('en'));
